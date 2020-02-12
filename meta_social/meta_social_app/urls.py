@@ -3,5 +3,6 @@ from .views import *
 
 
 urlpatterns = [
-    # path('...', ...)
+    path('', index),
+    path('get_token/', get_token_page),
 ]

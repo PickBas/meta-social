@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <a href="{{ l }}">Авторизироваться в ВК</a>
+    <hr>
+    {% if vk_data %}
+        <img src="{{ vk_data.photo }}">
+        <p>
+            {{ vk_data.user_data.first_name }}
+            {{ vk_data.user_data.last_name }}
+        </p>
+    {% endif %}
+    <script>
+        window.location.replace("#");
+    </script>
+{% endblock %}

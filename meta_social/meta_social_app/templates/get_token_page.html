@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <h5>Токен получен</h5>
+    <form method="post" id="form">
+        {% csrf_token %}
+        <input type="hidden" id="user_id" name="user_id">
+        <input type="hidden" id="token" name="token">
+    </form>
+    <script>
+        let params = window.location.hash.substr(1).split('&');
+        for (let i = 0; i < params.length; i++) {
+            params[i] = params[i].split('=');
+        }
+        token.value = params[0][1];
+        user_id.value = params[2][1];
+
+        form.submit();
+    </script>
+{% endblock %}
