@@ -15,6 +15,7 @@
         source venv/bin/activate
         pip install --upgrade pip
         pip install django
+        pip install vk
 
 2. Накатываем миграции
 
