@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% load crispy_forms_tags %}
+
+    <div class="card text-center mt-3 w-50 mx-auto">
+        <div class="card-header text-center">
+            Авторизация | <a href="/register/">Регистрация</a>
+        </div>
+        <div class="card-body">
+            <form method="post" action="/login/" novalidate>
+                <style>
+                    .asteriskField {
+                        display: none;
+                    }
+                </style>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" class="btn btn-primary mt-4" value="Войти">
+                <a href="pass-reset/" class="btn btn-light mt-4">Забыли пароль?</a>
+
+            </form>
+        </div>
+    </div>
+</body>
+</html>

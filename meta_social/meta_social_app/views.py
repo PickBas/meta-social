@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.views.generic.edit import FormView
+
+from .forms import SignUpForm
 from .models import VK_Token
 import vk
 
@@ -58,3 +61,22 @@ def index(request):
         context['vk_data'] = vk_data
 
     return render(request, 'index.html', context)
+
+
+class RegisterFormView(FormView):
+    form_class = SignUpForm
+    # Ссылка, на которую будет перенаправляться user
+    # в случае успешной регистрации
+    success_url = "#"
+
+    # Шаблон, который будет использоваться при отображении представления.
+    template_name = "registration/register.html"
+
+    def form_valid(self, form):
+        # Создаём пользователя, если данные в форму были введены корректно.
+        form.save()
+        for key in form.fields:
+            print(form.fields[key])
+
+        # Вызываем метод базового класса
+        return super(RegisterFormView, self).form_valid(form)
