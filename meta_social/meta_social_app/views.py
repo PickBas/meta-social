@@ -19,7 +19,7 @@ def get_token_link():
     response_type = 'token'
 
     link = base + '?client_id={}&redirect_uri={}&display={}&scope={}&response_type={}'.format(
-        client_id, redirect_uri, display, scope, response_type
+      client_id, redirect_uri, display, scope, response_type
     )
     return link
 

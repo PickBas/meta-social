@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% load bootstrap4 %}
     <head>
         <meta charset="UTF-8">
         <title>Some text</title>
+        {% bootstrap_css %}
+        <link href="https://getbootstrap.com/docs/4.1/examples/sticky-footer-navbar/sticky-footer-navbar.css"
+              rel="stylesheet">
+        {% block extra_css %} {% endblock %}
     </head>
     <body>
         {% block main %}
         {% endblock %}
+    {% block extra_js %}
+            {% bootstrap_javascript jquery='full' %}
+    {% endblock %}
     </body>
 </html>

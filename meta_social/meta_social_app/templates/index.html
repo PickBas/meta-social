@@ -3,6 +3,10 @@
 {% block main %}
     <a href="{{ l }}">Авторизироваться в ВК</a>
     <hr>
+
+    <div style="width:100%; margin:0 auto;">
+
+    <div style="width:20%; float:left">
     {% if vk_data %}
         <img src="{{ vk_data.photo }}">
         <p>
@@ -10,6 +14,24 @@
             {{ vk_data.user_data.last_name }}
         </p>
     {% endif %}
+    </div>
+
+    <div style="width:20%; float:right">
+    {% if vk_data %}
+        <img src="{{ vk_data.photo }}">
+        <p>
+            {{ vk_data.user_data.first_name }}
+            {{ vk_data.user_data.last_name }}
+        </p>
+    {% endif %}
+    </div>
+
+    <div style="margin:0 20% 0 20%">
+    {% include 'posts.html' %}
+    </div>
+
+    </div>
+
     <script>
         window.location.replace("#");
     </script>
