@@ -36,9 +36,18 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'meta_social_app',
     'crispy_forms',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.vk',
+    #'allauth.socialaccount.providers.twitter',
+    #'allauth.socialaccount.providers.facebook',
+    #'allauth.socialaccount.providers.instagram',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +79,16 @@ TEMPLATES = [
         },
     },
 ]
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+SITE_ID = 1
+
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
 
@@ -121,11 +140,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
 
-LOGOUT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_URL = '/accounts/logout/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 STATIC_URL = '/static/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
