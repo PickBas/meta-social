@@ -9,3 +9,15 @@ def index(request):
     context = {}
 
     return render(request, 'index.html', context)
+
+
+@login_required
+def profile(request, user_id):
+    if not User.objects.filter(id=user_id).exists():
+        raise Http404()
+
+    context = {}
+
+    user_item = User.objects.get(id=user_id)
+
+    return render(request, 'profile.html', context)
