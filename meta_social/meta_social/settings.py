@@ -155,3 +155,30 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'piryazev555@gmail.com'
 EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
+
+# Allauth providers
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'SCOPE': [
+            'user_posts',
+            'email',
+            'public_profile',
+            'user_friends',
+        ],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+            'updated_time',
+        ],
+    }
+}
