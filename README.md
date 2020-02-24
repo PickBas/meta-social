@@ -30,14 +30,23 @@
     python manage.py migrate
 
 
-# Данные о приложениях соц. сетей
+# Данные о соц. сетях
 
-## VK
+## VK - Нету прав доступа
+
+Приложение
 
     id: 7317110
     key: ST3oRjWFifOgxxFUl5sH
 
 ## Facebook
 
+Приложение
+
     id: 2555976281192292
     key: b82697d96b942c6f0aa253668c15eb6d
+
+Тестовый пользователь
+
+    login: test_pzymgqq_user@tfbnw.net
+    password: verystrongpa55word
