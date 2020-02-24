@@ -28,3 +28,16 @@
 
     python manage.py makemigrations meta_social_app
     python manage.py migrate
+
+
+# Данные о приложениях соц. сетей
+
+## VK
+
+    id: 7317110
+    key: ST3oRjWFifOgxxFUl5sH
+
+## Facebook
+
+    id: 2555976281192292
+    key: b82697d96b942c6f0aa253668c15eb6d

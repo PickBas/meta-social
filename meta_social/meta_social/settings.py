@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     #'allauth.socialaccount.providers.twitter',
-    #'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.instagram',
 ]
 
@@ -154,4 +154,3 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'piryazev555@gmail.com'
 EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
-
