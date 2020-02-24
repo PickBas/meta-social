@@ -1,7 +1,8 @@
+from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 
 @login_required
