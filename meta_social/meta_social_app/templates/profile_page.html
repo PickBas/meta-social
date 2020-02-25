@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style_profile.css">
+    <title>Profile</title>
+</head>
+<body>
+    <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" >
+    <a class="navbar-brand" href="#">Brand</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Vk</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Instagram</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Facebook</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Twitter</a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+</body>
+<main>
+    <div class='main_div'>
+    <div class="row left_div">
+        <div class="col-3">
+          <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" >
+            <a class="active_btn"  href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Home</a>
+            <a class="nav-link more" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Profile</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Vk</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Instagram</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Facebook</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Twitter</a>
+            <a class="nav-link more" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
+          </div>
+        </div>
+        
+      </div>
+
+    <div class="card profile_div" >
+    <img src="./img/unknown_profile.jpg" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Name</h5>
+      <p class="card-text">Description</p>
+    </div>
+    <div class="card-body">
+        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true" >Edit</a>
+    </div>
+  </div>
+
+  <div class="card text-center info_div">
+    <div class="card-header">
+      Profile
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Info</h5>
+      <p class="card-text">...</p>
+      <a href="#" class="btn btn-primary active_btn" style="width: 200px;">Edit</a>
+    </div>
+  </div>
+  <div class="card mb-3 post_div">
+    <div class="card-body">
+      <h5 class="card-title">Posts</h5>
+      <p class="card-text"><small class="text-muted">Last updated ... mins ago</small></p>
+      <p class="card-text">...</p>
+      
+    </div>
+  </div>
+</div>
+</main>
+</html>
