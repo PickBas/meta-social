@@ -1,44 +1,53 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.shortcuts import render, redirect
-from django.views.generic.edit import FormView
-
-from .forms import SignUpForm
-import vk_api
+from django.shortcuts import render
+import vk
+import requests
 
 
-def profile_page(request, user_id):
-    if User.objects.filter(id=user_id).exists():
-        user_item = User.objects.get(id=user_id)
-        context = {'username': user_item.username}
-    else:
-        raise Http404()
+def get_facebook_feed(user):
+    id = user.profile.get_social_data('facebook')['id']
+    token = user.profile.get_token('facebook')
 
-    return render(request, 'profile.html', context)
+    fields = ','.join([
+        'id',
+        'message',
+        'created_time',
+        'picture',
+    ])
+
+    feed = requests.get(
+        'https://graph.facebook.com/{}/feed?access_token={}&fields={}'.format(id, token, fields)
+    )
+
+    return feed.json()
 
 
 @login_required
 def index(request):
     context = {}
 
+    if 'facebook' in request.user.profile.get_social_accounts():
+        context['posts'] = get_facebook_feed(request.user)['data']
+
+    if 'vk' in request.user.profile.get_social_accounts():
+        session = vk.Session(access_token=request.user.profile.get_token('vk'))
+
+        api = vk.API(session)
+        print(api.users.get(user_id=1,v="5.103"))
+        context['posts'] = api.wall.get(v="5.103")
+
     return render(request, 'index.html', context)
 
 
-class RegisterFormView(FormView):
-    form_class = SignUpForm
-    # Ссылка, на которую будет перенаправляться user
-    # в случае успешной регистрации
-    success_url = "#"
+@login_required
+def profile(request, user_id):
+    if not User.objects.filter(id=user_id).exists():
+        raise Http404()
 
-    # Шаблон, который будет использоваться при отображении представления.
-    template_name = "registration/register.html"
+    context = {}
 
-    def form_valid(self, form):
-        # Создаём пользователя, если данные в форму были введены корректно.
-        form.save()
-        for key in form.fields:
-            print(form.fields[key])
+    user_item = User.objects.get(id=user_id)
 
-        # Вызываем метод базового класса
-        return super(RegisterFormView, self).form_valid(form)
+    return render(request, 'profile.html', context)

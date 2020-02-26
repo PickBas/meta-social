@@ -1,18 +1,65 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% load socialaccount %}
 
 {% block main %}
+    {% get_social_accounts user as accounts %}
     <div class="container">
         <div class="card mt-3">
-            <div class="card-header">
-                {{ username }}
-            </div>
             <div class="card-body">
-                <a href="#">Подключить VK</a><br>
-                <a href="#">Подключить Twitter</a><br>
-                <a href="#">Подключить Instagram</a><br>
-                <a href="#">Подключить Facebook</a><br>
-                <a href="#">Подключить Telegram</a>
+                <div class="row">
+                    <div class="col-3">
+                        <img
+                            class="border"
+                            src="https://im0-tub-ru.yandex.net/i?id=e2fac79d56ea8710b958a1579ce73419&n=13"
+                            width="240px"
+                            height="240px"
+                        >
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col border">
+                                Пусто
+                            </div>
+                            <div class="col-3 border">
+                                <img src="https://image.flaticon.com/icons/svg/145/145813.svg" width="20" height="20">
+                                <span>
+                                    {% if accounts.vk %}
+                                        <a href="">{{ accounts.vk.0.extra_data.screen_name }}</a>
+                                    {% else %}
+                                        <a href="{% provider_login_url 'vk' process='connect' %}">Подключить</a>
+                                    {% endif %}
+                                </span><br>
+
+                                <img src="https://image.flaticon.com/icons/svg/145/145802.svg" width="20" height="20">
+                                <span>
+                                    {% if accounts.facebook %}
+                                        <a href="#">{{ accounts.facebook.0.extra_data.name }}</a>
+                                    {% else %}
+                                        <a href="{% provider_login_url 'facebook' process='connect' %}">Подключить</a>
+                                    {% endif %}
+                                </span><br>
+
+                                <img src="https://image.flaticon.com/icons/svg/145/145812.svg" width="20" height="20">
+                                <span>
+                                    {% if accounts.twitter %}
+                                        <a href="#">{{ accounts.twitter.0 }}</a>
+                                    {% else %}
+                                        <a href="#">В разработке</a>
+                                    {% endif %}
+                                </span><br>
+
+                                <img src="https://image.flaticon.com/icons/svg/1384/1384063.svg" width="20" height="20">
+                                <span>
+                                    {% if accounts.instagram %}
+                                        <a href="#">{{ accounts.instagram.0 }}</a>
+                                    {% else %}
+                                        <a href="#">В разработке</a>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

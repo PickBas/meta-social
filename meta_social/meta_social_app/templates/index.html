@@ -1,5 +1,24 @@
 {% extends 'base.html' %}
 
 {% block main %}
-    <p>Страница для ленты новостей</p>
+    <div class="container">
+        {% if posts %}
+            {{ posts }}
+            {% for post in posts %}
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <p>{{ post.message }}</p>
+                        {% if post.picture %}
+                            <hr>
+                            <img src="{{ post.picture }}">
+                        {% endif %}
+                        <hr>
+                        <small class="mb-0 text-secondary float-left">Создан {{ post.created_time }}</small>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3>Постов нет :(</h3>
+        {% endif %}
+    </div>
 {% endblock %}
