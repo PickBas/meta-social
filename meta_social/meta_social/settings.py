@@ -165,6 +165,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'email',
             'public_profile',
             'user_friends',
+            'manage_pages',
         ],
         'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
         'FIELDS': [

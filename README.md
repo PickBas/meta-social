@@ -48,5 +48,10 @@
 
 Тестовый пользователь
 
+    # 1
     login: test_pzymgqq_user@tfbnw.net
+    password: verystrongpa55word
+    
+    # 2
+    login: vzsdnhqifk_1582663185@tfbnw.net
     password: verystrongpa55word
