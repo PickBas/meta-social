@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render
+import vk
 import requests
 
 
@@ -29,6 +30,13 @@ def index(request):
 
     if 'facebook' in request.user.profile.get_social_accounts():
         context['posts'] = get_facebook_feed(request.user)['data']
+
+    if 'vk' in request.user.profile.get_social_accounts():
+        session = vk.Session(access_token=request.user.profile.get_token('vk'))
+
+        api = vk.API(session)
+        print(api.users.get(user_id=1,v="5.103"))
+        context['posts'] = api.wall.get(v="5.103")
 
     return render(request, 'index.html', context)
 

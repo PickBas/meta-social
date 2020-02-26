@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     #'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.facebook',
+    #'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.instagram',
 ]
 
@@ -87,7 +87,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-SITE_ID = 1
+SITE_ID = 2
 
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
