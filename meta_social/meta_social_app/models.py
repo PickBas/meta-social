@@ -99,3 +99,9 @@ class Community(models.Model):
         return len(self.posts())
 
 
+class Participants(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_in_community')
+    community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='community_of_user')
+
+
+
