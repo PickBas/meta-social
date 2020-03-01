@@ -5,7 +5,7 @@
 > Время проведения совещаний: Среда 20:00
 
 
-## Что делать при первом запуске проекта?
+## Как запустить проект?
 
 1. Клонируем репозиторий, создаем и активируем venv, устанавливаем библиотеки
 
@@ -15,11 +15,17 @@
         source venv/bin/activate
         pip install -r requirements.txt
 
-2. Накатываем миграции
+2. Накатываем миграции, и импортируем бд
 
         cd meta_social
         python manage.py makemigrations
         python manage.py migrate
+        python manage.py loaddata db.json
+
+3. Данные для входа в админку
+
+        login: root
+        pass: toor
 
 
 ## Что делать если django не видит миграции?
