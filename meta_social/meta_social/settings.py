@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
+    'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.twitter',
-    #'allauth.socialaccount.providers.facebook',
     #'allauth.socialaccount.providers.instagram',
 ]
 
@@ -87,7 +87,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-SITE_ID = 2
+SITE_ID = 1
 
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
@@ -156,30 +156,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'piryazev555@gmail.com'
 EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
 
-# Allauth providers
-
-SOCIALACCOUNT_PROVIDERS = {
-    'facebook': {
-        'SCOPE': [
-            'user_posts',
-            'email',
-            'public_profile',
-            'user_friends',
-            'manage_pages',
-        ],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'FIELDS': [
-            'id',
-            'email',
-            'name',
-            'first_name',
-            'last_name',
-            'verified',
-            'locale',
-            'timezone',
-            'link',
-            'gender',
-            'updated_time',
-        ],
-    }
-}
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+      os.path.join(BASE_DIR, "static"),
+)

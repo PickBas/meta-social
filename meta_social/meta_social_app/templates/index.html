@@ -1,24 +1,23 @@
 {% extends 'base.html' %}
 
 {% block main %}
-    <div class="container">
-        {% if posts %}
-            {{ posts }}
-            {% for post in posts %}
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <p>{{ post.message }}</p>
-                        {% if post.picture %}
-                            <hr>
-                            <img src="{{ post.picture }}">
-                        {% endif %}
-                        <hr>
-                        <small class="mb-0 text-secondary float-left">Создан {{ post.created_time }}</small>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <h3>Постов нет :(</h3>
-        {% endif %}
+
+    <hr>
+
+    <div style="width:100%; margin:0 auto;">
+
+    <div style="width:20%; float:left;">
+        {% include 'navs.html' %}
     </div>
+
+    <div style="width:20%; float:right;">
+        {% include 'menu_main.html' %}
+    </div>
+
+    <div style="margin:0 20% 0 20%">
+        {% include 'posts.html' %}
+    </div>
+
+    </div>
+
 {% endblock %}

@@ -1,0 +1,70 @@
+.main_div{
+    display: inline;
+}
+.active_btn{
+    background-color: rgb(32, 31, 31);
+    border-radius: .25rem;
+    border: 2px;
+    font-weight: 400;
+    margin-left: 2px;
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: white;
+}
+.more{
+    color: black;
+}
+@media(max-width: 1200px){
+    .left_div{
+        margin: 80px 4px 0 10%;
+         height: 155px; 
+         width: 550px; 
+    }
+    .profile_div{
+        width: 200px;  
+        margin: -18% 0 0 25%;
+    }
+    .my_btn{
+        margin: -17% 0 0 2%; 
+        width: 150px;
+    }
+    .info_div{
+        margin: -31.5% 50% 15px 44%; 
+        width: 550px;
+    }
+    .post_div{
+        width: 550px; 
+        float: right; 
+        margin-right: 8.3%;
+    }
+}
+
+@media(min-width: 1200px){
+    .left_div{
+        margin: 50px 0 0 160px;
+         height: 155px; 
+         width: 200px; 
+
+    }
+    .profile_div{
+        width: 200px;  
+        margin: -155px 0 0 320px;
+        float: center;
+    }
+    .my_btn{
+        margin: -17% 0 0 2%; 
+        width: 150px;
+    }
+    .info_div{
+        margin: -363px 0 15px 560px; 
+        width: 550px;
+    }
+    .post_div{
+        width: 550px; 
+        float: right; 
+        margin-right: 42.2%;
+    }
+    }
+    

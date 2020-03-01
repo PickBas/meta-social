@@ -17,10 +17,10 @@
                     </div>
                     <div class="col">
                         <div class="row">
-                            <div class="col border">
+                            <div class="col">
                                 Пусто
                             </div>
-                            <div class="col-3 border">
+                            <div class="col-3">
                                 <img src="https://image.flaticon.com/icons/svg/145/145813.svg" width="20" height="20">
                                 <span>
                                     {% if accounts.vk %}
@@ -38,24 +38,6 @@
                                         <a href="{% provider_login_url 'facebook' process='connect' %}">Подключить</a>
                                     {% endif %}
                                 </span><br>
-
-                                <img src="https://image.flaticon.com/icons/svg/145/145812.svg" width="20" height="20">
-                                <span>
-                                    {% if accounts.twitter %}
-                                        <a href="#">{{ accounts.twitter.0 }}</a>
-                                    {% else %}
-                                        <a href="#">В разработке</a>
-                                    {% endif %}
-                                </span><br>
-
-                                <img src="https://image.flaticon.com/icons/svg/1384/1384063.svg" width="20" height="20">
-                                <span>
-                                    {% if accounts.instagram %}
-                                        <a href="#">{{ accounts.instagram.0 }}</a>
-                                    {% else %}
-                                        <a href="#">В разработке</a>
-                                    {% endif %}
-                                </span>
                             </div>
                         </div>
                     </div>

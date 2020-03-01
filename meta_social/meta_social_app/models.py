@@ -1,4 +1,3 @@
-from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -10,9 +9,6 @@ class Profile(models.Model):
 
     def get_social_accounts(self):
         return [i.provider for i in self.user.socialaccount_set.all()]
-
-    def get_token(self, provider):
-        return SocialToken.objects.get(account__user=self.user, account__provider=provider)
 
     def get_social_data(self, provider):
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
