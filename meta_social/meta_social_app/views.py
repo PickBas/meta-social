@@ -47,17 +47,6 @@ def add_friend(request, operation, pk):
     return redirect('/')
 
 
-def get_friends_posts(user_id):
-    if not User.objects.get(id=user_id).exists():
-        raise Http404()
-    friends = User.objects.get(id=user_id).friends()
-    posts = []
-    for friend in friends:
-        posts.append(friend.posts())
-    posts = sorted(posts, key=lambda x: x.date)
-    return posts
-
-
 
 
 

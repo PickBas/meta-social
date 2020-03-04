@@ -46,6 +46,13 @@ class Profile(models.Model):
     def amount_of_communities(self):
         return len(self.communities())
 
+    def get_friends_posts(self):
+        posts = []
+        for friend in self.friends():
+            posts.append(friend.posts())
+        posts = sorted(posts, key=lambda x: x.date)
+        return posts
+
 
 class Posts(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
