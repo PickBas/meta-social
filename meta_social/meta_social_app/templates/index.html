@@ -18,17 +18,21 @@
         {% include 'posts.html' %}
     </div>
     <h1>All users</h1>
-    {% for user in user %}
-        <h2>{{ user.username }}</h2>
-        <a href="{% url 'home:change_friends' operation='add' pk=user.pk %}">
+    {% for i in user %}
+        <h2>{{ i.username }}</h2>
+        {% if  not i in friends %}
+       <a href="{% url 'change_friends' 'add' i.pk %}">
         <button type="button" class="btn btn-success">Добавить дргуа</button>
         </a>
+        {% endif %}
     {% endfor %}
 
     <h1>Friends</h1>
     {% for friend in friends %}
         <h2>{{ friend.username }}</h2>
+         <a href="{% url 'change_friends' 'remove' friend.pk %}">
         <button type="button" class="btn btn-danger">Убрать дргуа</button>
+        </a>
     {% endfor %}
     </div>
 

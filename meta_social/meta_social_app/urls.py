@@ -5,10 +5,10 @@ from .views import *
 
 
 urlpatterns = [
-    url('', index, name='home'),
+    path('', index, name='home'),
     path('accounts/profile/<int:user_id>/', profile),
     path('accounts/profile/<int:user_id>/second/', profile_second),
-    url(r'connect/<operation>/<pk>/', add_friend, name='change_friends'),
+    path('connect/<operation>/<pk>/', add_friend, name='change_friends'),
 
     # Allauth urls
     path('accounts/', include('allauth.urls')),
