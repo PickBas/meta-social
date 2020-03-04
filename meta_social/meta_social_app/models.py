@@ -35,7 +35,7 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        return Friends.objects.filter(user=self.user)
+        return Friend.objects.filter(current_user=self.user)
 
     def amount_of_friends(self):
         return len(self.friends())
@@ -51,11 +51,6 @@ class Posts(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
     name_of_post = models.CharField(max_length=500)
     text = models.CharField(max_length=10000)
-
-
-class Friends(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-    user_friend = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='friend')
 
 
 class Communities(models.Model):
@@ -104,4 +99,21 @@ class Participants(models.Model):
     community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='community_of_user')
 
 
+class Friend(models.Model):
+    users = models.ManyToManyField(User)
+    current_user = models.ForeignKey(User, related_name='owner', null=True, on_delete=models.CASCADE)
+
+    @classmethod
+    def make_friend(cls, current_user, new_friend):
+        friend, created =  cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.add(new_friend)
+
+    @classmethod
+    def lose_friend(cls, current_user, new_friend):
+        friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.remove(new_friend)
 
