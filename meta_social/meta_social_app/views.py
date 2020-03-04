@@ -9,12 +9,10 @@ from meta_social_app.models import Friend
 @login_required
 def index(request):
     user = User.objects.exclude(id=request.user.id)
-    #friend = Friend.objects.all(current_user=request.user)
-    #friends = friend.users.all()
     context = {
-        'user': user,
-        #'friends': friends,
+        'user': user
     }
+    #friends =Friend.objects.get(current_user=request.user, )
     return render(request, 'index.html', context)
 
 
@@ -40,7 +38,6 @@ def profile_second(request, user_id):
     user_item = User.objects.get(id=user_id)
 
     return render(request, 'profile_page.html', context)
-
 
 @login_required
 def add_friend(request, operation, pk):

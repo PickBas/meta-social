@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  social:
+    build:
+      context: .
+    ports:
+      - 80:80
+    command: python3 ./meta_social/manage.py runserver 0.0.0.0:80
