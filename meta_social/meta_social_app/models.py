@@ -50,6 +50,8 @@ class Profile(models.Model):
         posts = []
         for friend in self.friends():
             posts.append(friend.posts())
+        for com in self.communities():
+            posts.append(com.posts())
         posts = sorted(posts, key=lambda x: x.date)
         return posts
 
