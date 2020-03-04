@@ -12,7 +12,7 @@ def index(request):
     context = {
         'user': user
     }
-    #friends =Friend.objects.get(current_user=request.user, )
+    friends = Friend.objects.get_or_create(current_user=request.user)
     return render(request, 'index.html', context)
 
 
