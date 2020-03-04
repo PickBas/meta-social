@@ -17,7 +17,7 @@
     color: black;
 }
 
-@media(max-width: 576px){
+@media(max-width: 500px){
     .left_div{
         margin: 80px 4px 0 10%;
          height: 155px; 
@@ -41,55 +41,77 @@
     }
 }
 
-@media(min-width: 576px){
+@media(min-width: 500px){
     .left_div{
-        margin: 80px 4px 0 10%;
+        margin: 50px 4px 0 1%;
          height: 155px; 
          width: 550px; 
     }
     .profile_div{
-        width: 200px;  
-        margin: -18% 0 0 25%;
+        width: 100px;  
+        margin: -37% 0 0 22%;
     }
     .my_btn{
         margin: -17% 0 0 2%; 
-        width: 150px;
+        width: 60px;
     }
     .info_div{
-        margin: -31.5% 50% 15px 44%; 
-        width: 550px;
+        margin: -48.2% 50% 15px 44%; 
+        width: 270px;
     }
     .post_div{
-        width: 550px; 
+        width: 270px; 
         margin-left: 44%;
     }
 }
-
+@media(min-width: 600px){
+    .left_div{
+        margin: 50px 4px 0 .2%;
+         height: 155px; 
+         width: 550px; 
+    }
+    .profile_div{
+        width: 140px;  
+        margin: -30% 0 0 23%;
+    }
+    .my_btn{
+        margin: -17% 0 0 2%; 
+        width: 80px;
+    }
+    .info_div{
+        margin: -50% 50% 15px 48%; 
+        width: 300px;
+    }
+    .post_div{
+        width: 300px; 
+        margin-left: 48%;
+    }
+}
 @media(min-width: 768px){
     .left_div{
-        margin: 80px 4px 0 10%;
+        margin: 50px 4px 0 3%;
          height: 155px; 
          width: 550px; 
     }
     .profile_div{
-        width: 200px;  
-        margin: -18% 0 0 25%;
+        width: 150px;  
+        margin: -22% 0 0 21%;
     }
     .my_btn{
         margin: -17% 0 0 2%; 
-        width: 150px;
+        width: 100px;
     }
     .info_div{
-        margin: -31.5% 50% 15px 44%; 
-        width: 550px;
+        margin: -37.3% 50% 15px 42%; 
+        width: 450px;
     }
     .post_div{
-        width: 550px; 
-        margin-left: 44%;
+        width: 450px; 
+        margin-left: 42%;
     }
 }
 
-@media(min-width: 992px){
+@media(min-width: 900px){
     .left_div{
         margin: 80px 4px 0 4%;
          height: 155px; 
@@ -114,7 +136,7 @@
 }
  @media(min-width: 1100px){
     .left_div{
-        margin: 80px 4px 0 8%;
+        margin: 80px 4px 0 10%;
          height: 155px; 
          width: 550px; 
     }
@@ -127,12 +149,12 @@
         width: 100px;
     }
     .info_div{
-        margin: -30.3% 50% 15px 46%; 
-        width: 450px;
+        margin: -30.8% 50% 15px 42%; 
+        width: 550px;
     }
     .post_div{
-        width: 450px; 
-        margin-left: 46%;
+        width: 550px; 
+        margin-left: 42%;
     }
 } 
 @media(min-width: 1200px){
