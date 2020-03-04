@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-from .models import Friend
+from .models import Friend, Posts
 
 
 @login_required
@@ -45,3 +45,20 @@ def add_friend(request, operation, pk):
     if operation == 'remove':
         Friend.lose_friend(request.user, new_friend)
     return redirect('/')
+
+
+def get_friends_posts(user_id):
+    if not User.objects.get(id=user_id).exists():
+        raise Http404()
+    friends = Friend.objects.get(current_user=User.objects.get(id=user_id))
+    posts = []
+    for friend in friends:
+        posts.append(Posts.objects.get(user=friend))
+    posts = sorted(posts, key=lambda x: x.date)
+    return posts
+
+
+
+
+
+

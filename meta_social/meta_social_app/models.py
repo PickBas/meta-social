@@ -51,6 +51,7 @@ class Posts(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
     name_of_post = models.CharField(max_length=500)
     text = models.CharField(max_length=10000)
+    date = models.DateField()
 
 
 class Communities(models.Model):
@@ -105,7 +106,7 @@ class Friend(models.Model):
 
     @classmethod
     def make_friend(cls, current_user, new_friend):
-        friend, created =  cls.objects.get_or_create(
+        friend, created = cls.objects.get_or_create(
             current_user=current_user
         )
         friend.users.add(new_friend)
