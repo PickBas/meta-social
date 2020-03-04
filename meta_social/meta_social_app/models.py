@@ -32,7 +32,7 @@ class Friend(models.Model):
 
     @classmethod
     def make_friend(cls, current_user, new_friend):
-        friend, created =  cls.objects.get_or_create(
+        friend, created = cls.objects.get_or_create(
             current_user=current_user
         )
         friend.users.add(new_friend)

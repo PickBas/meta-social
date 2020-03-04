@@ -20,10 +20,12 @@
     <h1>All users</h1>
     {% for user in user %}
         <h2>{{ user.username }}</h2>
-
     {% endfor %}
-    <h1>Friends</h1>
 
+    <h1>Friends</h1>
+    {% for friend in friends %}
+        <h2>{{ friend.username }}</h2>
+    {% endfor %}
     </div>
 
 {% endblock %}
