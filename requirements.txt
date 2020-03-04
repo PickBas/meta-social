@@ -1,3 +1,4 @@
 django
 django-crispy-forms
 django-allauth
+Pillow==7.0.0
