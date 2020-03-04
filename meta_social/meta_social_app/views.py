@@ -50,10 +50,10 @@ def add_friend(request, operation, pk):
 def get_friends_posts(user_id):
     if not User.objects.get(id=user_id).exists():
         raise Http404()
-    friends = Friend.objects.get(current_user=User.objects.get(id=user_id))
+    friends = User.objects.get(id=user_id).friends()
     posts = []
     for friend in friends:
-        posts.append(Posts.objects.get(user=friend))
+        posts.append(friend.posts())
     posts = sorted(posts, key=lambda x: x.date)
     return posts
 
