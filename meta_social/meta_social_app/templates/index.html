@@ -17,11 +17,12 @@
     <div style="margin:0 20% 0 20%">
         {% include 'posts.html' %}
     </div>
-    {% for user in users %}
-        <h2>user.username</h2>
+    <h1>All users</h1>
+    {% for user in user %}
+        <h2>{{ user.username }}</h2>
 
     {% endfor %}
-
+    <h1>Friends</h1>
 
     </div>
 

@@ -8,8 +8,11 @@ from meta_social_app.models import Friend
 
 @login_required
 def index(request):
-    context = {}
-
+    user = User.objects.exclude(id=request.user.id)
+    context = {
+        'user': user
+    }
+    #friends =Friend.objects.get(current_user=request.user, )
     return render(request, 'index.html', context)
 
 
