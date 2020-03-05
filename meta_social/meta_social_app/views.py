@@ -8,11 +8,8 @@ from .models import Friend, Posts
 
 @login_required
 def index(request):
-    user = User.objects.exclude(id=request.user.id)
-    context = {
-        'user': user
-    }
-    #friends =Friend.objects.get(current_user=request.user, )
+    context = {}
+
     return render(request, 'index.html', context)
 
 
@@ -24,20 +21,9 @@ def profile(request, user_id):
     context = {}
 
     user_item = User.objects.get(id=user_id)
+    context['c_user'] = user_item
 
-    return render(request, 'profile.html', context)
-
-
-@login_required
-def profile_second(request, user_id):
-    if not User.objects.filter(id=user_id).exists():
-        raise Http404()
-
-    context = {}
-
-    user_item = User.objects.get(id=user_id)
-
-    return render(request, 'profile_page.html', context)
+    return render(request, 'profile/profile_page.html', context)
 
 
 @login_required
