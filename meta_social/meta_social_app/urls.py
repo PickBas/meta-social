@@ -9,6 +9,9 @@ urlpatterns = [
     path('accounts/profile/<int:user_id>/second/', profile_second),
     path(r'connect/<operation>/<pk>/', add_friend),
 
+    path('friends/<int:user_id>/', friends_list),
+    path('friends/search/', friends_search),
+
     # Allauth urls
     path('accounts/', include('allauth.urls')),
 ]
