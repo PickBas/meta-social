@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-header">
+                {% if user == c_user %}
+                    Ваши друзья
+                {% else %}
+                    Друзья пользователя {{ c_user.first_name }} {{ c_user.last_name }} ({{ c_user.username }})
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <a href="/friends/search/">Найти друга?</a><hr>
+                {% if c_user.profile.friends %}
+                    {% for friend in c_user.profile.friends %}
+                        <div class="card mt-1">
+                            <div class="card-body">
+                                {{ friend.first_name }} {{ friend.last_name }} ({{ friend.username }})
+
+                                <a href="#" class="btn btn-danger float-right">
+                                    Удалить
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    Список друзей пуст.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

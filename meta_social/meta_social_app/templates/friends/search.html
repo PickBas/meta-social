@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Введите никнейм или имя пользователя."
+                               aria-label="Recipient's username" aria-describedby="button-addon2" name="name">
+                        <div class="input-group-append">
+                            <input class="btn btn-outline-success" type="submit" id="button-addon2" value="Найти">
+                        </div>
+                    </div>
+                </form>
+
+                {% if matches %}
+                    <hr>
+                    {% for i in matches %}
+                        <div class="card mt-1">
+                            <div class="card-body">
+                                {{ i.first_name }} {{ i.last_name }} ({{ i.username }})
+
+                                <a href="#" class="btn btn-success float-right ml-2">
+                                    Добавить
+                                </a>
+
+                                {% if i in user.profile.friends %}
+                                    <a href="#" class="btn btn-danger float-right">
+                                        Удалить
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

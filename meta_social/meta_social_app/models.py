@@ -35,7 +35,9 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        return Friend.objects.filter(current_user=self.user)
+        friend_item = Friend.objects.get_or_create(current_user=self.user)[0]
+
+        return friend_item.users.all()
 
     def amount_of_friends(self):
         return len(self.friends())
@@ -126,4 +128,3 @@ class Friend(models.Model):
             current_user=current_user
         )
         friend.users.remove(new_friend)
-
