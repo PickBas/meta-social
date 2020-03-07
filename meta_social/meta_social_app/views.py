@@ -1,14 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 
-from .models import Friend, Posts
+from .models import Friend
 
 
 @login_required
 def index(request):
     context = {}
+
+    context['news'] = request.user.profile.get_newsfeed()
 
     return render(request, 'index.html', context)
 
@@ -34,9 +36,3 @@ def add_friend(request, operation, pk):
     if operation == 'remove':
         Friend.lose_friend(request.user, new_friend)
     return redirect('/')
-
-
-
-
-
-

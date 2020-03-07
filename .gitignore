@@ -287,3 +287,10 @@ pip-selfcheck.json
 
 meta_social/meta_social_app/migrations/0*
 vk_config.v2.json
+
+### VisualStudioCode ###
+.vscode/*
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history

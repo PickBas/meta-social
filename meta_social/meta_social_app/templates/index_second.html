@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+    <hr>
+
+    <div style="width:100%; margin:0 auto;">
+
+    <div style="width:20%; float:left;">
+        {% include 'navs.html' %}
+    </div>
+
+    <div style="width:20%; float:right;">
+        {% include 'menu_main.html' %}
+    </div>
+
+    <div style="margin:0 20% 0 20%">
+        {% include 'posts.html' %}
+    </div>
+
+    </div>
+
+{% endblock %}
