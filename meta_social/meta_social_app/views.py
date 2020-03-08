@@ -4,8 +4,10 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
 from simple_search import search_filter
+from django.utils import timezone
 
-from .models import Friend
+from .models import Friend, Post
+from .forms import PostForm
 
 
 def get_menu_context(page):
@@ -31,6 +33,7 @@ def index(request):
     context = get_menu_context('newsfeed')
 
     context['news'] = request.user.profile.get_newsfeed()
+    print(context['news'])
 
     return render(request, 'index.html', context)
 
@@ -94,3 +97,21 @@ def friends_blacklist(request):
     context = get_menu_context('friends')
 
     return render(request, 'friends/blacklist.html', context)
+
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'post_list.html', {'posts': posts})
+
+
+def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.date = timezone.now()
+            post.save()
+    else:
+        form = PostForm()
+    return render(request, 'post_edit.html', {'form': form})

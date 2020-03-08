@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -29,7 +30,7 @@ class Profile(models.Model):
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
 
     def posts(self):
-        return Posts.objects.filter(user=self.user)
+        return Post.objects.filter(user=self.user)
 
     def amount_of_posts(self):
         return len(self.posts())
@@ -51,19 +52,24 @@ class Profile(models.Model):
     def get_newsfeed(self):
         posts = []
         for friend in self.friends():
-            posts.append(friend.posts())
+            posts += friend.profile.posts()
         for com in self.communities():
-            posts.append(com.posts())
-        posts = sorted(posts, key=lambda x: x.date)
+            posts += com.posts()
+        posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
 
-class Posts(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-    name_of_post = models.CharField(max_length=500)
-    text = models.CharField(max_length=10000)
-    date = models.DateField()
+class Post(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    name_of_post = models.CharField(max_length=200)
+    text = models.TextField()
+    date = models.DateTimeField(default=timezone.now)
 
+    def publish(self):
+        self.save()
+
+    def __str__(self):
+        return self.name_of_post
 
 class Communities(models.Model):
     community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_community')
@@ -100,7 +106,7 @@ class Community(models.Model):
         return len(self.participants())
 
     def posts(self):
-        return Posts.objects.filter(user=self.community)
+        return Post.objects.filter(user=self.community)
 
     def amount_of_posts(self):
         return len(self.posts())

@@ -104,15 +104,15 @@
         </div>
     </div>
     {% if news %}
-        {% for post in news %}
+        {% for i in news %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <h5 class="card-text">{{ post.name_of_post }}</h5>
+                    <h5 class="card-text">{{ i }}</h5>
                     <hr>
-                    <p class="card-text">{{ post.text }}</p>
+                    <p class="card-text">{{ i.text }}</p>
                     <hr class="mt-0 mb-1">
-                    <a href="#" class="mb-0 float-left">{{ post.user.username }}</a>
-                    <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                    <a href="/accounts/profile/{{ i.user.id }}/" class="mb-0 float-left">{{ i.user.username }}</a>
+                    <span class="text-muted mb-0 float-right">{{ i.date }}</span>
                 </div>
             </div>
         {% endfor %}
