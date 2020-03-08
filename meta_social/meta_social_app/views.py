@@ -9,7 +9,6 @@ from django.utils import timezone
 from .models import Profile
 from PIL import Image
 
-
 from .models import Friend, Post
 from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
 
@@ -26,7 +25,7 @@ def get_menu_context(page):
 
     context = {
         'page': page,
-        'messages_count': 0, # TODO: Вносить количество не прочитанных сообщений
+        'messages_count': 0,  # TODO: Вносить количество не прочитанных сообщений
     }
 
     return context
@@ -37,6 +36,7 @@ def index(request):
     context = get_menu_context('newsfeed')
 
     context['news'] = request.user.profile.get_newsfeed()
+    context['pagename'] = "Главная"
     print(context['news'])
 
     return render(request, 'index.html', context)
@@ -51,51 +51,54 @@ def profile(request, user_id):
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
     context['c_user'] = user_item
+    context['pagename'] = "Профиль"
 
     return render(request, 'profile/profile_page.html', context)
 
 
+def remove_old_avatar(profile, fs):
+    if profile.avatar.name != 'avatars/users/0.png':
+        fs.delete(profile.avatar.path)
+    print(profile.avatar.path)
+
+
+def save_avatar(profile, fs, path, image):
+    fs.save(path, image)
+    profile.avatar = path
+    profile.save()
+
+
+def resize_image(image):
+    image = Image.open(profile.avatar)
+    size = (200, 200)
+    image = image.resize(size, Image.ANTIALIAS)
+    image.save(profile.avatar.path)
+
+
 @login_required
 def edit_profile(request, user_id):
-    context = {}
-    context['profile'] = Profile.objects.get(user=user_id)
-    context['uedit'] = User.objects.get(id=user_id)
+    context = {'profile': Profile.objects.get(user=user_id), 'uedit': User.objects.get(id=user_id)}
+    context['pagename'] = "Редактировать профиль"
+
     if request.method == 'POST':
+
         user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=user_id))
         profile = Profile.objects.get(user=user_id)
         profile.show_email = False if request.POST.get('show_email') is None else True
+
         try:
             image = request.FILES['avatar']
             if image.size <= 5000000:
                 if image.content_type.split('/')[0] == 'image':
-                    # Get file extension
-                    i = -1
-                    while image.name[i] != '.':
-                        i -= 1
-                    path = 'avatars/users/' + str(user_id) + image.name[i:]
 
-                    # Init
+                    img_name, img_extension = image.name.split('.')
+                    path = 'avatars/users/' + str(user_id) + img_extension
                     fs = FileSystemStorage()
 
-                    # Remove old avatar
-                    if profile.avatar.name != 'avatars/users/0.png':
-                        fs.delete(profile.avatar.path)
-                    print(profile.avatar.path)
+                    remove_old_avatar(profile, fs)
+                    save_avatar(profile, fs, path, image)
+                    resize_image(image)
 
-                    # Save avatar
-                    fs.save(path, image)
-                    profile.avatar = path
-                    profile.save()
-
-                    # Resize
-                    image = Image.open(profile.avatar)
-                    size = (200, 200)
-                    image = image.resize(size, Image.ANTIALIAS)
-                    image.save(profile.avatar.path)
-                else:
-                    pass
-            else:
-                pass
         except Exception:
             pass
         profile.save()
@@ -126,6 +129,7 @@ def add_friend(request, operation, pk):
 @login_required
 def friends_list(request, user_id):
     context = get_menu_context('friends')
+    context['pagename'] = "Список друзей"
     context['c_user'] = User.objects.get(id=user_id)
 
     return render(request, 'friends/friends_list.html', context)
@@ -134,7 +138,7 @@ def friends_list(request, user_id):
 @login_required
 def friends_search(request):
     context = get_menu_context('friends')
-
+    context['pagename'] = "Поиск друзей"
     if request.method == 'POST':
         if request.POST.get('name'):
             query = request.POST.get('name')
@@ -150,20 +154,20 @@ def friends_search(request):
 @login_required
 def friends_requests(request):
     context = get_menu_context('friends')
-
+    context['pagename'] = "Заявки в друзья"
     return render(request, 'friends/requests.html', context)
 
 
 @login_required
 def friends_blacklist(request):
     context = get_menu_context('friends')
-
+    context['pagename'] = "Черный список"
     return render(request, 'friends/blacklist.html', context)
 
 
 def post_list(request):
     posts = Post.objects.all()
-    return render(request, 'post_list.html', {'posts': posts})
+    return render(request, 'post_list.html', {'posts': posts, 'pagename': "Посты"})
 
 
 def post_new(request):
@@ -176,4 +180,4 @@ def post_new(request):
             post.save()
     else:
         form = PostForm()
-    return render(request, 'post_edit.html', {'form': form})
+    return render(request, 'post_edit.html', {'form': form, "pagename": "Посты"})
