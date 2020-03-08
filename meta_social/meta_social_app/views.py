@@ -77,8 +77,8 @@ def resize_image(image):
 
 @login_required
 def edit_profile(request, user_id):
-    context = {'profile': Profile.objects.get(user=user_id), 'uedit': User.objects.get(id=user_id)}
-    context['pagename'] = "Редактировать профиль"
+    context = {'profile': Profile.objects.get(user=user_id), 'uedit': User.objects.get(id=user_id),
+               'pagename': "Редактировать профиль"}
 
     if request.method == 'POST':
 
@@ -88,16 +88,14 @@ def edit_profile(request, user_id):
 
         try:
             image = request.FILES['avatar']
-            if image.size <= 5000000:
-                if image.content_type.split('/')[0] == 'image':
+            if image.size <= 5000000 and image.content_type.split('/')[0] == 'image':
+                img_name, img_extension = image.name.split('.')
+                path = 'avatars/users/' + str(user_id) + img_extension
+                fs = FileSystemStorage()
 
-                    img_name, img_extension = image.name.split('.')
-                    path = 'avatars/users/' + str(user_id) + img_extension
-                    fs = FileSystemStorage()
-
-                    remove_old_avatar(profile, fs)
-                    save_avatar(profile, fs, path, image)
-                    resize_image(image)
+                remove_old_avatar(profile, fs)
+                save_avatar(profile, fs, path, image)
+                resize_image(image)
 
         except Exception:
             pass
