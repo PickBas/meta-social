@@ -8,9 +8,27 @@ from simple_search import search_filter
 from .models import Friend
 
 
+def get_menu_context(page):
+    available_pages = [
+        'profile',
+        'newsfeed',
+        'friends',
+    ]
+
+    if page not in available_pages:
+        raise KeyError
+
+    context = {
+        'page': page,
+        'messages_count': 0, # TODO: Вносить количество не прочитанных сообщений
+    }
+
+    return context
+
+
 @login_required
 def index(request):
-    context = {}
+    context = get_menu_context('newsfeed')
 
     context['news'] = request.user.profile.get_newsfeed()
 
@@ -22,7 +40,7 @@ def profile(request, user_id):
     if not User.objects.filter(id=user_id).exists():
         raise Http404()
 
-    context = {}
+    context = get_menu_context('profile')
 
     user_item = User.objects.get(id=user_id)
     context['c_user'] = user_item
@@ -42,7 +60,7 @@ def add_friend(request, operation, pk):
 
 @login_required
 def friends_list(request, user_id):
-    context = {}
+    context = get_menu_context('friends')
     context['c_user'] = User.objects.get(id=user_id)
 
     return render(request, 'friends/friends_list.html', context)
@@ -50,7 +68,7 @@ def friends_list(request, user_id):
 
 @login_required
 def friends_search(request):
-    context = {}
+    context = get_menu_context('friends')
 
     if request.method == 'POST':
         if request.POST.get('name'):
@@ -62,3 +80,17 @@ def friends_search(request):
             context['matches'] = matches
 
     return render(request, 'friends/search.html', context)
+
+
+@login_required
+def friends_requests(request):
+    context = get_menu_context('friends')
+
+    return render(request, 'friends/requests.html', context)
+
+
+@login_required
+def friends_blacklist(request):
+    context = get_menu_context('friends')
+
+    return render(request, 'friends/blacklist.html', context)

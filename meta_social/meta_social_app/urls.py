@@ -10,6 +10,8 @@ urlpatterns = [
 
     path('friends/<int:user_id>/', friends_list),
     path('friends/search/', friends_search),
+    path('friends/requests/', friends_requests),
+    path('friends/blacklist/', friends_blacklist),
 
     # Allauth urls
     path('accounts/', include('allauth.urls')),
