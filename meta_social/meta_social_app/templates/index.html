@@ -1,12 +1,48 @@
 {% extends 'base_menu.html' %}
 
 {% block center %}
+<style>
+.card_big{
+height: 250px;
+}
+.btn{
+margin-top: 120px;
+padding-left: 25px;
+padding-right: 25px;
+}
+.im_photo{
+margin-top: 130px;
+position: fixed;
+}
+.im_video{
+margin-left: 30px;
+margin-top: 130px;
+position: fixed;
+}
+.im_music{
+margin-left: 60px;
+margin-top: 130px;
+position: fixed;
+}
+.im_doc{
+margin-left: 90px;
+margin-top: 130px;
+position: fixed;
+}
+
+</style>
+
+
     <div class="card">
         <div class="card-body">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Что у вас нового?" aria-label="Recipient's username" aria-describedby="button-addon">
+                <img src="https://image.flaticon.com/icons/svg/685/685655.svg" width=20 height=20 class="im_photo  all">
+                <img src="https://www.flaticon.com/premium-icon/icons/svg/604/604338.svg" width=20 height=20 class="im_video all">
+                <img src="https://image.flaticon.com/icons/svg/727/727204.svg" width=20 height=20 class="im_music all">
+                 <img src="https://image.flaticon.com/icons/svg/684/684831.svg" width=20 height=20 class="im_doc all">
+                <input type="text" class="form-control" style="border: none" placeholder="Что у вас нового?" aria-label="Recipient's username" aria-describedby="button-addon">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon">
+                    <button class="btn btn-outline-secondary all" type="button" id="button-addon">
                         <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
                     </button>
                 </div>
@@ -103,6 +139,16 @@
             </div>
         </div>
     </div>
+<script>
+    let a = document.querySelector(".card");
+    let b = document.querySelector(".form-control");
+    let c = document.querySelectorAll(".all");
+    b.addEventListener("click", function(){
+
+
+    })
+
+</script>
     {% if news %}
         {% for i in news %}
             <div class="card mt-3">
