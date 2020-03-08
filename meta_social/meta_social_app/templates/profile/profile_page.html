@@ -51,7 +51,7 @@
             </div>
 
             <div class="card profile_div">
-                <img src="{% static 'img/unknown_profile.jpg' %}" class="card-img-top" alt="...">
+                <img src="{{ MEDIA_URL }}{{ profile.avatar.url }}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">
                         {% if c_user.first_name and c_user.last_name %}
@@ -66,8 +66,7 @@
                 </div>
                 <div class="card-body">
                     {% if c_user == user %}
-                        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" data-toggle="pill"
-                           href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Edit</a>
+                        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" href="/accounts/profile/{{ c_user.id }}/edit_profile/">Edit</a>
                     {% endif %}
                 </div>
             </div>

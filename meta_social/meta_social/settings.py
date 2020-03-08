@@ -162,3 +162,6 @@ STATICFILES_DIRS = (
 )
 
 ACCOUNT_EMAIL_REQUIRED = True
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

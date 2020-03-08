@@ -1,13 +1,17 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
 from simple_search import search_filter
 from django.utils import timezone
+from .models import Profile
+from PIL import Image
+
 
 from .models import Friend, Post
-from .forms import PostForm
+from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
 
 
 def get_menu_context(page):
@@ -44,11 +48,69 @@ def profile(request, user_id):
         raise Http404()
 
     context = get_menu_context('profile')
-
+    context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
     context['c_user'] = user_item
 
     return render(request, 'profile/profile_page.html', context)
+
+
+@login_required
+def edit_profile(request, user_id):
+    context = {}
+    context['profile'] = Profile.objects.get(user=user_id)
+    context['uedit'] = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=user_id))
+        profile = Profile.objects.get(user=user_id)
+        profile.show_email = False if request.POST.get('show_email') is None else True
+        try:
+            image = request.FILES['avatar']
+            if image.size <= 5000000:
+                if image.content_type.split('/')[0] == 'image':
+                    # Get file extension
+                    i = -1
+                    while image.name[i] != '.':
+                        i -= 1
+                    path = 'avatars/users/' + str(user_id) + image.name[i:]
+
+                    # Init
+                    fs = FileSystemStorage()
+
+                    # Remove old avatar
+                    if profile.avatar.name != 'avatars/users/0.png':
+                        fs.delete(profile.avatar.path)
+                    print(profile.avatar.path)
+
+                    # Save avatar
+                    fs.save(path, image)
+                    profile.avatar = path
+                    profile.save()
+
+                    # Resize
+                    image = Image.open(profile.avatar)
+                    size = (200, 200)
+                    image = image.resize(size, Image.ANTIALIAS)
+                    image.save(profile.avatar.path)
+                else:
+                    pass
+            else:
+                pass
+        except Exception:
+            pass
+        profile.save()
+        profile_form = ProfileUpdateForm(request.POST, instance=Profile.objects.get(user=user_id))
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('/accounts/profile/' + str(user_id))
+
+    else:
+        user_form = UserUpdateForm(instance=User.objects.get(id=user_id))
+        profile_form = ProfileUpdateForm(instance=Profile.objects.get(user=user_id))
+    context['user_form'] = user_form
+    context['profile_form'] = profile_form
+    return render(request, 'profile/edit_profile.html', context)
 
 
 @login_required

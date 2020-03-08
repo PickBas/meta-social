@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Profile
 
 
 class SignUpForm(UserCreationForm):
@@ -24,3 +24,23 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('name_of_post', 'text', 'date')
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+
+        for key in self.fields:
+            self.fields[key].required = False
+
+    class Meta:
+        model = Profile
+        fields = ('job', 'biography', 'gender', 'country', 'birth')
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name' )
+
+
