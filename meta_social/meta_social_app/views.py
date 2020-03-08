@@ -2,8 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
+from django.utils import timezone
 
-from .models import Friend
+from .models import Friend, Post
+from .forms import PostForm
 
 
 @login_required
@@ -36,3 +38,21 @@ def add_friend(request, operation, pk):
     if operation == 'remove':
         Friend.lose_friend(request.user, new_friend)
     return redirect('/')
+
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'post_list.html', {'posts': posts})
+
+
+def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.date = timezone.now()
+            post.save()
+    else:
+        form = PostForm()
+    return render(request, 'post_edit.html', {'form': form})
