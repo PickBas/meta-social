@@ -7,7 +7,26 @@
 
 
 {% block content %}
+<style>
+  .card{
+  text-align: center;
+  position: absolute;
+  border: 2px solid grey;
+  top: 26.2%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%)
+
+  }
+
+
+</style>
+<div class="card" style="width: 36rem;">
+  <div class="card-body">
+
 <h1>{% trans "Confirm E-mail Address" %}</h1>
+
+<hr style="border: 1px solid grey;">
 
 {% if confirmation %}
 
@@ -27,5 +46,6 @@
 <p>{% blocktrans %}This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.{% endblocktrans %}</p>
 
 {% endif %}
-
+  </div>
+</div>
 {% endblock %}

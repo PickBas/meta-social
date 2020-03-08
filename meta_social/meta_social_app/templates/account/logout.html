@@ -5,8 +5,24 @@
 {% block head_title %}{% trans "Sign Out" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Sign Out" %}</h1>
+<style>
+  .card{
+  text-align: center;
+  position: absolute;
+  border: 2px solid grey;
+  top: 24.8%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%)
 
+  }
+
+
+</style>
+<div class="card" style="width: 36rem;">
+  <div class="card-body">
+<h1>{% trans "Sign Out" %}</h1>
+<hr style="border: 1px solid grey;">
 <p>{% trans 'Are you sure you want to sign out?' %}</p>
 
 <form method="post" action="{% url 'account_logout' %}">
