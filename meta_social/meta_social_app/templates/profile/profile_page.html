@@ -89,9 +89,9 @@
                     </p>
                     <p class="card-text">
                         {% if c_user.profile.country %}
-                            {{ c_user.profile.country }}
+                            {{ c_user.profile.country.name }}
                         {% else %}
-                            Город не указан
+                            Страна не указана
                         {% endif %}
                     </p>
                     <p class="card-text">

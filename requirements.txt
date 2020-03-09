@@ -3,3 +3,4 @@ django-crispy-forms
 django-allauth
 Pillow
 django-simple-search
+django-countries

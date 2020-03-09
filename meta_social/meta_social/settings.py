@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'meta_social_app',
     'crispy_forms',
+    'django_countries',
 
     'allauth',
     'allauth.account',

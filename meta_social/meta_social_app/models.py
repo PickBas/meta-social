@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
@@ -19,7 +20,7 @@ class Profile(models.Model):
     biography = models.CharField(max_length=500, null=True)
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-    country = models.CharField(null=True, max_length=60)
+    country = CountryField()
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
