@@ -57,45 +57,43 @@ def profile(request, user_id):
     return render(request, 'profile/profile_page.html', context)
 
 
+class ImageManage():
+    def __init__(self, user_id, profile, image):
+        self.fs = FileSystemStorage()
+        self.path = 'avatars/users/' + str(user_id) + '.'
+        self.profile = profile
+        self.image = image
+
+    def remove_old_avatar(self):
+        if self.profile.avatar.name != 'avatars/users/0.png':
+            self.fs.delete(self.profile.avatar.path)
+
+    def save_avatar(self):
+        self.fs.save(self.path, self.image)
+        self.profile.avatar = self.path
+        self.profile.save()
+
+    def resize_image(self):
+        self.image = Image.open(self.profile.avatar)
+        size = (200, 200)
+        self.image = self.image.resize(size, Image.ANTIALIAS)
+        self.image.save(self.profile.avatar.path)
+
+    def process_img(self):
+        if self.image.size <= 5000000 and self.image.content_type.split('/')[0] == 'image':
+            img_name, img_extension = self.image.name.split('.')
+            self.path += img_extension
+            self.remove_old_avatar()
+            self.save_avatar()
+            self.resize_image()
+
+
 class EditProfile(View):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template_name = 'profile/edit_profile.html'
         self.profile = Profile.objects.get()
-
-    def remove_old_avatar(self, fs):
-        if self.profile.avatar.name != 'avatars/users/0.png':
-            fs.delete(self.profile.avatar.path)
-        print(self.profile.avatar.path)
-
-    def save_avatar(self, fs, path, image):
-        fs.save(path, image)
-        self.profile.avatar = path
-        self.profile.save()
-
-    def resize_image(self):
-        image = Image.open(self.profile.avatar)
-        size = (200, 200)
-        image = image.resize(size, Image.ANTIALIAS)
-        image.save(self.profile.avatar.path)
-
-    def process_img(self, request, **kwargs):
-        try:
-            image = request.FILES['avatar']
-
-            if image.size <= 5000000 and image.content_type.split('/')[0] == 'image':
-                fs = FileSystemStorage()
-
-                img_name, img_extension = image.name.split('.')
-                path = 'avatars/users/' + str(kwargs['user_id']) + img_extension
-
-                self.remove_old_avatar(fs)
-                self.save_avatar(fs, path, image)
-                self.resize_image()
-
-        except Exception:
-            pass
 
     def post(self, request, **kwargs):
 
@@ -104,8 +102,12 @@ class EditProfile(View):
 
         self.profile.show_email = False if request.POST.get('show_email') is None else True
 
-        self.process_img(request, **kwargs)
-        self.profile.save()
+        try:
+            img_manage = ImageManage(kwargs['user_id'], self.profile, request.FILES['avatar'])
+            img_manage.process_img()
+        except Exception:
+            pass
+
         profile_form = ProfileUpdateForm(request.POST, instance=Profile.objects.get(user=kwargs['user_id']))
 
         if user_form.is_valid() and profile_form.is_valid():
