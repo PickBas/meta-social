@@ -4,6 +4,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
+from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from .models import Profile
@@ -56,62 +57,69 @@ def profile(request, user_id):
     return render(request, 'profile/profile_page.html', context)
 
 
-def remove_old_avatar(profile, fs):
-    if profile.avatar.name != 'avatars/users/0.png':
-        fs.delete(profile.avatar.path)
-    print(profile.avatar.path)
+class EditProfile(View):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template_name = 'profile/edit_profile.html'
+        self.profile = Profile.objects.get()
 
-def save_avatar(profile, fs, path, image):
-    fs.save(path, image)
-    profile.avatar = path
-    profile.save()
+    def remove_old_avatar(self, fs):
+        if self.profile.avatar.name != 'avatars/users/0.png':
+            fs.delete(self.profile.avatar.path)
+        print(self.profile.avatar.path)
 
+    def save_avatar(self, fs, path, image):
+        fs.save(path, image)
+        self.profile.avatar = path
+        self.profile.save()
 
-def resize_image(image):
-    image = Image.open(profile.avatar)
-    size = (200, 200)
-    image = image.resize(size, Image.ANTIALIAS)
-    image.save(profile.avatar.path)
+    def resize_image(self):
+        image = Image.open(self.profile.avatar)
+        size = (200, 200)
+        image = image.resize(size, Image.ANTIALIAS)
+        image.save(self.profile.avatar.path)
 
-
-@login_required
-def edit_profile(request, user_id):
-    context = {'profile': Profile.objects.get(user=user_id), 'uedit': User.objects.get(id=user_id),
-               'pagename': "Редактировать профиль"}
-
-    if request.method == 'POST':
-
-        user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=user_id))
-        profile = Profile.objects.get(user=user_id)
-        profile.show_email = False if request.POST.get('show_email') is None else True
-
+    def process_img(self, request, **kwargs):
         try:
             image = request.FILES['avatar']
+
             if image.size <= 5000000 and image.content_type.split('/')[0] == 'image':
-                img_name, img_extension = image.name.split('.')
-                path = 'avatars/users/' + str(user_id) + img_extension
                 fs = FileSystemStorage()
 
-                remove_old_avatar(profile, fs)
-                save_avatar(profile, fs, path, image)
-                resize_image(image)
+                img_name, img_extension = image.name.split('.')
+                path = 'avatars/users/' + str(kwargs['user_id']) + img_extension
+
+                self.remove_old_avatar(fs)
+                self.save_avatar(fs, path, image)
+                self.resize_image()
 
         except Exception:
             pass
-        profile.save()
-        profile_form = ProfileUpdateForm(request.POST, instance=Profile.objects.get(user=user_id))
+
+    def post(self, request, **kwargs):
+
+        user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=kwargs['user_id']))
+        self.profile = Profile.objects.get(user=kwargs['user_id'])
+
+        self.profile.show_email = False if request.POST.get('show_email') is None else True
+
+        self.process_img(request, **kwargs)
+        self.profile.save()
+        profile_form = ProfileUpdateForm(request.POST, instance=Profile.objects.get(user=kwargs['user_id']))
+
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('/accounts/profile/' + str(user_id))
+            return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
-    else:
-        user_form = UserUpdateForm(instance=User.objects.get(id=user_id))
-        profile_form = ProfileUpdateForm(instance=Profile.objects.get(user=user_id))
-    context['user_form'] = user_form
-    context['profile_form'] = profile_form
-    return render(request, 'profile/edit_profile.html', context)
+    def get(self, request, **kwargs):
+        context = {'profile': Profile.objects.get(user=kwargs['user_id']),
+                   'uedit': User.objects.get(id=kwargs['user_id']), 'pagename': "Редактировать профиль",
+                   'user_form': UserUpdateForm(instance=User.objects.get(id=kwargs['user_id'])),
+                   'profile_form': ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))}
+
+        return render(request, self.template_name, context)
 
 
 @login_required

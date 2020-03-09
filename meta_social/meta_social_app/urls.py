@@ -11,7 +11,7 @@ urlpatterns = [
     path('post_list/', post_list),
     path('post_new/', post_new),
     path('accounts/profile/<int:user_id>/', profile),
-    path('accounts/profile/<int:user_id>/edit_profile/', edit_profile),
+    path('accounts/profile/<int:user_id>/edit_profile/', login_required(EditProfile.as_view())),
     path(r'connect/<operation>/<pk>/', add_friend),
 
     path('friends/<int:user_id>/', friends_list),
