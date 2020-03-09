@@ -93,7 +93,7 @@ class EditProfile(View):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template_name = 'profile/edit_profile.html'
-        self.profile = Profile.objects.get()
+        self.profile = None
 
     def post(self, request, **kwargs):
 
