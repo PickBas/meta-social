@@ -116,10 +116,11 @@ class EditProfile(View):
             return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
     def get(self, request, **kwargs):
-        context = {'profile': Profile.objects.get(user=kwargs['user_id']),
-                   'uedit': User.objects.get(id=kwargs['user_id']), 'pagename': "Редактировать профиль",
-                   'user_form': UserUpdateForm(instance=User.objects.get(id=kwargs['user_id'])),
-                   'profile_form': ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))}
+        context = get_menu_context('profile')
+        context['profile'] = Profile.objects.get(user=kwargs['user_id'])
+        context['uedit'] = User.objects.get(id=kwargs['user_id'])
+        context['user_form'] = UserUpdateForm(instance=User.objects.get(id=kwargs['user_id']))
+        context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
 
         return render(request, self.template_name, context)
 

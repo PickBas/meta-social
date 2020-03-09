@@ -2,50 +2,48 @@
 {% load crispy_forms_tags %}
 
 {% block center %}
-    <div class="container">
-        <div class="card mt-3">
-            <div class="card-header text-center">
-                Редактирование
-            </div>
-            <div class="card-body mb">
-                {% if uedit == user %}
-                    <form method="post" enctype="multipart/form-data" novalidate>
-                        <style>
-                            .asteriskField {
-                                display: none;
-                            }
-                        </style>
-                        {% csrf_token %}
+    <div class="card">
+        <div class="card-header text-center">
+            Редактирование
+        </div>
+        <div class="card-body mb">
+            {% if uedit == user %}
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    <style>
+                        .asteriskField {
+                            display: none;
+                        }
+                    </style>
+                    {% csrf_token %}
 
-                        <div class="row">
-                            <div class="col-3">
-                                <img class="border rounded-circle mt-2 img-thumbnail"
-                                     src="{{ MEDIA_URL }}{{ profile.avatar.url }}"
-                                     style="display: block; margin: auto;">
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="exampleFormControlFile1" class="d-flex">Выбрать аватар</label>
-                                    <input type="file" class="form-control-file" id="exampleFormControlFile1"
-                                           name="avatar">
-                                </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <img class="border rounded-circle mt-2 img-thumbnail"
+                                    src="{{ MEDIA_URL }}{{ profile.avatar.url }}"
+                                    style="display: block; margin: auto;">
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="exampleFormControlFile1" class="d-flex">Выбрать аватар</label>
+                                <input type="file" class="form-control-file" id="exampleFormControlFile1"
+                                        name="avatar">
                             </div>
                         </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col mt-3">
-                                {{ user_form|crispy }}
-                                {{ profile_form|crispy }}
-                                <input type="checkbox" name="show_email" {% if profile.show_email %} checked {% endif %}>
-                                <label>Отображать почту</label>
-                                <input class="btn btn-primary btn-block" type="submit" value="Сохранить">
-                            </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col mt-3">
+                            {{ user_form|crispy }}
+                            {{ profile_form|crispy }}
+                            <input type="checkbox" name="show_email" {% if profile.show_email %} checked {% endif %}>
+                            <label>Отображать почту</label>
+                            <input class="btn btn-primary btn-block" type="submit" value="Сохранить">
                         </div>
-                    </form>
-                {% else %}
-                    <p>Вы не можете редактировать этот профиль. <a href="/profile/{{ ufp.id }}/">Вернуться назад.</a></p>
-                {% endif %}
-            </div>
+                    </div>
+                </form>
+            {% else %}
+                <p>Вы не можете редактировать этот профиль. <a href="/profile/{{ ufp.id }}/">Вернуться назад.</a></p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
