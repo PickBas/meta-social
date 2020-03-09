@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'meta_social_app',
     'crispy_forms',
+    'django_countries',
 
     'allauth',
     'allauth.account',
@@ -162,3 +163,6 @@ STATICFILES_DIRS = (
 )
 
 ACCOUNT_EMAIL_REQUIRED = True
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
