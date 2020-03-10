@@ -62,15 +62,9 @@ class Profile(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    name_of_post = models.CharField(max_length=200)
     text = models.TextField()
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now_add=True)
 
-    def publish(self):
-        self.save()
-
-    def __str__(self):
-        return self.name_of_post
 
 class Communities(models.Model):
     community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_community')

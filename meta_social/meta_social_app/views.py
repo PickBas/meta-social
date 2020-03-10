@@ -11,10 +11,10 @@ from .models import Profile
 from PIL import Image
 
 from .models import Friend, Post
-from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
+from .forms import ProfileUpdateForm, UserUpdateForm
 
 
-def get_menu_context(page):
+def get_menu_context(page, pagename):
     available_pages = [
         'profile',
         'newsfeed',
@@ -27,6 +27,7 @@ def get_menu_context(page):
     context = {
         'page': page,
         'messages_count': 0,  # TODO: Вносить количество не прочитанных сообщений
+        'pagename': pagename,
     }
 
     return context
@@ -34,11 +35,18 @@ def get_menu_context(page):
 
 @login_required
 def index(request):
-    context = get_menu_context('newsfeed')
+    context = get_menu_context('newsfeed', 'Главная')
 
     context['news'] = request.user.profile.get_newsfeed()
-    context['pagename'] = "Главная"
-    print(context['news'])
+    
+    if request.method == "POST":
+        if request.POST.get('post_text'):
+            item = Post(
+                text=request.POST.get('post_text'),
+                user=request.user,
+            )
+
+            item.save()
 
     return render(request, 'index.html', context)
 
@@ -48,11 +56,10 @@ def profile(request, user_id):
     if not User.objects.filter(id=user_id).exists():
         raise Http404()
 
-    context = get_menu_context('profile')
+    context = get_menu_context('profile', 'Профиль')
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
     context['c_user'] = user_item
-    context['pagename'] = "Профиль"
 
     return render(request, 'profile/profile_page.html', context)
 
@@ -116,7 +123,7 @@ class EditProfile(View):
             return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
     def get(self, request, **kwargs):
-        context = get_menu_context('profile')
+        context = get_menu_context('profile', 'Редактирование профиля')
         context['profile'] = Profile.objects.get(user=kwargs['user_id'])
         context['uedit'] = User.objects.get(id=kwargs['user_id'])
         context['user_form'] = UserUpdateForm(instance=User.objects.get(id=kwargs['user_id']))
@@ -137,8 +144,7 @@ def add_friend(request, operation, pk):
 
 @login_required
 def friends_list(request, user_id):
-    context = get_menu_context('friends')
-    context['pagename'] = "Список друзей"
+    context = get_menu_context('friends', 'Список друзей')
     context['c_user'] = User.objects.get(id=user_id)
 
     return render(request, 'friends/friends_list.html', context)
@@ -146,8 +152,7 @@ def friends_list(request, user_id):
 
 @login_required
 def friends_search(request):
-    context = get_menu_context('friends')
-    context['pagename'] = "Поиск друзей"
+    context = get_menu_context('friends', 'Поиск друзей')
     if request.method == 'POST':
         if request.POST.get('name'):
             query = request.POST.get('name')
@@ -162,31 +167,11 @@ def friends_search(request):
 
 @login_required
 def friends_requests(request):
-    context = get_menu_context('friends')
-    context['pagename'] = "Заявки в друзья"
+    context = get_menu_context('friends', 'Заявки в друзья')
     return render(request, 'friends/requests.html', context)
 
 
 @login_required
 def friends_blacklist(request):
-    context = get_menu_context('friends')
-    context['pagename'] = "Черный список"
+    context = get_menu_context('friends', 'Черный список')
     return render(request, 'friends/blacklist.html', context)
-
-
-def post_list(request):
-    posts = Post.objects.all()
-    return render(request, 'post_list.html', {'posts': posts, 'pagename': "Посты"})
-
-
-def post_new(request):
-    if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.date = timezone.now()
-            post.save()
-    else:
-        form = PostForm()
-    return render(request, 'post_edit.html', {'form': form, "pagename": "Посты"})
