@@ -22,11 +22,6 @@
         python manage.py migrate
         python manage.py loaddata db.json
 
-3. Данные для входа в админку
-
-        login: root
-        pass: toor
-
 
 ## Что делать если django не видит миграции?
 
@@ -38,7 +33,7 @@
 
 # Данные о соц. сетях
 
-## VK - Нету прав доступа
+## VK
 
 Приложение
 
