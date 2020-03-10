@@ -12,13 +12,12 @@ urlpatterns = [
     path('post_new/', post_new),
     path('accounts/profile/<int:user_id>/', profile),
     path('accounts/profile/<int:user_id>/edit_profile/', login_required(EditProfile.as_view())),
-    path(r'connect/<operation>/<pk>/', add_friend),
 
     path('friends/<int:user_id>/', friends_list),
     path('friends/search/', friends_search),
     path('friends/requests/', friends_requests),
     path('friends/blacklist/', friends_blacklist),
-
+    path('friends/request/<int:friend_id>/', add_friend),
     # Allauth urls
     path('accounts/', include('allauth.urls')),
 ]

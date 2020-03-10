@@ -10,7 +10,7 @@ from django.utils import timezone
 from .models import Profile
 from PIL import Image
 
-from .models import Friend, Post
+from .models import Friend, Post, FriendshipRequest
 from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
 
 
@@ -126,13 +126,16 @@ class EditProfile(View):
 
 
 @login_required
-def add_friend(request, operation, pk):
-    new_friend = User.objects.get(pk=pk)
-    if operation == 'add':
-        Friend.make_friend(request.user, new_friend)
-    if operation == 'remove':
-        Friend.lose_friend(request.user, new_friend)
-    return redirect('/')
+def add_friend(request, friend_id):
+    if request.method == 'POST':
+        request_item = FriendshipRequest.objects.get(id=friend_id)
+        friends_item = Friend(
+            current_user=request_item.from_user,
+            friends=request_item.to_user,
+        )
+        friends_item.save()
+        request_item.delete()
+    return redirect('/accounts/profile/{}/'.format(request_item.id))
 
 
 @login_required
@@ -140,6 +143,9 @@ def friends_list(request, user_id):
     context = get_menu_context('friends')
     context['pagename'] = "Список друзей"
     context['c_user'] = User.objects.get(id=user_id)
+    context['apply'] = Friend.users.filter(request=False)
+    context['apply_by'] = Friend.users.filter(user=request.user)
+
 
     return render(request, 'friends/friends_list.html', context)
 
@@ -164,6 +170,9 @@ def friends_search(request):
 def friends_requests(request):
     context = get_menu_context('friends')
     context['pagename'] = "Заявки в друзья"
+    friend_req = Friend(current_user=request.user, request=False)
+
+
     return render(request, 'friends/requests.html', context)
 
 
@@ -172,6 +181,7 @@ def friends_blacklist(request):
     context = get_menu_context('friends')
     context['pagename'] = "Черный список"
     return render(request, 'friends/blacklist.html', context)
+
 
 
 def post_list(request):

@@ -21,9 +21,11 @@
                         <div class="card-body">
                             {{ i.first_name }} {{ i.last_name }} ({{ i.username }})
 
-                            <a href="#" class="btn btn-success float-right ml-2">
-                                Добавить
-                            </a>
+                            <form method='POST'   action='/friends/request/{{ i.id }}/'>
+                            {% csrf_token %}
+                                <input type='submit' value="Добавить" class="btn btn-success float-right ml-2">
+                            </form>
+
 
                             {% if i in user.profile.friends %}
                                 <a href="#" class="btn btn-danger float-right">

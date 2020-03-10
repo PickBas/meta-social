@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
 
-
 class Profile(models.Model):
     GENDER_CHOICES = (
         ('M', 'Мужчина'),
@@ -119,19 +118,11 @@ class Participants(models.Model):
 
 
 class Friend(models.Model):
-    users = models.ManyToManyField(User)
-    current_user = models.ForeignKey(User, related_name='owner', null=True, on_delete=models.CASCADE)
+    friends = models.ManyToManyField(User)
+    current_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user+', default='d')
+    request = models.BooleanField(default=False)
 
-    @classmethod
-    def make_friend(cls, current_user, new_friend):
-        friend, created = cls.objects.get_or_create(
-            current_user=current_user
-        )
-        friend.users.add(new_friend)
 
-    @classmethod
-    def lose_friend(cls, current_user, new_friend):
-        friend, created = cls.objects.get_or_create(
-            current_user=current_user
-        )
-        friend.users.remove(new_friend)
+class FriendshipRequest(models.Model):
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from+', default='d')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+', default='d')
