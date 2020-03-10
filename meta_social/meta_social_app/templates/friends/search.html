@@ -21,7 +21,7 @@
                         <div class="card-body">
                             {{ i.first_name }} {{ i.last_name }} ({{ i.username }})
 
-                            <form method='POST'   action='/friends/request/{{ i.id }}/'>
+                            <form method='POST'   action='/friends/send_request/{{ i.id }}/'>
                             {% csrf_token %}
                                 <input type='submit' value="Добавить" class="btn btn-success float-right ml-2">
                             </form>

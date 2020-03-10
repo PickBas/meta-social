@@ -1,8 +1,18 @@
 {% extends 'base_menu.html' %}
 
 {% block center %}
-
-    разработка
+    {% if user.profile.friendship_requests %}
+        {% for req in user.profile.friendship_requests %}
+            {{ req.from_user.username }}
+            <form method="POST" action="/friends/accept_request/{{ req.id }}/">
+                {% csrf_token %}
+                <input type="submit" value="Принять">
+            </form>
+            <br>
+        {% endfor %}
+    {% else %}
+        У вас нет друзей.ха
+    {% endif %}
 {% endblock %}
 
 {% block right %}

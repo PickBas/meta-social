@@ -23,6 +23,8 @@ class Profile(models.Model):
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
+    blacklist = models.ManyToManyField(User, 'blacklist')
+
     def get_social_accounts(self):
         return [i.provider for i in self.user.socialaccount_set.all()]
 
@@ -36,9 +38,14 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        friend_item = Friend.objects.get_or_create(current_user=self.user)[0]
+        # TODO: Сделать всё в один словарь
+        friend_items1 = Friend.objects.filter(from_user=self.user)
+        friend_items2 = Friend.objects.filter(to_user=self.user)
 
-        return friend_item.users.all()
+        return [friend_items1, friend_items2]
+    
+    def friendship_requests(self):
+        return FriendshipRequest.objects.filter(to_user=self.user)
 
     def amount_of_friends(self):
         return len(self.friends())
@@ -118,11 +125,10 @@ class Participants(models.Model):
 
 
 class Friend(models.Model):
-    friends = models.ManyToManyField(User)
-    current_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user+', default='d')
-    request = models.BooleanField(default=False)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="1+")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="2+")
 
 
 class FriendshipRequest(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from+', default='d')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+', default='d')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="3+")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="4+")

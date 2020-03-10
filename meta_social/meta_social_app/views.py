@@ -36,9 +36,8 @@ def get_menu_context(page):
 def index(request):
     context = get_menu_context('newsfeed')
 
-    context['news'] = request.user.profile.get_newsfeed()
+    #context['news'] = request.user.profile.get_newsfeed()
     context['pagename'] = "Главная"
-    print(context['news'])
 
     return render(request, 'index.html', context)
 
@@ -126,26 +125,10 @@ class EditProfile(View):
 
 
 @login_required
-def add_friend(request, friend_id):
-    if request.method == 'POST':
-        request_item = FriendshipRequest.objects.get(id=friend_id)
-        friends_item = Friend(
-            current_user=request_item.from_user,
-            friends=request_item.to_user,
-        )
-        friends_item.save()
-        request_item.delete()
-    return redirect('/accounts/profile/{}/'.format(request_item.id))
-
-
-@login_required
 def friends_list(request, user_id):
     context = get_menu_context('friends')
     context['pagename'] = "Список друзей"
     context['c_user'] = User.objects.get(id=user_id)
-    context['apply'] = Friend.users.filter(request=False)
-    context['apply_by'] = Friend.users.filter(user=request.user)
-
 
     return render(request, 'friends/friends_list.html', context)
 
@@ -170,8 +153,6 @@ def friends_search(request):
 def friends_requests(request):
     context = get_menu_context('friends')
     context['pagename'] = "Заявки в друзья"
-    friend_req = Friend(current_user=request.user, request=False)
-
 
     return render(request, 'friends/requests.html', context)
 
@@ -200,3 +181,50 @@ def post_new(request):
     else:
         form = PostForm()
     return render(request, 'post_edit.html', {'form': form, "pagename": "Посты"})
+
+
+@login_required
+def send_friendship_request(request, user_id):
+    # TODO: Запретить повторяющиеся заявки, и себе
+    if request.method == 'POST':
+        item = FriendshipRequest(
+            from_user=request.user,
+            to_user=User.objects.get(id=user_id)
+        )
+
+        item.save()
+
+    return redirect('/friends/search/')
+
+
+@login_required
+def accept_request(request, request_id):
+    if request.method == 'POST':
+        request_item = FriendshipRequest.objects.get(id=request_id)
+        friends_item = Friend(
+            from_user=request_item.from_user,
+            to_user=request_item.to_user,
+        )
+        friends_item.save()
+        request_item.delete()
+    
+    return redirect('/friends/requests/')
+
+
+@login_required
+def remove_friend(request, user_id):
+    if request.method == 'POST':
+        pass
+
+
+@login_required
+def blacklist_add(request, user_id):
+    if request.method == 'POST':
+        pass
+
+
+@login_required
+def blacklist_remove(request, user_id):
+    if request.method == 'POST':
+        pass
+

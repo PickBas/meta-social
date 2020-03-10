@@ -17,7 +17,13 @@ urlpatterns = [
     path('friends/search/', friends_search),
     path('friends/requests/', friends_requests),
     path('friends/blacklist/', friends_blacklist),
-    path('friends/request/<int:friend_id>/', add_friend),
+
+    path('friends/send_request/<int:user_id>/', send_friendship_request),
+    path('friends/accept_request/<int:request_id>/', accept_request),
+    path('friends/remove_friend/<int:user_id>/', remove_friend),
+    path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
+    path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
+
     # Allauth urls
     path('accounts/', include('allauth.urls')),
 ]

@@ -10,16 +10,13 @@
             {% endif %}
             <hr>
             {% if c_user.profile.friends %}
-                {% for friend in c_user.profile.friends %}
-                    <div class="card mt-1">
-                        <div class="card-body">
-                            {{ friend.first_name }} {{ friend.last_name }} ({{ friend.username }})
-
-                            <a href="#" class="btn btn-danger float-right">
-                                Удалить
-                            </a>
-                        </div>
-                    </div>
+                {% for friend in c_user.profile.friends.0 %}
+                    {{ friend.to_user.username }} 
+                    <br>
+                {% endfor %}
+                {% for friend in c_user.profile.friends.1 %}
+                    {{ friend.from_user.username }} 
+                    <br>
                 {% endfor %}
             {% else %}
                 Список друзей пуст.
