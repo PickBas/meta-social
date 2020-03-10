@@ -1,4 +1,6 @@
 django
 django-crispy-forms
 django-allauth
-Pillow==7.0.0
+Pillow
+django-simple-search
+django-countries
