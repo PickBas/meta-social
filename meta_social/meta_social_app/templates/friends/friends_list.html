@@ -9,13 +9,22 @@
                 <h5>Друзья пользователя {{ c_user.first_name }} {{ c_user.last_name }} ({{ c_user.username }})</h5>
             {% endif %}
             <hr>
+
             {% if c_user.profile.friends %}
                 {% for friend in c_user.profile.friends.0 %}
-                    {{ friend.to_user.username }} 
+                    {{ friend.to_user.username }}
+                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                    {% csrf_token %}
+                    <input type="submit" value="Удалить">
+                    </form>
                     <br>
                 {% endfor %}
                 {% for friend in c_user.profile.friends.1 %}
-                    {{ friend.from_user.username }} 
+                    {{ friend.from_user.username }}
+                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                    {% csrf_token %}
+                    <input type="submit" value="Удалить">
+                    </form>
                     <br>
                 {% endfor %}
             {% else %}

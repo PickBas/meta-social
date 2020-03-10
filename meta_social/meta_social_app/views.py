@@ -143,7 +143,6 @@ def friends_search(request):
             search_fields = ['username', 'first_name', 'last_name']
 
             matches = User.objects.filter(search_filter(search_fields, query))
-
             context['matches'] = matches
 
     return render(request, 'friends/search.html', context)
@@ -189,7 +188,8 @@ def send_friendship_request(request, user_id):
     if request.method == 'POST':
         item = FriendshipRequest(
             from_user=request.user,
-            to_user=User.objects.get(id=user_id)
+            to_user=User.objects.get(id=user_id),
+            already_sent=True
         )
 
         item.save()
@@ -214,7 +214,9 @@ def accept_request(request, request_id):
 @login_required
 def remove_friend(request, user_id):
     if request.method == 'POST':
-        pass
+        friend_item = Friend.objects.get(id=user_id)
+        friend_item.delete()
+    return redirect('/friends/'+str(request.user.id))
 
 
 @login_required

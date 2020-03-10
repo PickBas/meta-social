@@ -132,3 +132,4 @@ class Friend(models.Model):
 class FriendshipRequest(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="3+")
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="4+")
+    already_sent = models.BooleanField(default=False)
