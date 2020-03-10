@@ -1,0 +1,35 @@
+{% extends 'base_menu.html' %}
+
+{% block center %}
+    <div class="card">
+        <div class="card-body">
+            {% if user == c_user %}
+                <h5>Ваши друзья</h5>
+            {% else %}
+                <h5>Друзья пользователя {{ c_user.first_name }} {{ c_user.last_name }} ({{ c_user.username }})</h5>
+            {% endif %}
+            <hr>
+            {% if c_user.profile.friends %}
+                {% for friend in c_user.profile.friends %}
+                    <div class="card mt-1">
+                        <div class="card-body">
+                            {{ friend.first_name }} {{ friend.last_name }} ({{ friend.username }})
+
+                            <a href="#" class="btn btn-danger float-right">
+                                Удалить
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                Список друзей пуст.
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block right %}
+    {% if user == c_user %}
+        {% include 'friends/right_menu.html' %}
+    {% endif %}
+{% endblock %}

@@ -3,19 +3,16 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-from meta_social_app.models import Friend
+from .models import Friend
 
 
 @login_required
 def index(request):
-    users = User.objects.exclude(id=request.user.id)
-
-    friend, created = Friend.objects.get_or_create(current_user=request.user)
-    friends = friend.users.all()
+    user = User.objects.exclude(id=request.user.id)
     context = {
-        'user': users,
-        'friends': friends,
+        'user': user
     }
+    #friends =Friend.objects.get(current_user=request.user, )
     return render(request, 'index.html', context)
 
 
@@ -42,6 +39,7 @@ def profile_second(request, user_id):
 
     return render(request, 'profile_page.html', context)
 
+
 @login_required
 def add_friend(request, operation, pk):
     new_friend = User.objects.get(pk=pk)
@@ -50,3 +48,9 @@ def add_friend(request, operation, pk):
     if operation == 'remove':
         Friend.lose_friend(request.user, new_friend)
     return redirect('/')
+
+
+
+
+
+
