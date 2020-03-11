@@ -147,7 +147,7 @@ def friends_search(request):
 
 @login_required
 def friends_requests(request):
-    context = get_menu_context('friends')
+    context = get_menu_context('friends', 'Заявки в друзья')
     context['pagename'] = "Заявки в друзья"
     return render(request, 'friends/requests.html', context)
 
