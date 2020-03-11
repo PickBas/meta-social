@@ -1,4 +1,5 @@
 {% extends "account/base.html" %}
+{% load crispy_forms_tags %}
 
 {% load i18n %}
 {% load account socialaccount %}
@@ -6,8 +7,24 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
+<style>
+  .card{
+  text-align: center;
+  position: absolute;
+  border: 2px solid grey;
+  top: 48%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%)
 
-<h1>{% trans "Sign In" %}</h1>
+  }
+
+
+</style>
+<div class="card" style="width: 36rem;">
+  <div class="card-body">
+  <h1>{% trans "Sign In" %}</h1>
+    <hr style="border: 1px solid grey;">
 
 {% get_providers as socialaccount_providers %}
 
@@ -16,13 +33,17 @@
 of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
 for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 
+
 <div class="socialaccount_ballot">
 
   <ul class="socialaccount_providers">
     {% include "socialaccount/snippets/provider_list.html" with process="login" %}
   </ul>
 
-  <div class="login-or">{% trans 'or' %}</div>
+
+
+  <div class="login-or">{% trans 'or' %} <br> Войдите с аккаунта Meta Social: </div>
+   <hr style="border: 1px solid grey;">
 
 </div>
 
@@ -33,14 +54,18 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
+
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+  {{ form | crispy }}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
+  <hr style="border: 1px solid grey;">
   <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
   <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
 </form>
+  </div>
+</div>
 
 {% endblock %}
