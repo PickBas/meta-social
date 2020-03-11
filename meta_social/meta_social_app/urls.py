@@ -23,7 +23,7 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
     # Allauth urls
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')), # перенести в основной файл urls
 ]
 
 if settings.DEBUG:
