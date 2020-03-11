@@ -7,3 +7,11 @@ services:
     ports:
       - 80:80
     command: python3 ./meta_social/manage.py runserver 0.0.0.0:80
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: DB

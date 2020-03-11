@@ -286,7 +286,7 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/venv,linux,django,python,pycharm
 
-meta_social/meta_social_app/migrations/0*
+# meta_social/meta_social_app/migrations/0*
 vk_config.v2.json
 
 ### VisualStudioCode ###
