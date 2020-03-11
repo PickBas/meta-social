@@ -9,17 +9,23 @@
                 <h5>Друзья пользователя {{ c_user.first_name }} {{ c_user.last_name }} ({{ c_user.username }})</h5>
             {% endif %}
             <hr>
-            {% if c_user.profile.friends %}
-                {% for friend in c_user.profile.friends %}
-                    <div class="card mt-1">
-                        <div class="card-body">
-                            {{ friend.first_name }} {{ friend.last_name }} ({{ friend.username }})
 
-                            <a href="#" class="btn btn-danger float-right">
-                                Удалить
-                            </a>
-                        </div>
-                    </div>
+            {% if c_user.profile.friends %}
+                {% for friend in c_user.profile.friends.0 %}
+                    {{ friend.to_user.username }}
+                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                    {% csrf_token %}
+                    <input type="submit" value="Удалить">
+                    </form>
+                    <br>
+                {% endfor %}
+                {% for friend in c_user.profile.friends.1 %}
+                    {{ friend.from_user.username }}
+                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                    {% csrf_token %}
+                    <input type="submit" value="Удалить">
+                    </form>
+                    <br>
                 {% endfor %}
             {% else %}
                 Список друзей пуст.
@@ -29,7 +35,7 @@
 {% endblock %}
 
 {% block right %}
-    {% if user == c_user %}
+
         {% include 'friends/right_menu.html' %}
-    {% endif %}
+
 {% endblock %}

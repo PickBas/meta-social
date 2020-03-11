@@ -10,6 +10,11 @@ from django.utils import timezone
 from .models import Profile
 from PIL import Image
 
+<<<<<<< HEAD
+=======
+from .models import Friend, Post, FriendshipRequest
+from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
+>>>>>>> origin/feature/friends_with_accept
 
 from .models import Friend
 
@@ -37,6 +42,7 @@ def get_menu_context(page, pagename):
 def index(request):
     context = get_menu_context('newsfeed', 'Главная')
 
+<<<<<<< HEAD
     context['news'] = request.user.profile.get_newsfeed()
     
     if request.method == "POST":
@@ -47,6 +53,10 @@ def index(request):
             )
 
             item.save()
+=======
+    #context['news'] = request.user.profile.get_newsfeed()
+    context['pagename'] = "Главная"
+>>>>>>> origin/feature/friends_with_accept
 
     return render(request, 'index.html', context)
 
@@ -133,16 +143,6 @@ class EditProfile(View):
 
 
 @login_required
-def add_friend(request, operation, pk):
-    new_friend = User.objects.get(pk=pk)
-    if operation == 'add':
-        Friend.make_friend(request.user, new_friend)
-    if operation == 'remove':
-        Friend.lose_friend(request.user, new_friend)
-    return redirect('/')
-
-
-@login_required
 def friends_list(request, user_id):
     context = get_menu_context('friends', 'Список друзей')
     context['c_user'] = User.objects.get(id=user_id)
@@ -158,8 +158,7 @@ def friends_search(request):
             query = request.POST.get('name')
             search_fields = ['username', 'first_name', 'last_name']
 
-            matches = User.objects.filter(search_filter(search_fields, query))
-
+            matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
 
     return render(request, 'friends/search.html', context)
@@ -167,7 +166,8 @@ def friends_search(request):
 
 @login_required
 def friends_requests(request):
-    context = get_menu_context('friends', 'Заявки в друзья')
+    context = get_menu_context('friends')
+    context['pagename'] = "Заявки в друзья"
     return render(request, 'friends/requests.html', context)
 
 
@@ -175,3 +175,78 @@ def friends_requests(request):
 def friends_blacklist(request):
     context = get_menu_context('friends', 'Черный список')
     return render(request, 'friends/blacklist.html', context)
+
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'post_list.html', {'posts': posts, 'pagename': "Посты"})
+
+
+def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.date = timezone.now()
+            post.save()
+    else:
+        form = PostForm()
+    return render(request, 'post_edit.html', {'form': form, "pagename": "Посты"})
+
+
+@login_required
+def send_friendship_request(request, user_id):
+    # TODO: Запретить повторяющиеся заявки, и себе
+    if request.method == 'POST':
+        item = FriendshipRequest(
+            from_user=request.user,
+            to_user=User.objects.get(id=user_id),
+            already_sent=True
+        )
+
+        item.save()
+
+    return redirect('/friends/search/')
+
+
+@login_required
+def accept_request(request, request_id):
+    if request.method == 'POST':
+        request_item = FriendshipRequest.objects.get(id=request_id)
+        friends_item = Friend(
+            from_user=request_item.from_user,
+            to_user=request_item.to_user,
+        )
+        friends_item.save()
+        request_item.delete()
+    
+    return redirect('/friends/requests/')
+
+
+@login_required
+def remove_friend(request, user_id):
+    if request.method == 'POST':
+        friend_item = Friend.objects.get(id=user_id)
+        friend_item.delete()
+    return redirect('/friends/'+str(request.user.id))
+
+
+@login_required
+def blacklist_add(request, user_id):
+    if request.method == 'POST':
+        pass
+
+
+@login_required
+def blacklist_remove(request, user_id):
+    if request.method == 'POST':
+        pass
+
+
+@login_required
+def accept_request(request, request_id):
+    if request.method == 'POST':
+        item = User.objects.get(id=request_id)
+    return redirect('/accounts/profile/{}/'.format(item.id))
+

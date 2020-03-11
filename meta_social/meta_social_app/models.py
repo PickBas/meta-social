@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
 
-
 class Profile(models.Model):
     GENDER_CHOICES = (
         ('M', 'Мужчина'),
@@ -24,6 +23,8 @@ class Profile(models.Model):
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
+    blacklist = models.ManyToManyField(User, 'blacklist')
+
     def get_social_accounts(self):
         return [i.provider for i in self.user.socialaccount_set.all()]
 
@@ -37,9 +38,14 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        friend_item = Friend.objects.get_or_create(current_user=self.user)[0]
+        # TODO: Сделать всё в один словарь
+        friend_items1 = Friend.objects.filter(from_user=self.user)
+        friend_items2 = Friend.objects.filter(to_user=self.user)
 
-        return friend_item.users.all()
+        return [friend_items1, friend_items2]
+    
+    def friendship_requests(self):
+        return FriendshipRequest.objects.filter(to_user=self.user)
 
     def amount_of_friends(self):
         return len(self.friends())
@@ -120,19 +126,11 @@ class Participants(models.Model):
 
 
 class Friend(models.Model):
-    users = models.ManyToManyField(User)
-    current_user = models.ForeignKey(User, related_name='owner', null=True, on_delete=models.CASCADE)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="1+")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="2+")
 
-    @classmethod
-    def make_friend(cls, current_user, new_friend):
-        friend, created = cls.objects.get_or_create(
-            current_user=current_user
-        )
-        friend.users.add(new_friend)
 
-    @classmethod
-    def lose_friend(cls, current_user, new_friend):
-        friend, created = cls.objects.get_or_create(
-            current_user=current_user
-        )
-        friend.users.remove(new_friend)
+class FriendshipRequest(models.Model):
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="3+")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="4+")
+    already_sent = models.BooleanField(default=False)
