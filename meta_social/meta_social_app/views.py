@@ -10,12 +10,9 @@ from django.utils import timezone
 from .models import Profile
 from PIL import Image
 
-<<<<<<< HEAD
-=======
+
 from .models import Friend, Post, FriendshipRequest
 from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
->>>>>>> origin/feature/friends_with_accept
-
 from .models import Friend
 
 
