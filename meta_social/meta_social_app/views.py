@@ -142,7 +142,7 @@ def friends_search(request):
             query = request.POST.get('name')
             search_fields = ['username', 'first_name', 'last_name']
 
-            matches = User.objects.filter(search_filter(search_fields, query))
+            matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
 
     return render(request, 'friends/search.html', context)
@@ -230,3 +230,9 @@ def blacklist_remove(request, user_id):
     if request.method == 'POST':
         pass
 
+
+@login_required
+def accept_request(request, request_id):
+    if request.method == 'POST':
+        item = User.objects.get(id=request_id)
+    return redirect('/accounts/profile/{}/'.format(item.id))

@@ -17,7 +17,7 @@
             {% if matches %}
                 <hr>
                 {% for i in matches %}
-                    {% if i.id != user.id %}
+
                     <div class="card mt-1">
                         <div class="card-body">
 
@@ -27,11 +27,10 @@
                             {% csrf_token %}
                                 <input type='submit' value="Добавить" class="btn btn-success float-right ml-2">
                             </form>
-                    {% else %}
-                        <div class="card mt-1">
-                        <div class="card-body">
-                            <h2>Вы ошиблись, таких людей не существует</h2>
-                        {% endif %}
+                            <form method='POST'   action='/accounts/profile/{{ i.id }}/'>
+                            {% csrf_token %}
+                                <input type='submit' value="Посмотреть профиль" class="btn btn-info float-left ml-2">
+                            </form>
                             {% if i in user.profile.friends %}
                                 <a href="#" class="btn btn-danger float-right">
                                     Удалить
