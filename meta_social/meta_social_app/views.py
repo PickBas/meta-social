@@ -38,23 +38,7 @@ def get_menu_context(page, pagename):
 @login_required
 def index(request):
     context = get_menu_context('newsfeed', 'Главная')
-
-<<<<<<< HEAD
-    context['news'] = request.user.profile.get_newsfeed()
-    
-    if request.method == "POST":
-        if request.POST.get('post_text'):
-            item = Post(
-                text=request.POST.get('post_text'),
-                user=request.user,
-            )
-
-            item.save()
-=======
-    #context['news'] = request.user.profile.get_newsfeed()
     context['pagename'] = "Главная"
->>>>>>> origin/feature/friends_with_accept
-
     return render(request, 'index.html', context)
 
 
