@@ -10,8 +10,8 @@ from django.utils import timezone
 from .models import Profile
 from PIL import Image
 
-from .models import Friend, Post
-from .forms import ProfileUpdateForm, UserUpdateForm
+
+from .models import Friend
 
 
 def get_menu_context(page, pagename):

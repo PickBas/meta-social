@@ -119,9 +119,9 @@
                 {% for post in c_user.profile.posts %}
                     <div class="card mb-3 post_div">
                         <div class="card-body">
+                            <h5 class="card-title">{{ post.name_of_post }}</h5>
+                            <p class="card-text"><small class="text-muted">{{ post.data }}</small></p>
                             <p class="card-text">{{ post.text }}</p>
-                            <hr class="mt-0 mb-1">
-                            <p class="text-muted mb-0 float-right">{{ post.date }}</p>
                         </div>
                     </div>
                 {% endfor %}

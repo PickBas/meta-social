@@ -91,6 +91,7 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 2
 
 
+
 WSGI_APPLICATION = 'meta_social.wsgi.application'
 
 

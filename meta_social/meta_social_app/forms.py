@@ -21,6 +21,12 @@ class SignUpForm(UserCreationForm):
             raise forms.ValidationError("Email is already in use!")
 
 
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('name_of_post', 'text', 'date')
+
+
 class ProfileUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProfileUpdateForm, self).__init__(*args, **kwargs)
