@@ -44,8 +44,11 @@ class Profile(models.Model):
 
         return friends
     
-    def friendship_requests(self):
+    def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
+    
+    def friendship_outbox_requests(self):
+        return FriendshipRequest.objects.filter(from_user=self.user)
 
     def amount_of_friends(self):
         return len(self.friends())
