@@ -7,21 +7,8 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
-<style>
-  .card{
-  text-align: center;
-  position: absolute;
-  border: 2px solid grey;
-  top: 48%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%)
-
-  }
-
-
-</style>
-<div class="card" style="width: 36rem;">
+<div class="container">
+<div class="card mt-3">
   <div class="card-body">
   <h1>{% trans "Sign In" %}</h1>
     <hr style="border: 1px solid grey;">
@@ -37,7 +24,9 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 <div class="socialaccount_ballot">
 
   <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+    <a href="{% provider_login_url "vk" %}">Vk</a>
+    
+    <a href="{% provider_login_url "facebook" %}">Facebook</a>
   </ul>
 
 
@@ -67,5 +56,5 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 </form>
   </div>
 </div>
-
+</div>
 {% endblock %}
