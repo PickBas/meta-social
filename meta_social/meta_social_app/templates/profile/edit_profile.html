@@ -35,8 +35,6 @@
                         <div class="col mt-3">
                             {{ user_form|crispy }}
                             {{ profile_form|crispy }}
-                            <input type="checkbox" name="show_email" {% if profile.show_email %} checked {% endif %}>
-                            <label>Отображать почту</label>
                             <input class="btn btn-primary btn-block" type="submit" value="Сохранить">
                         </div>
                     </div>

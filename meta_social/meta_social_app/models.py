@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
 
+
 class Profile(models.Model):
     GENDER_CHOICES = (
         ('M', 'Мужчина'),
@@ -43,7 +44,7 @@ class Profile(models.Model):
         friend_items2 = Friend.objects.filter(to_user=self.user)
 
         return [friend_items1, friend_items2]
-    
+
     def friendship_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 

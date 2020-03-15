@@ -36,7 +36,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('job', 'biography', 'gender', 'country', 'birth')
+        fields = ('job', 'biography', 'gender', 'country', 'birth', 'show_email')
         widgets = {
             'birth': forms.DateInput(attrs={'type': 'date', 'placeholder': 'Select a date'})
         }
@@ -45,7 +45,8 @@ class ProfileUpdateForm(forms.ModelForm):
             "biography": "Биография",
             "gender": "Пол",
             "country": "Страна",
-            "birth": "Дата рождения"
+            "birth": "Дата рождения",
+            "show_email": "Отображать почту",
         }
 
 
