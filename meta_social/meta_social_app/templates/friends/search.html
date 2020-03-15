@@ -31,10 +31,8 @@
                             {% csrf_token %}
                                 <input type='submit' value="Посмотреть профиль" class="btn btn-info float-left ml-2">
                             </form>
-                            {% if i in user.profile.friends %}
-                                <a href="#" class="btn btn-danger float-right">
-                                    Удалить
-                                </a>
+                            {% if i in i.profile.friends.1 %}
+                                <h1>ДЭм</h1>
                             {% endif %}
                         </div>
                     </div>

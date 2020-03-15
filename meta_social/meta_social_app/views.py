@@ -231,8 +231,3 @@ def blacklist_remove(request, user_id):
         pass
 
 
-@login_required
-def accept_request(request, request_id):
-    if request.method == 'POST':
-        item = User.objects.get(id=request_id)
-    return redirect('/accounts/profile/{}/'.format(item.id))
