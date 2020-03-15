@@ -11,16 +11,8 @@
             <hr>
 
             {% if c_user.profile.friends %}
-                {% for friend in c_user.profile.friends.0 %}
+                {% for friend in c_user.profile.friends %}
                     <a href="/accounts/profile/{{ friend.to_user.id }}/">{{ friend.to_user.username }}</a>
-                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
-                    {% csrf_token %}
-                    <input type="submit" value="Удалить">
-                    </form>
-                    <br>
-                {% endfor %}
-                {% for friend in c_user.profile.friends.1 %}
-                    <a href="/accounts/profile/{{ friend.from_user.id }}/">{{ friend.from_user.username }}</a>
                     <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
                     {% csrf_token %}
                     <input type="submit" value="Удалить">

@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
 
+
 class Profile(models.Model):
     GENDER_CHOICES = (
         ('M', 'Мужчина'),
@@ -38,11 +39,10 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        # TODO: Сделать всё в один словарь
-        friend_items1 = Friend.objects.filter(from_user=self.user)
-        friend_items2 = Friend.objects.filter(to_user=self.user)
+        friends = [i.to_user for i in list(Friend.objects.filter(from_user=self.user))]
+        friends += [i.from_user for i in list(Friend.objects.filter(to_user=self.user))]
 
-        return [friend_items1, friend_items2]
+        return friends
     
     def friendship_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
@@ -59,7 +59,7 @@ class Profile(models.Model):
     def get_newsfeed(self):
         posts = []
         for friend in self.friends():
-            posts += friend.profile.posts()
+            posts += list(friend.profile.posts())
         for com in self.communities():
             posts += com.posts()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
@@ -68,15 +68,11 @@ class Profile(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    name_of_post = models.CharField(max_length=200)
     text = models.TextField()
-    date = models.DateTimeField(default=timezone.now)
-
-    def publish(self):
-        self.save()
+    date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name_of_post
+        return self.text
 
 
 class Communities(models.Model):

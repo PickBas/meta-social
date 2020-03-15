@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Post, Profile
-from django_countries.fields import CountryField
+from .models import Profile
 
 
 class SignUpForm(UserCreationForm):
@@ -19,12 +18,6 @@ class SignUpForm(UserCreationForm):
             return email
         else:
             raise forms.ValidationError("Email is already in use!")
-
-
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ('name_of_post', 'text', 'date')
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -53,5 +46,3 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name')
-
-

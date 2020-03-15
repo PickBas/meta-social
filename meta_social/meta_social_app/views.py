@@ -1,9 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
@@ -12,8 +11,7 @@ from PIL import Image
 
 
 from .models import Friend, Post, FriendshipRequest
-from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
-from .models import Friend
+from .forms import ProfileUpdateForm, UserUpdateForm
 
 
 def get_menu_context(page, pagename):
@@ -79,7 +77,7 @@ class ImageManage():
 
     def process_img(self):
         if self.image.size <= 5000000 and self.image.content_type.split('/')[0] == 'image':
-            img_name, img_extension = self.image.name.split('.')
+            img_extension = self.image.name.split('.')[1]
             self.path += img_extension
             self.remove_old_avatar()
             self.save_avatar()
@@ -158,22 +156,17 @@ def friends_blacklist(request):
     return render(request, 'friends/blacklist.html', context)
 
 
-def post_list(request):
-    posts = Post.objects.all()
-    return render(request, 'post_list.html', {'posts': posts, 'pagename': "Посты"})
-
-
+@login_required
 def post_new(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.date = timezone.now()
+        if request.POST.get('text'):
+            post = Post(
+                text=request.POST.get('text'),
+                user=request.user,
+            )
             post.save()
-    else:
-        form = PostForm()
-    return render(request, 'post_edit.html', {'form': form, "pagename": "Посты"})
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -188,7 +181,7 @@ def send_friendship_request(request, user_id):
 
         item.save()
 
-    return redirect('/friends/search/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -201,8 +194,8 @@ def accept_request(request, request_id):
         )
         friends_item.save()
         request_item.delete()
-
-    return redirect('/friends/requests/')
+    
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -210,16 +203,19 @@ def remove_friend(request, user_id):
     if request.method == 'POST':
         friend_item = Friend.objects.get(id=user_id)
         friend_item.delete()
-    return redirect('/friends/'+str(request.user.id))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
 def blacklist_add(request, user_id):
     if request.method == 'POST':
         pass
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
 def blacklist_remove(request, user_id):
     if request.method == 'POST':
         pass
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

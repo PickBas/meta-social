@@ -22,10 +22,8 @@ urlpatterns = [
     path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
-    # Allauth urls
-    path('accounts/', include('allauth.urls')), # перенести в основной файл urls
+    path('post/create/', post_new)
 ]
 
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

@@ -88,7 +88,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-SITE_ID = 4
+SITE_ID = 2
 
 
 
@@ -168,7 +168,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #EMAIL_HOST_USER = 'piryazev555@gmail.com'
 #EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
 
-STATIC_URL = '/static/'
 STATICFILES_DIRS = (
       os.path.join(BASE_DIR, "static"),
 )

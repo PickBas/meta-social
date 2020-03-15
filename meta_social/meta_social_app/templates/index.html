@@ -31,22 +31,21 @@ position: fixed;
 }
 
 </style>
-
-
     <div class="card">
         <div class="card-body">
-            <div class="input-group">
+            <form method="POST" class="input-group" action="/post/create/">
+                {% csrf_token %}
                 <img src="https://image.flaticon.com/icons/svg/685/685655.svg" width=20 height=20 class="im_photo  all">
                 <img src="https://www.flaticon.com/premium-icon/icons/svg/604/604338.svg" width=20 height=20 class="im_video all">
                 <img src="https://image.flaticon.com/icons/svg/727/727204.svg" width=20 height=20 class="im_music all">
-                 <img src="https://image.flaticon.com/icons/svg/684/684831.svg" width=20 height=20 class="im_doc all">
-                <input type="text" class="form-control" style="border: none" placeholder="Что у вас нового?" aria-label="Recipient's username" aria-describedby="button-addon">
+                <img src="https://image.flaticon.com/icons/svg/684/684831.svg" width=20 height=20 class="im_doc all">
+                <input type="text" class="form-control" style="border: none" placeholder="Что у вас нового?" aria-label="Recipient's username" aria-describedby="button-addon" name="text">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary all" type="button" id="button-addon">
+                    <button class="btn btn-outline-secondary all" type="submit" id="button-addon">
                         <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     <div class="card mt-3">
@@ -149,16 +148,15 @@ position: fixed;
     })
 
 </script>
-    {% if news %}
-        {% for i in news %}
+    {% if user.profile.get_newsfeed %}
+        {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <h5 class="card-text">{{ i }}</h5>
-                    <hr>
-                    <p class="card-text">{{ i.text }}</p>
+                    <img src="{{ post.user.profile.avatar.url }}" class="rounded-circle border border-dark" width=35 height=35>
+                    <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+                    <p class="card-text mt-2">{{ post.text }}</p>
                     <hr class="mt-0 mb-1">
-                    <a href="/accounts/profile/{{ i.user.id }}/" class="mb-0 float-left">{{ i.user.username }}</a>
-                    <span class="text-muted mb-0 float-right">{{ i.date }}</span>
+                    <span class="text-muted mb-0 float-right">{{ post.date }}</span>
                 </div>
             </div>
         {% endfor %}

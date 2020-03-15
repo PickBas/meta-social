@@ -51,7 +51,7 @@
             </div>
 
             <div class="card profile_div">
-                <img src="{{ MEDIA_URL }}{{ profile.avatar.url }}" class="card-img-top" alt="...">
+                <img src="{{ MEDIA_URL }}{{ c_user.profile.avatar.url }}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">
                         {% if c_user.first_name and c_user.last_name %}
@@ -119,7 +119,7 @@
                 {% for post in c_user.profile.posts %}
                     <div class="card mb-3 post_div">
                         <div class="card-body">
-                            <h5 class="card-title">{{ post.name_of_post }}</h5>
+                            <h5 class="card-title">{{ post }}</h5>
                             <p class="card-text"><small class="text-muted">{{ post.data }}</small></p>
                             <p class="card-text">{{ post.text }}</p>
                         </div>
