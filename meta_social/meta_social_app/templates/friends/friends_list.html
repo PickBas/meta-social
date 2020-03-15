@@ -12,7 +12,7 @@
 
             {% if c_user.profile.friends %}
                 {% for friend in c_user.profile.friends.0 %}
-                    {{ friend.to_user.username }}
+                    <a href="/accounts/profile/{{ friend.to_user.id }}/">{{ friend.to_user.username }}</a>
                     <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
                     {% csrf_token %}
                     <input type="submit" value="Удалить">
@@ -20,7 +20,7 @@
                     <br>
                 {% endfor %}
                 {% for friend in c_user.profile.friends.1 %}
-                    {{ friend.from_user.username }}
+                    <a href="/accounts/profile/{{ friend.from_user.id }}/">{{ friend.from_user.username }}</a>
                     <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
                     {% csrf_token %}
                     <input type="submit" value="Удалить">
