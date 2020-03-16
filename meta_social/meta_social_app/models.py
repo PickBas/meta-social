@@ -1,3 +1,8 @@
+"""
+Modules module
+"""
+
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -7,6 +12,9 @@ from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
+    """
+    User profile class
+    """
     GENDER_CHOICES = (
         ('M', 'Мужчина'),
         ('F', 'Женщина'),
@@ -26,13 +34,24 @@ class Profile(models.Model):
 
     blacklist = models.ManyToManyField(User, 'blacklist')
 
-    def get_social_accounts(self):
+    def get_social_accounts(self) -> list:
+        """
+        Getting social accounts
+        :return: list
+        """
         return [i.provider for i in self.user.socialaccount_set.all()]
 
     def get_social_data(self, provider):
+        """
+        Getting social data
+        :param provider:
+        """
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
 
     def posts(self):
+        """
+        Getting user's posts
+        """
         return Post.objects.filter(user=self.user)
 
     def amount_of_posts(self):
