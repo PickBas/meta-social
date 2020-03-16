@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 
@@ -21,11 +21,9 @@ urlpatterns = [
     path('friends/remove_friend/<int:user_id>/', remove_friend),
     path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
-
-    # Allauth urls
-    path('accounts/', include('allauth.urls')), # перенести в основной файл urls
 ]
 
 if settings.DEBUG:
-    urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += staticfiles_urlpatterns() + \
+                   static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

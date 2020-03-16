@@ -127,11 +127,11 @@ class Participants(models.Model):
 
 
 class Friend(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="1+")
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="2+")
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='1+')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='2+')
 
 
 class FriendshipRequest(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="3+")
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="4+")
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='3+')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='4+')
     already_sent = models.BooleanField(default=False)
