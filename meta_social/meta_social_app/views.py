@@ -43,6 +43,18 @@ def get_menu_context(page: str, pagename: str) -> dict:
     return context
 
 
+def get_last_act(request, user_item) -> None:
+    """
+    Get last user's action time
+    :param request: request
+    :param user_item: User
+    :return: None
+    """
+    if request.method == 'GET' and request.user == user_item:
+        user_item.profile.last_act = timezone.now()
+        user_item.profile.save()
+
+
 @login_required
 def index(request) -> render:
     """
@@ -66,7 +78,6 @@ def logout_track(request, user_id) -> redirect:
     user_item = User.objects.get(id=user_id)
     user_item.profile.last_logout = timezone.now()
     user_item.profile.save()
-    print(user_item.profile.last_logout)
     return redirect('/accounts/logout/')
 
 
@@ -78,15 +89,28 @@ def profile(request, user_id) -> render:
     :param user_id: id
     :return: context
     """
+    is_online = False
     if not User.objects.filter(id=user_id).exists():
         raise Http404()
 
     context = get_menu_context('profile', 'Профиль')
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
+    if user_item.last_login.hour >= user_item.profile.last_logout.hour and \
+            user_item.last_login.minute >= user_item.profile.last_logout.minute and \
+            user_item.last_login.second >= user_item.profile.last_logout.second:
+        is_online = True
+    elif user_item.last_login.hour >= user_item.profile.last_logout.hour and user_item.last_login.minute > user_item.profile.last_logout.minute:
+        is_online = True
+    elif user_item.last_login.hour > user_item.profile.last_logout.hour:
+        is_online = True
+    else:
+        is_online = False
+
     context['c_user'] = user_item
-    print(user_item.last_login)
-    print(user_item.profile.last_logout)
+    context['is_online'] = is_online
+    get_last_act(request, user_item)
+
     return render(request, 'profile/profile_page.html', context)
 
 
@@ -192,6 +216,7 @@ class EditProfile(View):
             instance=User.objects.get(id=kwargs['user_id'])
         )
         context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
+        get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
 
@@ -206,6 +231,7 @@ def friends_list(request, user_id) -> render:
     """
     context = get_menu_context('friends', 'Список друзей')
     context['c_user'] = User.objects.get(id=user_id)
+    get_last_act(request, context['uedit'])
 
     return render(request, 'friends/friends_list.html', context)
 
@@ -225,6 +251,8 @@ def friends_search(request) -> render:
 
             matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
+    if request.method == 'GET':
+        get_last_act(request, context['uedit'])
 
     return render(request, 'friends/search.html', context)
 

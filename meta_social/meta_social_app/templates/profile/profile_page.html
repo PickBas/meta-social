@@ -62,20 +62,11 @@
                     </h5>
                     <hr class="mt-0 mb-1">
                     <p class="card-text">
-                        {% if c_user.last_login.hour >= c_user.profile.last_logout.hour and c_user.last_login.minute >= c_user.profile.last_logout.minute and c_user.last_login.second >= c_user.profile.last_logout.second  %}
-                            Онлайн
-                        {% else %}
-                            {% if c_user.last_login.hour >= c_user.profile.last_logout.hour and c_user.last_login.minute > c_user.profile.last_logout.minute %}
-                                Онлайн
-                            {% else %}
-                                {% if c_user.last_login.hour > c_user.profile.last_logout.hour %}
-                                    Онлайн
-                                {% else %}
-                                    Оффлайн
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
-
+                       {% if is_online %}
+                           Онлайн
+                       {% else %}
+                           Оффлайн
+                       {% endif %}
                     </p>
                     <p class="card-text">Пол: {{ c_user.profile.get_gender_display }}</p>
                 </div>
