@@ -13,7 +13,6 @@ from django.utils import timezone
 from PIL import Image
 from .models import Profile
 
-
 from .models import Post, FriendshipRequest
 from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
 from .models import Friend
@@ -57,6 +56,21 @@ def index(request) -> render:
 
 
 @login_required
+def logout_track(request, user_id) -> redirect:
+    """
+    When user logs out, time is written to a database
+    :param request: request
+    :param user_id: id
+    :return: redirect
+    """
+    user_item = User.objects.get(id=user_id)
+    user_item.profile.last_logout = timezone.now()
+    user_item.profile.save()
+    print(user_item.profile.last_logout)
+    return redirect('/accounts/logout/')
+
+
+@login_required
 def profile(request, user_id) -> render:
     """
     User profile view.
@@ -71,7 +85,8 @@ def profile(request, user_id) -> render:
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
     context['c_user'] = user_item
-
+    print(user_item.last_login)
+    print(user_item.profile.last_logout)
     return render(request, 'profile/profile_page.html', context)
 
 
@@ -79,6 +94,7 @@ class ImageManage:
     """
     Processing images class
     """
+
     def __init__(self, user_id, profile, image):
         self.file_sys = FileSystemStorage()
         self.path = 'avatars/users/' + str(user_id) + '.'
@@ -316,7 +332,7 @@ def remove_friend(request, user_id) -> redirect:
     if request.method == 'POST':
         friend_item = Friend.objects.get(id=user_id)
         friend_item.delete()
-    return redirect('/friends/'+str(request.user.id))
+    return redirect('/friends/' + str(request.user.id))
 
 
 @login_required
