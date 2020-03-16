@@ -10,8 +10,8 @@ from django.shortcuts import render, redirect
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
-from .models import Profile
 from PIL import Image
+from .models import Profile
 
 
 from .models import Post, FriendshipRequest
@@ -80,7 +80,7 @@ class ImageManage:
     Processing images class
     """
     def __init__(self, user_id, profile, image):
-        self.fs = FileSystemStorage()
+        self.file_sys = FileSystemStorage()
         self.path = 'avatars/users/' + str(user_id) + '.'
         self.profile = profile
         self.image = image
@@ -91,14 +91,14 @@ class ImageManage:
         :return: None
         """
         if self.profile.avatar.name != 'avatars/users/0.png':
-            self.fs.delete(self.profile.avatar.path)
+            self.file_sys.delete(self.profile.avatar.path)
 
     def save_avatar(self) -> None:
         """
         Saving new avatar
         :return: None
         """
-        self.fs.save(self.path, self.image)
+        self.file_sys.save(self.path, self.image)
         self.profile.avatar = self.path
         self.profile.save()
 
@@ -118,7 +118,7 @@ class ImageManage:
         :return: None
         """
         if self.image.size <= 5000000 and self.image.content_type.split('/')[0] == 'image':
-            img_name, img_extension = self.image.name.split('.')
+            _, img_extension = self.image.name.split('.')
             self.path += img_extension
             self.remove_old_avatar()
             self.save_avatar()
@@ -154,7 +154,8 @@ class EditProfile(View):
         except Exception:
             pass
 
-        profile_form = ProfileUpdateForm(request.POST, instance=Profile.objects.get(user=kwargs['user_id']))
+        profile_form = ProfileUpdateForm(request.POST,
+                                         instance=Profile.objects.get(user=kwargs['user_id']))
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
@@ -171,7 +172,9 @@ class EditProfile(View):
         context = get_menu_context('profile', 'Редактирование профиля')
         context['profile'] = Profile.objects.get(user=kwargs['user_id'])
         context['uedit'] = User.objects.get(id=kwargs['user_id'])
-        context['user_form'] = UserUpdateForm(instance=User.objects.get(id=kwargs['user_id']))
+        context['user_form'] = UserUpdateForm(
+            instance=User.objects.get(id=kwargs['user_id'])
+        )
         context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
 
         return render(request, self.template_name, context)
