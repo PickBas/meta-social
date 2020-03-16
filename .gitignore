@@ -146,6 +146,7 @@ dmypy.json
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+meta_social/meta_social_app/migrations/0*.py
 
 # Generated files
 .idea/**/contentModel.xml
