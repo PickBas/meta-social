@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cropping %}
 
 {% block main %}
     <link rel="stylesheet" href='{% static "css/style_profile_page.css" %}'>
@@ -51,7 +52,19 @@
             </div>
 
             <div class="card profile_div">
-                <img src="{{ c_user.profile.avatar.url }}" class="card-img-top" alt="...">
+                <style>
+                    .rollover {
+                        transition-duration: 0.5s;
+                    }
+                    .rollover:hover {
+                        border-radius: 35px;
+                        transition-duration: 1s;
+                    }
+                </style>
+
+                <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
+                    <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover" alt="...">
+                </a>
                 <div class="card-body">
                     <h5 class="card-title">
                         {% if c_user.first_name and c_user.last_name %}

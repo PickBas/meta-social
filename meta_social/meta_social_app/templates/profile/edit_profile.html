@@ -15,24 +15,8 @@
                         }
                     </style>
                     {% csrf_token %}
-
                     <div class="row">
-                        <div class="col-3">
-                            <img class="border rounded-circle mt-2 img-thumbnail"
-                                    src="{{ MEDIA_URL }}{{ profile.avatar.url }}"
-                                    style="display: block; margin: auto;">
-                        </div>
                         <div class="col">
-                            <div class="form-group">
-                                <label for="exampleFormControlFile1" class="d-flex">Выбрать аватар</label>
-                                <input type="file" class="form-control-file" id="exampleFormControlFile1"
-                                        name="avatar">
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col mt-3">
                             {{ user_form|crispy }}
                             {{ profile_form|crispy }}
                             <input type="checkbox" name="show_email" {% if profile.show_email %} checked {% endif %}>

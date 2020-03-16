@@ -1,0 +1,30 @@
+{% extends 'base_menu.html' %}
+{% load cropping %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock  %}
+
+{% block center %}
+    <style>
+        .clearable-file-input {
+            visibility: hidden;
+        }
+    </style>
+    <div class="card">
+        <div class="card-body">
+            <h5>Изменение аватарки</h5>
+            <hr>
+            <!--{% if image %}
+                <img src="{% cropped_thumbnail image "cropping" %}" />
+            {% endif %}-->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.image }} 
+                {{ form.cropping }}
+                <hr>
+                <input type="submit" value="Сохранить">
+            </form>
+        </div>
+    </div>
+{% endblock  %}

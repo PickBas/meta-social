@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
+from image_cropping import ImageRatioField, ImageCropField
 
 
 class Profile(models.Model):
@@ -15,7 +16,9 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
-    avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True, default='avatars/users/0.png')
+    image = ImageCropField(blank=True, upload_to='avatars/users', default='avatars/users/0.png')
+    cropping = ImageRatioField('image', '250x250')
+
     job = models.CharField(null=True, max_length=100)
     biography = models.CharField(max_length=500, null=True)
 

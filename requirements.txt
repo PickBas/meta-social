@@ -4,6 +4,8 @@ django-allauth
 Pillow
 django-simple-search
 django-countries
+easy_thumbnails
+django-image-cropping
 
 # for postgresql
 gunicorn==20.0.4

@@ -10,6 +10,7 @@ urlpatterns = [
     path('', index, name='home'),
     path('accounts/profile/<int:user_id>/', profile),
     path('accounts/profile/<int:user_id>/edit_profile/', login_required(EditProfile.as_view())),
+    path('accounts/profile/<user_id>/change_avatar/', crop_image, name='crop'),
 
     path('friends/<int:user_id>/', friends_list),
     path('friends/search/', friends_search),
@@ -22,7 +23,7 @@ urlpatterns = [
     path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
-    path('post/create/', post_new)
+    path('post/create/', post_new),
 ]
 
 if settings.DEBUG:

@@ -2,16 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
+from django.urls import reverse
 from .models import Profile
 from PIL import Image
 
 
 from .models import Friend, Post, FriendshipRequest
-from .forms import ProfileUpdateForm, UserUpdateForm
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm
 
 
 def get_menu_context(page, pagename):
@@ -219,3 +220,24 @@ def blacklist_remove(request, user_id):
         pass
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def crop_image(request, user_id):
+    if int(request.user.id) != int(user_id):
+        raise Http404()
+
+    image = get_object_or_404(Profile, pk=user_id) if user_id else None
+    form = CropImageForm(instance=image)
+
+    if request.method == 'POST':
+        form = CropImageForm(request.POST, request.FILES, instance=image)
+        if form.is_valid():
+            image = form.save()
+            return HttpResponseRedirect(reverse('crop', args=(image.pk,)))
+
+    context = get_menu_context('profile', 'Смена аватарки')
+    context['form'] = form
+    context['image'] = image
+
+    return render(request, 'profile/crop.html', context)
