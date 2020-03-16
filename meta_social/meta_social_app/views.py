@@ -257,7 +257,7 @@ def friends_list(request, user_id) -> render:
     """
     context = get_menu_context('friends', 'Список друзей')
     context['c_user'] = User.objects.get(id=user_id)
-    get_last_act(request, context['uedit'])
+    get_last_act(request, context['c_user'])
 
     return render(request, 'friends/friends_list.html', context)
 
