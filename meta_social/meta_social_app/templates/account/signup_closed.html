@@ -5,21 +5,8 @@
 {% block head_title %}{% trans "Sign Up Closed" %}{% endblock %}
 
 {% block content %}
-<style>
-  .card{
-  text-align: center;
-  position: absolute;
-  border: 2px solid grey;
-  top: 24.6%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%)
-
-  }
-
-
-</style>
-<div class="card" style="width: 36rem;">
+<div class="container">
+<div class="card mt-3">
   <div class="card-body">
 
 <h1>{% trans "Sign Up Closed" %}</h1>
@@ -27,5 +14,6 @@
 
 <p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
         </div>
+</div>
 </div>
 {% endblock %}
