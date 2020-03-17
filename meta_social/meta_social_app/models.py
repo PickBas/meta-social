@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
+from django.template.defaultfilters import slugify
 from image_cropping import ImageRatioField, ImageCropField
 
 
@@ -79,6 +80,14 @@ class Post(models.Model):
 
     def __str__(self):
         return self.text
+
+    def get_images(self):
+        return PostImages.objects.filter(post=self)
+
+
+class PostImages(models.Model):
+    post = models.ForeignKey(Post, models.CASCADE)
+    image = models.ImageField(upload_to='post/images/')
 
 
 class Communities(models.Model):

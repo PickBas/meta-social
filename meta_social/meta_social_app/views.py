@@ -9,10 +9,10 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import Profile
 from PIL import Image
+from django.forms import modelformset_factory
 
-
-from .models import Friend, Post, FriendshipRequest
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm
+from .models import Friend, Post, FriendshipRequest, PostImages
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
 
 
 def get_menu_context(page, pagename):
@@ -38,6 +38,12 @@ def get_menu_context(page, pagename):
 def index(request):
     context = get_menu_context('newsfeed', 'Главная')
     context['pagename'] = "Главная"
+
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    context['postform'] = PostForm()
+    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
     return render(request, 'index.html', context)
 
 
@@ -159,13 +165,22 @@ def friends_blacklist(request):
 
 @login_required
 def post_new(request):
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
     if request.method == "POST":
-        if request.POST.get('text'):
-            post = Post(
-                text=request.POST.get('text'),
-                user=request.user,
-            )
-            post.save()
+        postForm = PostForm(request.POST)
+        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+        if postForm.is_valid() and formset.is_valid():
+            post_form = postForm.save(commit=False)
+            post_form.user = request.user
+            post_form.save()
+
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    photo = PostImages(post=post_form, image=image)
+                    photo.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
