@@ -1,4 +1,5 @@
 {% extends 'base_menu.html' %}
+{% load cropping %}
 
 {% block center %}
     <div class="card">
@@ -14,7 +15,7 @@
                 <ul class="list-group list-group-flush">
                     {% for friend in c_user.profile.friends %}
                         <li class="list-group-item">
-                            <img src="{{ friend.profile.avatar.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
                             <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
                                 {% csrf_token %}

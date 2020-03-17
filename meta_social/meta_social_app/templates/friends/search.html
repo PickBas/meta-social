@@ -1,4 +1,5 @@
 {% extends 'base_menu.html' %}
+{% load cropping %}
 
 {% block center %}
     <div class="card">
@@ -18,7 +19,7 @@
                 <ul class="list-group list-group-flush">
                     {% for match in matches %}
                         <li class="list-group-item">
-                            <img src="{{ match.profile.avatar.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <img src="{% cropped_thumbnail match.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
                             {% if match in user.profile.friends %}
