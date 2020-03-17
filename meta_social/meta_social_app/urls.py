@@ -8,6 +8,7 @@ from .views import *
 
 urlpatterns = [
     path('', index, name='home'),
+    path('track/logout/<int:user_id>/', logout_track),
     path('accounts/profile/<int:user_id>/', profile),
     path('accounts/profile/<int:user_id>/edit_profile/', login_required(EditProfile.as_view())),
     path('accounts/profile/<user_id>/change_avatar/', crop_image, name='crop'),

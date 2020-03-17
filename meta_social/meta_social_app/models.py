@@ -36,6 +36,9 @@ class Profile(models.Model):
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
+    last_logout = models.DateTimeField(default=timezone.now, auto_now=False, auto_now_add=False)
+    last_act = models.DateTimeField(default=timezone.now, auto_now=False, auto_now_add=False)
+
     blacklist = models.ManyToManyField(User, 'blacklist')
 
     def get_social_accounts(self) -> list:

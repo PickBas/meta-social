@@ -45,6 +45,18 @@ def get_menu_context(page: str, pagename: str) -> dict:
     return context
 
 
+def get_last_act(request, user_item) -> None:
+    """
+    Get last user's action time
+    :param request: request
+    :param user_item: User
+    :return: None
+    """
+    if request.method == 'GET' and request.user == user_item:
+        user_item.profile.last_act = timezone.now()
+        user_item.profile.save()
+
+
 @login_required
 def index(request) -> render:
     """
@@ -64,6 +76,55 @@ def index(request) -> render:
 
 
 @login_required
+def logout_track(request, user_id) -> redirect:
+    """
+    When user logs out, time is written to a database
+    :param request: request
+    :param user_id: id
+    :return: redirect
+    """
+    user_item = User.objects.get(id=user_id)
+    user_item.profile.last_logout = timezone.now()
+    user_item.profile.save()
+    return redirect('/accounts/logout/')
+
+
+def check_online_with_last_log(user_item) -> bool:
+    """
+    Checking onlime status using last login/logout
+    :param user_item: User
+    :return: bool
+    """
+    if user_item.last_login.hour >= user_item.profile.last_logout.hour and \
+            user_item.last_login.minute >= user_item.profile.last_logout.minute and \
+            user_item.last_login.second >= user_item.profile.last_logout.second:
+        return True
+    if user_item.last_login.hour >= user_item.profile.last_logout.hour and \
+            user_item.last_login.minute > user_item.profile.last_logout.minute:
+        return True
+    if user_item.last_login.hour > user_item.profile.last_logout.hour:
+        return True
+
+    return False
+
+
+def check_online_with_afk(is_online, user_item) -> bool:
+    """
+    Checking user afk. If user is, online status is changed to offline
+    :param is_online:
+    :param user_item:
+    :return:
+    """
+    if is_online:
+        if timezone.now().hour - user_item.profile.last_act.hour == 0 and \
+                timezone.now().minute - user_item.profile.last_act.minute >= 5:
+            return False
+        if timezone.now().hour - user_item.profile.last_act.hour >= 1:
+            return False
+    return True
+
+
+@login_required
 def profile(request, user_id) -> render:
     """
     User profile view.
@@ -77,7 +138,12 @@ def profile(request, user_id) -> render:
     context = get_menu_context('profile', 'Профиль')
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
+
+    is_online = check_online_with_last_log(user_item)
+
     context['c_user'] = user_item
+    context['is_online'] = check_online_with_afk(is_online, user_item)
+    get_last_act(request, user_item)
 
     return render(request, 'profile/profile_page.html', context)
 
@@ -86,6 +152,7 @@ class ImageManage:
     """
     Processing images class
     """
+
     def __init__(self, user_id, profile, image):
         self.file_sys = FileSystemStorage()
         self.path = 'avatars/users/' + str(user_id) + '.'
@@ -183,6 +250,7 @@ class EditProfile(View):
             instance=User.objects.get(id=kwargs['user_id'])
         )
         context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
+        get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
 
@@ -197,6 +265,7 @@ def friends_list(request, user_id) -> render:
     """
     context = get_menu_context('friends', 'Список друзей')
     context['c_user'] = User.objects.get(id=user_id)
+    get_last_act(request, context['c_user'])
 
     return render(request, 'friends/friends_list.html', context)
 
@@ -216,6 +285,8 @@ def friends_search(request) -> render:
 
             matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
+    if request.method == 'GET':
+        get_last_act(request, context['uedit'])
 
     return render(request, 'friends/search.html', context)
 

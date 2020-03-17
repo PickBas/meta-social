@@ -15,8 +15,33 @@
 </header>
 
 <main>
-  <div >
-
+  <div>
+            <div class="card profile_div">
+                <img src="{{ MEDIA_URL }}{{ profile.avatar.url }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {% if c_user.first_name and c_user.last_name %}
+                            {{ c_user.first_name }} {{ c_user.last_name }}
+                        {% else %}
+                            {{ c_user.username }}
+                        {% endif %}
+                    </h5>
+                    <hr class="mt-0 mb-1">
+                    <p class="card-text">
+                       {% if is_online %}
+                           Онлайн
+                       {% else %}
+                           Оффлайн
+                       {% endif %}
+                    </p>
+                    <p class="card-text">Пол: {{ c_user.profile.get_gender_display }}</p>
+                </div>
+                <div class="card-body">
+                    {% if c_user == user %}
+                        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" href="/accounts/profile/{{ c_user.id }}/edit_profile/">Edit</a>
+                    {% endif %}
+                </div>
+            </div>
 
     <div class="row left_div">
         <div class="col-3">
