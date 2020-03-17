@@ -1,52 +1,50 @@
 {% extends 'base_menu.html' %}
+{% load cropping %}
 
 {% block center %}
-<style>
-.card_big{
-height: 250px;
-}
-.btn{
-margin-top: 120px;
-padding-left: 25px;
-padding-right: 25px;
-}
-.im_photo{
-margin-top: 130px;
-position: fixed;
-}
-.im_video{
-margin-left: 30px;
-margin-top: 130px;
-position: fixed;
-}
-.im_music{
-margin-left: 60px;
-margin-top: 130px;
-position: fixed;
-}
-.im_doc{
-margin-left: 90px;
-margin-top: 130px;
-position: fixed;
-}
-
-</style>
-
-
     <div class="card">
-        <div class="card-body">
-            <div class="input-group">
-                <img src="https://image.flaticon.com/icons/svg/685/685655.svg" width=20 height=20 class="im_photo  all">
-                <img src="https://www.flaticon.com/premium-icon/icons/svg/604/604338.svg" width=20 height=20 class="im_video all">
-                <img src="https://image.flaticon.com/icons/svg/727/727204.svg" width=20 height=20 class="im_music all">
-                 <img src="https://image.flaticon.com/icons/svg/684/684831.svg" width=20 height=20 class="im_doc all">
-                <input type="text" class="form-control" style="border: none" placeholder="Что у вас нового?" aria-label="Recipient's username" aria-describedby="button-addon">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary all" type="button" id="button-addon">
-                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
-                    </button>
+        <div class="card-body text-left">
+            <form method="POST" action="/post/create/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ postform }}
+
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary all" type="submit" id="button-addon">
+                            <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                <!--<hr>
+                <style>
+                .none-image {
+                    border: 1px dashed;
+                    border-radius: 7px;
+                }
+
+                .none-image:hover {
+                    background-color: #DEDEDE;
+                }
+
+                .none-image:active {
+                    background-color: #D5D5D5;
+                }
+                </style>
+                <div class="row ml-1 mr-1">
+                    {% for i in '0123456789'|make_list %}
+                        <div class="col ml-1 mr-1 mt-1 text-center none-image" style="height: 70px;" id="upload-image-{{ i }}">
+                            <img src="https://image.flaticon.com/icons/svg/1578/1578253.svg" width=25 height=25 class="mt-4">
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>-->
+
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {{ form }} <br>
+                {% endfor %}
+            </form>
         </div>
     </div>
     <div class="card mt-3">
@@ -139,26 +137,22 @@ position: fixed;
             </div>
         </div>
     </div>
-<script>
-    let a = document.querySelector(".card");
-    let b = document.querySelector(".form-control");
-    let c = document.querySelectorAll(".all");
-    b.addEventListener("click", function(){
-
-
-    })
-
-</script>
-    {% if news %}
-        {% for i in news %}
+    {% if user.profile.get_newsfeed %}
+        {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <h5 class="card-text">{{ i }}</h5>
-                    <hr>
-                    <p class="card-text">{{ i.text }}</p>
-                    <hr class="mt-0 mb-1">
-                    <a href="/accounts/profile/{{ i.user.id }}/" class="mb-0 float-left">{{ i.user.username }}</a>
-                    <span class="text-muted mb-0 float-right">{{ i.date }}</span>
+                    <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                    <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+                    <p class="card-text mt-2">{{ post.text }}</p>
+
+                    {% if post.get_images %}
+                        {% for post_img in post.get_images %}
+                            <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                        {% endfor %}
+                    {% endif %}
+
+                    <hr class="mt-1 mb-1">
+                    <span class="text-muted mb-0 float-right">{{ post.date }}</span>
                 </div>
             </div>
         {% endfor %}

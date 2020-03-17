@@ -4,40 +4,11 @@ Forms module
 
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Post, Profile
 
-
-class SignUpForm(UserCreationForm):
-    """
-    SignUpForm class. Custom sign up
-    """
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
-
-    def clean_email(self):
-        """
-        Getting clean_email
-        :return: email
-        """
-        email = self.cleaned_data.get('email')
-
-        if not User.objects.filter(email=email).exists():
-            return email
-        raise forms.ValidationError('Email is already in use!')
-
-
-class PostForm(forms.ModelForm):
-    """
-    Class for posts
-    """
-    class Meta:
-        model = Post
-        fields = ('name_of_post', 'text', 'date')
+from .models import Profile, Post, PostImages
+from image_cropping import ImageCropWidget
+from crispy_forms.helper import FormHelper
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -73,3 +44,39 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name')
+
+
+class CropImageForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('cropping', 'image')
+        widgets = {
+            'image': ImageCropWidget,
+        }
+
+
+class PostForm(forms.ModelForm):
+    text = forms.CharField(max_length=500)
+
+    class Meta:
+        model = Post
+        fields = ('text',)
+    
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        self.fields['text'].label = ''
+        self.fields['text'].widget.attrs['width'] = '100%'
+        self.fields['text'].widget.attrs['class'] = 'form-control'
+        self.fields['text'].widget.attrs['aria-describedby'] = 'button-addon'
+
+
+class PostImageForm(forms.ModelForm):
+    image = forms.ImageField()
+
+    class Meta:
+        model = PostImages
+        fields = ('image', )
+    
+    def __init__(self, *args, **kwargs):
+        super(PostImageForm, self).__init__(*args, **kwargs)
+        self.fields['image'].label = ''

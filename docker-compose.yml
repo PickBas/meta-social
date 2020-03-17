@@ -9,6 +9,7 @@ services:
     command: ./docker-entrypoint.sh
     depends_on:
       - db
+    container_name: social
 
   db:
     image: postgres
@@ -17,3 +18,4 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: DB
+    container_name: db

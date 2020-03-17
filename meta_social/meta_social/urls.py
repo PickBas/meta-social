@@ -22,5 +22,3 @@ urlpatterns = [
     path('', include('meta_social_app.urls')),
     path('accounts/', include('allauth.urls')),
 ]
-
-

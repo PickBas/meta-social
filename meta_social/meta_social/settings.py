@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'meta_social_app',
     'crispy_forms',
     'django_countries',
+    'easy_thumbnails',
+    'image_cropping',
 
     'allauth',
     'allauth.account',
@@ -84,7 +86,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-SITE_ID = 4
+SITE_ID = 2
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
 
@@ -93,14 +95,14 @@ WSGI_APPLICATION = 'meta_social.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'DB',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
-    },
-    'old_sqlite3': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'DB',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'postgres',
+    #     'HOST': 'db',
+    #     'PORT': '5432',
+    # },
+    # 'old_sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
@@ -158,7 +160,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST_USER = 'piryazev555@gmail.com'
 # EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
 
-STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
@@ -166,3 +167,10 @@ STATICFILES_DIRS = (
 ACCOUNT_EMAIL_REQUIRED = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+from easy_thumbnails.conf import Settings as thumbnail_settings
+THUMBNAIL_PROCESSORS = (
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+IMAGE_CROPPING_THUMB_SIZE = (800, 800)

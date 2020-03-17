@@ -1,133 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cropping %}
 
 {% block main %}
-    <link rel="stylesheet" type="text/css" href='{% static "css/style_profile_page.css" %}'>
-<!--
-    <body>
+    <link rel="stylesheet" href='{% static "css/style_profile_page.css" %}'>
+<body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Brand</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Vk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Facebook</a>
-                    </li>
-                    Возможно понадобится в будующем
-                </ul>
-            </div>
-        </nav>
-    </header>
-    </body>
--->
-    <main>
-        <div class='main_div'>
-            <div class="row left_div">
-                <div class="col-3">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        <a class="active_btn" href="#v-pills-home" role="tab" aria-controls="v-pills-home"
-                           aria-selected="true">Профиль</a>
-                        <a class="nav-link more" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings"
-                           aria-selected="false">Настройки</a>
-                        <!--<a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Vk</a>
-                        <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Facebook</a>
-                        Возможно понадобится в будующем-->
-                    </div>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg header" >
+    <a class="navbar-brand" href="#">Meta Social</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+</header>
 
-            </div>
+<main>
+  <div >
 
-            <div class="card profile_div">
-                <img src="{{ MEDIA_URL }}{{ profile.avatar.url }}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {% if c_user.first_name and c_user.last_name %}
-                            {{ c_user.first_name }} {{ c_user.last_name }}
-                        {% else %}
-                            {{ c_user.username }}
-                        {% endif %}
-                    </h5>
-                    <hr class="mt-0 mb-1">
-                    <p class="card-text">Оффлайн/Онлайн</p>
-                    <p class="card-text">Пол: {{ c_user.profile.get_gender_display }}</p>
-                </div>
-                <div class="card-body">
-                    {% if c_user == user %}
-                        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" href="/accounts/profile/{{ c_user.id }}/edit_profile/">Edit</a>
-                    {% endif %}
-                </div>
-            </div>
 
-            <div class="card text-center info_div">
-                <div class="card-body">
-                    <p class="card-text">
-                        {% if c_user.profile.job %}
-                            {{ c_user.profile.job }}
-                        {% else %}
-                            Место работы/учебы не указано
-                        {% endif %}
-                    </p>
-                    <p class="card-text">
-                        {% if c_user.profile.biography %}
-                            {{ c_user.profile.biography }}
-                        {% else %}
-                            Биография не указана
-                        {% endif %}
-                    </p>
-                    <p class="card-text">
-                        {% if c_user.profile.country %}
-                            {{ c_user.profile.country.name }}
-                        {% else %}
-                            Страна не указана
-                        {% endif %}
-                    </p>
-                    <p class="card-text">
-                        {% if c_user.profile.birth %}
-                            {{ c_user.profile.birth }}
-                        {% else %}
-                            Дата рождения не указана
-                        {% endif %}
-                    </p>
-                    {% if c_user.profile.show_email %}
-                        <p class="card-text">
-                            {% if c_user.email %}
-                                {{ c_user.email }}
-                            {% else %}
-                                Почта не указана
-                            {% endif %}
-                        </p>
-                    {% endif %}
-                    {% if c_user == user %}
-                        <a href="#" class="btn btn-primary active_btn" style="width: 200px;">Edit</a>
-                    {% endif %}
-                </div>
-            </div>
-            {% if c_user.profile.posts %}
-                {% for post in c_user.profile.posts %}
-                    <div class="card mb-3 post_div">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ post.name_of_post }}</h5>
-                            <p class="card-text"><small class="text-muted">{{ post.data }}</small></p>
-                            <p class="card-text">{{ post.text }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <h4>Постов нету</h4>
-            {% endif %}
+    <div class="row left_div">
+        <div class="col-3">
+          <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" >
+            <a class="active_btn"  href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Моя страница</a>
+            <a class="nav-link more" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Новости</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Сообщения</a>
+            <a class="nav-link more" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Друзья</a>
+            <a class="nav-link more" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Сообщества</a>
+            <a class="nav-link more" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Музыка</a>
+          </div>
         </div>
-    </main>
+      </div>
+
+    <div class="card profile_div">
+    <img src="./static/img/no-photo.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <div class="card-body">
+        <a class="btn btn-primary my_btn active_btn" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true" >Edit</a>
+    </div>
+    </div>
+    <div class="card mb-3 friends_div">
+      <div class="card-body">
+        <h5 class="card-title">Друзья</h5>
+        <div class='circles'>
+          <div class='circle'></div>
+          <div class='circle'></div>
+          <div class='circle'></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card mb-3 groups_div">
+      <div class="card-body">
+        <h5 class="card-title">Сообщества</h5>
+        <div class='circles'>
+          <div class='circle'></div>
+          <div class='circle'></div>
+          <div class='circle'></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card text-center info_div">
+    <div class="card-header">
+      <a>Имя Фамилия</a>
+      <a> <br> Online/offline</a>
+    </div>
+     <div class="card-body">
+      <p class="card-text text-left">Пол: ...</p>
+      <p class="card-text text-left">Работа: ...</p>
+      <p class="card-text text-left">Биография: ...</p>
+      <p class="card-text text-left">Страна: ...</p>
+      <p class="card-text text-left">Дата рождения: ...</p>
+    </div>
+  </div>
+  <div class="card mb-3 post_div">
+    <div class="card-body">
+      <h5 class="card-title">
+        Создатель поста
+      </h5>
+      <p class="card-text">Текст</p>
+      <img src="./img/no-photo.png"  class="card-img-top photo" alt="...">
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</main>
+</body>
 {% endblock %}

@@ -6,17 +6,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404
-from django.shortcuts import render, redirect
+
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
-from PIL import Image
+from django.urls import reverse
 from .models import Profile
+from PIL import Image
+from django.forms import modelformset_factory
 
-
-from .models import Post, FriendshipRequest
-from .forms import PostForm, ProfileUpdateForm, UserUpdateForm
-from .models import Friend
+from .models import Friend, Post, FriendshipRequest, PostImages
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -52,7 +53,13 @@ def index(request) -> render:
     :return: render
     """
     context = get_menu_context('newsfeed', 'Главная')
-    context['pagename'] = 'Главная'
+    context['pagename'] = "Главная"
+
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    context['postform'] = PostForm()
+    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
     return render(request, 'index.html', context)
 
 
@@ -118,7 +125,7 @@ class ImageManage:
         :return: None
         """
         if self.image.size <= 5000000 and self.image.content_type.split('/')[0] == 'image':
-            _, img_extension = self.image.name.split('.')
+            img_extension = self.image.name.split('.')[1]
             self.path += img_extension
             self.remove_old_avatar()
             self.save_avatar()
@@ -236,32 +243,26 @@ def friends_blacklist(request) -> render:
     return render(request, 'friends/blacklist.html', context)
 
 
-def post_list(request) -> render:
-    """
-    Post_list view
-    :param request: request
-    :return: render
-    """
-    posts = Post.objects.all()
-    return render(request, 'post_list.html', {'posts': posts, 'pagename': 'Посты'})
+@login_required
+def post_new(request):
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
 
+    if request.method == "POST":
+        postForm = PostForm(request.POST)
+        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
 
-def post_new(request) -> render:
-    """
-    Post_new view. Creating new post
-    :param request:
-    :return: render
-    """
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.date = timezone.now()
-            post.save()
-    else:
-        form = PostForm()
-    return render(request, 'post_edit.html', {'form': form, 'pagename': 'Посты'})
+        if postForm.is_valid() and formset.is_valid():
+            post_form = postForm.save(commit=False)
+            post_form.user = request.user
+            post_form.save()
+
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    photo = PostImages(post=post_form, image=image)
+                    photo.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -282,7 +283,7 @@ def send_friendship_request(request, user_id) -> redirect:
 
         item.save()
 
-    return redirect('/friends/search/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -301,8 +302,8 @@ def accept_request(request, request_id) -> redirect:
         )
         friends_item.save()
         request_item.delete()
-
-    return redirect('/friends/requests/')
+    
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -316,7 +317,7 @@ def remove_friend(request, user_id) -> redirect:
     if request.method == 'POST':
         friend_item = Friend.objects.get(id=user_id)
         friend_item.delete()
-    return redirect('/friends/'+str(request.user.id))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -328,6 +329,7 @@ def blacklist_add(request, user_id):
     """
     if request.method == 'POST':
         pass
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -339,3 +341,26 @@ def blacklist_remove(request, user_id):
     """
     if request.method == 'POST':
         pass
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def crop_image(request, user_id):
+    if int(request.user.id) != int(user_id):
+        raise Http404()
+
+    image = get_object_or_404(Profile, pk=user_id) if user_id else None
+    form = CropImageForm(instance=image)
+
+    if request.method == 'POST':
+        form = CropImageForm(request.POST, request.FILES, instance=image)
+        if form.is_valid():
+            image = form.save()
+            return HttpResponseRedirect(reverse('crop', args=(image.pk,)))
+
+    context = get_menu_context('profile', 'Смена аватарки')
+    context['form'] = form
+    context['image'] = image
+
+    return render(request, 'profile/crop.html', context)

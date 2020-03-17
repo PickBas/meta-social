@@ -1,4 +1,5 @@
 {% extends 'base_menu.html' %}
+{% load cropping %}
 
 {% block center %}
     <div class="card">
@@ -11,22 +12,18 @@
             <hr>
 
             {% if c_user.profile.friends %}
-                {% for friend in c_user.profile.friends.0 %}
-                    <a href="/accounts/profile/{{ friend.to_user.id }}/">{{ friend.to_user.username }}</a>
-                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
-                    {% csrf_token %}
-                    <input type="submit" value="Удалить">
-                    </form>
-                    <br>
-                {% endfor %}
-                {% for friend in c_user.profile.friends.1 %}
-                    <a href="/accounts/profile/{{ friend.from_user.id }}/">{{ friend.from_user.username }}</a>
-                    <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
-                    {% csrf_token %}
-                    <input type="submit" value="Удалить">
-                    </form>
-                    <br>
-                {% endfor %}
+                <ul class="list-group list-group-flush">
+                    {% for friend in c_user.profile.friends %}
+                        <li class="list-group-item">
+                            <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
+                            <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                                {% csrf_token %}
+                                <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% else %}
                 Список друзей пуст.
             {% endif %}

@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
+from django.template.defaultfilters import slugify
+from image_cropping import ImageRatioField, ImageCropField
 
 
 class Profile(models.Model):
@@ -23,7 +25,9 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
-    avatar = models.ImageField(upload_to='avatars/users/', null=True, blank=True, default='avatars/users/0.png')
+    image = ImageCropField(blank=True, upload_to='avatars/users', default='avatars/users/0.png')
+    cropping = ImageRatioField('image', '250x250')
+
     job = models.CharField(null=True, max_length=100)
     biography = models.CharField(max_length=500, null=True)
 
@@ -61,22 +65,17 @@ class Profile(models.Model):
         """
         return len(self.posts())
 
-    def friends(self) -> list:
-        """
-        Get friends
-        :return: dict
-        """
-        # TODO: Сделать всё в один словарь
-        friend_items1 = Friend.objects.filter(from_user=self.user)
-        friend_items2 = Friend.objects.filter(to_user=self.user)
+    def friends(self):
+        friends = [i.to_user for i in list(Friend.objects.filter(from_user=self.user))]
+        friends += [i.from_user for i in list(Friend.objects.filter(to_user=self.user))]
 
-        return [friend_items1, friend_items2]
+        return friends
 
-    def friendship_requests(self):
-        """
-        Get friendship requests
-        """
+    def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
+
+    def friendship_outbox_requests(self):
+        return FriendshipRequest.objects.filter(from_user=self.user)
 
     def amount_of_friends(self) -> int:
         """
@@ -105,7 +104,7 @@ class Profile(models.Model):
         """
         posts = []
         for friend in self.friends():
-            posts += friend.profile.posts()
+            posts += list(friend.profile.posts())
         for com in self.communities():
             posts += com.posts()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
@@ -117,19 +116,19 @@ class Post(models.Model):
     Post class
     """
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    name_of_post = models.CharField(max_length=200)
     text = models.TextField()
-    date = models.DateTimeField(default=timezone.now)
-
-    def publish(self) -> None:
-        """
-        Publish a post
-        :return: None
-        """
-        self.save()
+    date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name_of_post
+        return self.text
+
+    def get_images(self):
+        return PostImages.objects.filter(post=self)
+
+
+class PostImages(models.Model):
+    post = models.ForeignKey(Post, models.CASCADE)
+    image = models.ImageField(upload_to='post/images/')
 
 
 class Communities(models.Model):

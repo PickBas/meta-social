@@ -1,4 +1,5 @@
 {% extends 'base_menu.html' %}
+{% load cropping %}
 
 {% block center %}
     <div class="card">
@@ -13,30 +14,30 @@
                     </div>
                 </div>
             </form>
-
+            <hr>
             {% if matches %}
-                <hr>
-                {% for i in matches %}
+                <ul class="list-group list-group-flush">
+                    {% for match in matches %}
+                        <li class="list-group-item">
+                            <img src="{% cropped_thumbnail match.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
-                    <div class="card mt-1">
-                        <div class="card-body">
-
-                            {{ i.first_name }} {{ i.last_name }} ({{ i.username }})
-
-                            <form method='POST'   action='/friends/send_request/{{ i.id }}/'>
-                            {% csrf_token %}
-                                <input type='submit' value="Добавить" class="btn btn-success float-right ml-2">
-                            </form>
-                            <form method='POST'   action='/accounts/profile/{{ i.id }}/'>
-                            {% csrf_token %}
-                                <input type='submit' value="Посмотреть профиль" class="btn btn-info float-left ml-2">
-                            </form>
-                            {% if i in i.profile.friends.1 %}
-                                <h1>ДЭм</h1>
+                            {% if match in user.profile.friends %}
+                                <form method="POST" action="/friends/remove_friend/{{ match.id }}/">
+                                    {% csrf_token %}
+                                    <input class="float-right btn btn-outline-danger" type="submit" value="&#128465;">
+                                </form>
+                            {% else %}
+                                <form method="POST" action="/friends/send_request/{{ match.id }}/">
+                                    {% csrf_token %}
+                                    <input class="float-right btn btn-outline-success" type="submit" value="+">
+                                </form>
                             {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <h4>Пусто</h4>
             {% endif %}
         </div>
     </div>
