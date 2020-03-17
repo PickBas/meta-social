@@ -145,6 +145,11 @@ def profile(request, user_id) -> render:
     context['is_online'] = check_online_with_afk(is_online, user_item)
     get_last_act(request, user_item)
 
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    context['postform'] = PostForm()
+    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
     return render(request, 'profile/profile_page.html', context)
 
 

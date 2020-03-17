@@ -59,7 +59,7 @@ class Profile(models.Model):
         """
         Getting user's posts
         """
-        return Post.objects.filter(user=self.user)
+        return reversed(Post.objects.filter(user=self.user))
 
     def amount_of_posts(self) -> int:
         """
