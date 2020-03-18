@@ -290,8 +290,6 @@ def friends_search(request) -> render:
 
             matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
-    if request.method == 'GET':
-        get_last_act(request, context['uedit'])
 
     return render(request, 'friends/search.html', context)
 
@@ -378,7 +376,7 @@ def accept_request(request, request_id) -> redirect:
         )
         friends_item.save()
         request_item.delete()
-    
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
