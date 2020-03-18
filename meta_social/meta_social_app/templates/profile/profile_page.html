@@ -51,7 +51,7 @@
     <div class="col">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title float-left">{{ c_user.first_name }} {{ c_user.last_name }}</h5>
+          <h5 class="card-title float-left">{% if c_user.first_name or c_user.last_name %}{{ c_user.first_name }} {{ c_user.last_name }}{% else %}{{ c_user.username }}{% endif %}</h5>
           <small class="float-right text-muted">{% if is_online %}Онлайн{% else %}Оффлайн{% endif %}</small>
           <br><hr>
           <p class="card-text">{{ c_user.profile.get_gender_display }}</p>
