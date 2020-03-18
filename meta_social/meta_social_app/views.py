@@ -353,14 +353,18 @@ def send_friendship_request(request, user_id) -> redirect:
     :return: redirect
     """
     # TODO: Запретить повторяющиеся заявки, и себе
-    if request.method == 'POST':
-        item = FriendshipRequest(
-            from_user=request.user,
-            to_user=User.objects.get(id=user_id),
-            already_sent=True
-        )
 
-        item.save()
+    users_item = User.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        if not [i.from_user for i in users_item.profile.friendship_inbox_requests()]:
+            item = FriendshipRequest(
+                from_user=request.user,
+                to_user=User.objects.get(id=user_id),
+                already_sent=True
+            )
+
+            item.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
