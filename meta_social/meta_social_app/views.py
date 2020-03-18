@@ -381,7 +381,10 @@ def accept_request(request, request_id) -> redirect:
     :return: redirect
     """
     if request.method == 'POST':
-        request_item = FriendshipRequest.objects.get(id=request_id)
+        try:
+            request_item = FriendshipRequest.objects.get(to_user=request_id)
+        except Exception:
+            request_item = FriendshipRequest.objects.get(from_user=request_id)
         friends_item = Friend(
             from_user=request_item.from_user,
             to_user=request_item.to_user,
@@ -401,8 +404,12 @@ def remove_friend(request, user_id) -> redirect:
     :return: redirect
     """
     if request.method == 'POST':
-        friend_item = Friend.objects.get(id=user_id)
-        friend_item.delete()
+        try:
+            friend_item = Friend.objects.get(from_user=user_id)
+            friend_item.delete()
+        except Exception:
+            friend_item = Friend.objects.get(to_user=user_id)
+            friend_item.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
