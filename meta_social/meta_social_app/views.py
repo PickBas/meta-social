@@ -89,7 +89,7 @@ def logout_track(request, user_id) -> redirect:
     return redirect('/accounts/logout/')
 
 
-def check_online_with_last_log(user_item) -> bool:
+def check_online_with_last_log(user_item) -> bool: # TODO: перенести в модель
     """
     Checking onlime status using last login/logout
     :param user_item: User

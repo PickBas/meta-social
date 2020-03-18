@@ -10,6 +10,8 @@ services:
     depends_on:
       - db
     container_name: social
+    volumes:
+      - ./:/code
 
   db:
     image: postgres
