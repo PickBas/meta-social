@@ -290,8 +290,6 @@ def friends_search(request) -> render:
 
             matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
-    if request.method == 'GET':
-        get_last_act(request, context['uedit'])
 
     return render(request, 'friends/search.html', context)
 
