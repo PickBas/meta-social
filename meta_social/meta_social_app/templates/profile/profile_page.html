@@ -6,7 +6,18 @@
   <div class="row text-left">
     <div class="col-xl-3">
       <div class="card">
-        <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top">
+        <style>
+          .rollover {
+            transition: 0.3s;
+          }
+          .rollover:hover {
+            transition: 0.7s;
+            opacity: 0.7;
+          }
+        </style>
+        <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
+          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
+        </a>
         <div class="card-body">
           {% if c_user == user %}
             <hr class="mt-0">
