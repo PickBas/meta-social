@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <!--<hr>
+    <hr>
     <style>
     .none-image {
         border: 1px dashed;
@@ -24,18 +24,102 @@
     .none-image:active {
         background-color: #D5D5D5;
     }
+
+    .none-image.hover {
+        background-color: #DEDEDE;
+    }
+
+    .none-image.active {
+        background-color: #D5D5D5;
+    }
+
+    .hide-image {
+        display: none;
+    }
     </style>
     <div class="row ml-1 mr-1">
         {% for i in '0123456789'|make_list %}
-            <div class="col ml-1 mr-1 mt-1 text-center none-image" style="height: 70px;" id="upload-image-{{ i }}">
-                <img src="https://image.flaticon.com/icons/svg/1578/1578253.svg" width=25 height=25 class="mt-4">
+            <div class="col ml-1 mr-1 mt-1 text-center none-image" style="height: 70px;" id="dropzone_{{ i }}">
+                <img src="https://image.flaticon.com/icons/svg/1578/1578253.svg" width=25 height=25 class="mt-4" id="up_image_{{ i }}">
+                <img src="https://image.flaticon.com/icons/svg/1828/1828666.svg" width=20 height=20 class="mt-4 hide-image" id="cl_image_{{ i }}">
             </div>
         {% endfor %}
     </div>
-    <hr>-->
+    <hr>
 
     {{ formset.management_form }}
-    {% for form in formset %}
-        {{ form }} <br>
-    {% endfor %}
+    <div style="display: none;">
+        {% for form in formset %}
+            {{ form }} <br>
+        {% endfor %}
+    </div>
+    <script>
+        const dragAndDrop = () => {
+            let dropzones = document.getElementsByClassName('none-image');
+
+            function dragOver (evt) {
+                evt.preventDefault();  
+                evt.stopPropagation();
+            };
+
+            function dropImage (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+
+                if (evt.dataTransfer.files.length > 1) {
+                    alert('Нельзя отправить несколько файлов');
+                    return false;
+                };
+
+                if (evt.dataTransfer.files[0].type.split('/')[0] != 'image') {
+                    alert('Это должна быть картинка');
+                    return false;
+                };
+                
+                let number = null;
+
+                if (evt.target.classList.contains('none-image')) {
+                    number = evt.target.id.slice(-1);
+                } else {
+                    number = evt.target.parentNode.id.slice(-1);
+                };
+
+                let file_field = document.getElementById("id_form-" + number + "-image");
+                file_field.files = evt.dataTransfer.files;
+                document.getElementById("up_image_" + number).classList.add('hide-image');
+                document.getElementById("cl_image_" + number).classList.remove('hide-image');
+            };
+
+            function clickImage (evt) {
+                let number = null;
+
+                if (evt.target.classList.contains('none-image')) {
+                    number = evt.target.id.slice(-1);
+                } else {
+                    number = evt.target.parentNode.id.slice(-1);
+                };
+
+                if (document.getElementById("up_image_" + number).classList.contains('hide-image')) {
+                    document.getElementById("up_image_" + number).classList.remove('hide-image');
+                    document.getElementById("cl_image_" + number).classList.add('hide-image');
+
+                    if (evt.target.classList.contains('none-image')) {
+                        evt.target.value = '';
+                    } else {
+                        evt.target.parentNode.value = '';
+                    };
+                } else {
+                    // TODO: Вызвать диалоговое окно загрузки файла
+                    console.log('Im work!');
+                };
+            };
+
+            for (var i=0; i < dropzones.length; i++) {
+                dropzones[i].addEventListener('dragover', dragOver);
+                dropzones[i].addEventListener('drop', dropImage);
+                dropzones[i].addEventListener('click', clickImage);
+            };
+        };
+        dragAndDrop();
+    </script>
 </form>
