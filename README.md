@@ -5,7 +5,7 @@
 > Время проведения совещаний: Среда 20:00
 
 
-## Что делать при первом запуске проекта?
+## Как запустить проект?
 
 1. Клонируем репозиторий, создаем и активируем venv, устанавливаем библиотеки
 
@@ -13,14 +13,14 @@
         cd meta-social
         python3 -m venv venv
         source venv/bin/activate
-        pip install --upgrade pip
-        pip install django
+        pip install -r requirements.txt
 
-2. Накатываем миграции
+2. Накатываем миграции, и импортируем бд
 
         cd meta_social
         python manage.py makemigrations
         python manage.py migrate
+        python manage.py loaddata db.json
 
 
 ## Что делать если django не видит миграции?
@@ -29,3 +29,30 @@
 
     python manage.py makemigrations meta_social_app
     python manage.py migrate
+
+
+# Данные о соц. сетях
+
+## VK
+
+Приложение
+
+    id: 7317110
+    key: ST3oRjWFifOgxxFUl5sH
+
+## Facebook
+
+Приложение
+
+    id: 2555976281192292
+    key: b82697d96b942c6f0aa253668c15eb6d
+
+Тестовый пользователь
+
+    # 1
+    login: test_pzymgqq_user@tfbnw.net
+    password: verystrongpa55word
+    
+    # 2
+    login: vzsdnhqifk_1582663185@tfbnw.net
+    password: verystrongpa55word

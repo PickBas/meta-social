@@ -1,0 +1,524 @@
+.main_div{
+    display: inline;
+}
+.header{
+    background-color: rgb(17, 16, 16);
+    color: white;
+}
+.active_btn{
+    background-color: rgb(32, 31, 31);
+    border-radius: .25rem;
+    border: 2px;
+    font-weight: 400;
+    margin-left: 2px;
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: white;
+}
+.more{
+    color: black;
+}
+.person{
+    display: inline-block;
+    white-space: nowrap;
+}
+.circles{
+    display: flex;
+}
+@media(max-width: 500px){
+    .left_div{
+        margin: 2% 0 0 15%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+
+    }
+    .profile_div{
+        width: 200px;
+        height: 350px;
+        margin: -270px 0 0 27%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 160px;
+    }
+    .friends_div{
+        width: 200px;
+        margin: 118px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 200px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -350px 0 15px 44%;
+        width: 500px;
+    }
+    .name{
+        text-align: left;
+    }
+    .status{
+        text-align: right;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 44%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+}
+
+@media(min-width: 500px){
+    .left_div{
+        margin: 2% 0 0 15%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+
+    }
+    .profile_div{
+        width: 200px;
+        height: 350px;
+        margin: -270px 0 0 27%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 160px;
+    }
+    .friends_div{
+        width: 200px;
+        margin: 118px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 200px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -350px 0 15px 44%;
+        width: 500px;
+    }
+    .name{
+        text-align: left;
+    }
+    .status{
+        text-align: right;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 44%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+    .circle{
+        width: 100px;
+        height: 30px;
+        border-radius: 50%;
+        border: .8px solid black;
+        margin: 0 0 0 7px;
+    }
+}
+@media(min-width: 600px){
+    .left_div{
+        margin: 2% 0 0 -2%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+
+    }
+    .profile_div{
+        width: 130px;
+        height: 230px;
+        margin: -270px 0 0 22%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 90px;
+    }
+    .friends_div{
+        width: 130px;
+        margin: 70px 0 0 -1px;
+        text-align: center;
+        font-size: 2px;
+    }
+    .groups_div{
+        width: 130px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -230px 0 15px 45%;
+        width: 320px;
+    }
+    .post_div{
+        width: 320px;
+        margin-left: 45%;
+    }
+    .photo{
+        width: 290px;
+        height: 200px;
+    }
+    .circle{
+        width: 60px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid black;
+        margin: 0 0 0 4px;
+    }
+}
+@media(min-width: 768px){
+    .navbar-brand{
+        margin-left: 15px;
+        }
+    .left_div{
+        margin: 2% 0 0 1%;
+         height: 270px;
+         width: 200px;
+         text-align: center;
+    }
+    .profile_div{
+        width: 160px;
+        height: 250px;
+        margin: -270px 0 0 18%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 120px;
+    }
+    .friends_div{
+        width: 160px;
+        margin: 60px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 160px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -250px 0 15px 38%;
+        width: 500px;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 38%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+    .circle{
+        width: 80px;
+        height: 30px;
+        border-radius: 50%;
+        border: .7px solid black;
+        margin: 0 0 0 8px;
+    }
+}
+
+@media(min-width: 900px){
+    .navbar-brand{
+        margin-left: 100px;
+        }
+    .left_div{
+        margin: 2% 0 0 9%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+    }
+    .profile_div{
+        width: 180px;
+        height: 270px;
+        margin: -270px 0 0 24%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 140px;
+    }
+    .friends_div{
+        width: 180px;
+        margin: 60px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 180px;
+        margin: -10px 0 0 0;
+        text-align: center;
+    }
+    .info_div{
+        margin: -270px 0 15px 43%;
+        width: 500px;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 43%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+    .circle{
+        width: 50px;
+        height: 40px;
+        border-radius: 50%;
+        border: .9px solid black;
+        margin: 0 0 0 8px;
+    }
+}
+ @media(min-width: 1100px){
+    .navbar-brand{
+    margin-left: 170px;
+    }
+    .left_div{
+        margin: 2% 0 0 14%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+    }
+    .profile_div{
+        width: 200px;
+        height: 290px;
+        margin: -270px 0 0 27%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 160px;
+    }
+    .friends_div{
+        width: 200px;
+        margin: 60px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 200px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -290px 0 15px 46%;
+        width: 500px;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 46%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+    .circle{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid black;
+        margin: 0 0 0 10px;
+    }
+}
+@media(min-width: 1200px){
+    .navbar-brand{
+        margin-left: 200px;
+    }
+    .left_div{
+        margin: 2% 0 0 15%;
+         height: 270px;
+         width: 250px;
+         text-align: center;
+    }
+    .profile_div{
+        width: 200px;
+        height: 290px;
+        margin: -270px 0 0 27%;
+    }
+    .my_btn{
+        margin: -17% 0 0 -20px;
+        width: 160px;
+    }
+    .friends_div{
+        width: 200px;
+        margin: 60px 0 0 -1px;
+        text-align: center;
+    }
+    .groups_div{
+        width: 200px;
+        margin: -10px 0 0 -1px;
+        text-align: center;
+    }
+    .info_div{
+        margin: -290px 0 15px 44%;
+        width: 500px;
+    }
+    .name{
+        text-align: left;
+    }
+    .status{
+        text-align: right;
+    }
+    .post_div{
+        width: 500px;
+        margin-left: 44%;
+    }
+    .photo{
+        width: 450px;
+        height: 350px;
+    }
+    .circle{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid black;
+        margin: 0 0 0 10px;
+    }
+}
+@media(min-width: 2000px){
+        .left_div{
+            margin: 2% 0 0 15%;
+             height: 270px;
+             width: 250px;
+             text-align: center;
+
+        }
+        .profile_div{
+            width: 200px;
+            height: 100px;
+            margin: -270px 0 0 27%;
+        }
+        .my_btn{
+            margin: -17% 0 0 -20px;
+            width: 160px;
+        }
+        .friends_div{
+            width: 200px;
+            margin: 118px 0 0 -1px;
+            text-align: center;
+        }
+        .groups_div{
+            width: 200px;
+            margin: -10px 0 0 -1px;
+            text-align: center;
+        }
+        .info_div{
+            margin: -350px 0 15px 44%;
+            width: 500px;
+        }
+        .post_div{
+            width: 500px;
+            margin-left: 44%;
+        }
+        .photo{
+            width: 450px;
+            height: 350px;
+        }
+    }
+
+    @media(min-width: 2050px){
+        .navbar-brand{
+            margin-left: 140px;
+        }
+            .left_div{
+                margin: 2% 0 0 4%;
+                 height: 270px;
+                 width: 1000px;
+                 text-align: center;
+
+            }
+            .profile_div{
+                width: 400px;
+                height: 600px;
+                margin: -270px 0 0 17%;
+            }
+            .my_btn{
+                margin: -5% 0 0 -20px;
+                width: 350px;
+                font-size: 30px;
+            }
+            .friends_div{
+                width: 400px;
+                margin: 180px 0 0 -1px;
+                text-align: center;
+            }
+            .groups_div{
+                width: 400px;
+                margin: -10px 0 0 -1px;
+                text-align: center;
+            }
+            .info_div{
+                margin: -600px 0 15px 38%;
+                width: 1200px;
+            }
+            .post_div{
+                width: 1200px;
+                margin-left: 38%;
+            }
+            .photo{
+                width: 1100px;
+                height: 900px;
+            }
+            .circle{
+                width: 90px;
+                height: 90px;
+                border-radius: 50%;
+                border: 1px solid black;
+                margin: 13px 0 0 25px;
+            }
+        }
+
+@media(min-width: 2300px){
+    .navbar-brand{
+        margin-left: 310px;
+    }
+        .left_div{
+            margin: 2% 0 0 10%;
+             height: 270px;
+             width: 1000px;
+             text-align: center;
+
+        }
+        .profile_div{
+            width: 500px;
+            height: 600px;
+            margin: -270px 0 0 22%;
+        }
+        .my_btn{
+            margin: -5% 0 0 -20px;
+            width: 450px;
+            font-size: 30px;
+        }
+        .friends_div{
+            width: 500px;
+            margin: 70px 0 0 -1px;
+            text-align: center;
+        }
+        .groups_div{
+            width: 500px;
+            margin: -10px 0 0 -1px;
+            text-align: center;
+        }
+        .info_div{
+            margin: -600px 0 15px 44%;
+            width: 1300px;
+        }
+        .post_div{
+            width: 1300px;
+            margin-left: 44%;
+        }
+        .photo{
+            width: 1200px;
+            height: 900px;
+        }
+        .circle{
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 1px solid black;
+            margin: 13px 0 0 47px;
+        }
+    }

@@ -1,0 +1,58 @@
+[
+{
+  "model": "sites.site",
+  "pk": 2,
+  "fields": {
+    "domain": "http://localhost:8000/",
+    "name": "http://localhost:8000/"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 3,
+  "fields": {
+    "domain": "http://127.0.0.1:8000/",
+    "name": "http://127.0.0.1:8000/"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 4,
+  "fields": {
+    "domain": "http://social.savink.in/",
+    "name": "http://social.savink.in/"
+  }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 1,
+  "fields": {
+    "provider": "vk",
+    "name": "VK",
+    "client_id": "7317110",
+    "secret": "ST3oRjWFifOgxxFUl5sH",
+    "key": "",
+    "sites": [
+      3,
+      2,
+      4
+    ]
+  }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 2,
+  "fields": {
+    "provider": "facebook",
+    "name": "Facebook",
+    "client_id": "2555976281192292",
+    "secret": "b82697d96b942c6f0aa253668c15eb6d",
+    "key": "",
+    "sites": [
+      3,
+      2,
+      4
+    ]
+  }
+}
+]
