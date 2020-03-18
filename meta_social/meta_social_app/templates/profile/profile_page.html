@@ -15,9 +15,13 @@
             opacity: 0.7;
           }
         </style>
-        <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
-          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
-        </a>
+        {% if user == c_user %}
+          <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
+            <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
+          </a>
+        {% else %}
+          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top"></img>
+        {% endif %}
         <div class="card-body">
           {% if c_user == user %}
             <hr class="mt-0">
@@ -50,33 +54,33 @@
           <h5 class="card-title float-left">{{ c_user.first_name }} {{ c_user.last_name }}</h5>
           <small class="float-right text-muted">{% if is_online %}Онлайн{% else %}Оффлайн{% endif %}</small>
           <br><hr>
-          <p class="card-text">Пол: {{ c_user.profile.get_gender_display }}</p>
+          <p class="card-text">{{ c_user.profile.get_gender_display }}</p>
           <p class="card-text">
             {% if c_user.profile.job %}
                 {{ c_user.profile.job }}
             {% else %}
-                Место работы/учебы: не указано
+                Место работы/учебы не указано
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.biography %}
                 {{ c_user.profile.biography }}
             {% else %}
-                Биография: не указана
+                Биография не указана
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.country %}
                 {{ c_user.profile.country.name }}
             {% else %}
-                Страна: не указана
+                Страна не указана
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.birth %}
                 {{ c_user.profile.birth }}
             {% else %}
-                Дата рождения: не указана
+                Дата рождения не указана
             {% endif %}
           </p>
           {% if c_user.profile.show_email %}
@@ -84,18 +88,20 @@
               {% if c_user.email %}
                 {{ c_user.email }}
               {% else %}
-                Почта: не указана
+                Почта не указана
               {% endif %}
             </p>
           {% endif %}
         </div>
       </div>
 
-      <div class="card mt-3">
-        <div class="card-body">
-          {% include 'post_menu.html' %}
+      {% if c_user == user %}
+        <div class="card mt-3">
+          <div class="card-body">
+            {% include 'post_menu.html' %}
+          </div>
         </div>
-      </div>
+      {% endif %}
 
       {% if c_user.profile.posts %}
         {% for post in c_user.profile.posts %}

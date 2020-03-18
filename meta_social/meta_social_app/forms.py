@@ -56,6 +56,12 @@ class CropImageForm(forms.ModelForm):
         widgets = {
             'image': ImageCropWidget,
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(CropImageForm, self).__init__(*args, **kwargs)
+
+        # TODO: Сделать нормальный размер кропинга
+        self.fields['cropping'].widget.attrs['width'] = '100%'
 
 
 class PostForm(forms.ModelForm):
