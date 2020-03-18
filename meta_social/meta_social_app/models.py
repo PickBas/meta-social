@@ -130,6 +130,9 @@ class Post(models.Model):
 
 
 class PostImages(models.Model):
+    """
+    Posts Images class
+    """
     post = models.ForeignKey(Post, models.CASCADE)
     image = models.ImageField(upload_to='post/images/')
 

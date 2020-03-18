@@ -47,6 +47,9 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class CropImageForm(forms.ModelForm):
+    """
+        Form for cropping image
+    """
     class Meta:
         model = Profile
         fields = ('cropping', 'image')
@@ -56,6 +59,9 @@ class CropImageForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
+    """
+        Form for creation post
+    """
     text = forms.CharField(max_length=500)
 
     class Meta:
@@ -71,6 +77,9 @@ class PostForm(forms.ModelForm):
 
 
 class PostImageForm(forms.ModelForm):
+    """
+        Form for adding images to post
+    """
     image = forms.ImageField()
 
     class Meta:

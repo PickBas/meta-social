@@ -319,6 +319,11 @@ def friends_blacklist(request) -> render:
 
 @login_required
 def post_new(request):
+    """
+    Function for creating post
+    :param request: request
+    :return: HttpResponseRedirect
+    """
     PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
 
     if request.method == "POST":
@@ -421,6 +426,11 @@ def blacklist_remove(request, user_id):
 
 @login_required
 def crop_image(request, user_id):
+    """
+    Function for cropping image
+    :param request: request
+    :return: HttpResponseRedirect
+    """
     if int(request.user.id) != int(user_id):
         raise Http404()
 
