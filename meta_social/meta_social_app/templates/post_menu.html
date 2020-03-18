@@ -76,7 +76,14 @@
                     return false;
                 };
                 
-                let number = evt.target.id.slice(-1);
+                let number = null;
+
+                if (evt.target.classList.contains('none-image')) {
+                    number = evt.target.id.slice(-1);
+                } else {
+                    number = evt.target.parentNode.id.slice(-1);
+                };
+
                 let file_field = document.getElementById("id_form-" + number + "-image");
                 file_field.files = evt.dataTransfer.files;
                 document.getElementById("up_image_" + number).classList.add('hide-image');
