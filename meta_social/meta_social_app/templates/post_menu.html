@@ -91,15 +91,26 @@
             };
 
             function clickImage (evt) {
-                let number = evt.target.id.slice(-1);
+                let number = null;
+
+                if (evt.target.classList.contains('none-image')) {
+                    number = evt.target.id.slice(-1);
+                } else {
+                    number = evt.target.parentNode.id.slice(-1);
+                };
 
                 if (document.getElementById("up_image_" + number).classList.contains('hide-image')) {
                     document.getElementById("up_image_" + number).classList.remove('hide-image');
                     document.getElementById("cl_image_" + number).classList.add('hide-image');
 
-                    evt.target.value = '';
+                    if (evt.target.classList.contains('none-image')) {
+                        evt.target.value = '';
+                    } else {
+                        evt.target.parentNode.value = '';
+                    };
                 } else {
-                    // TODO: Вызывать окно выбора файла
+                    // TODO: Вызвать диалоговое окно загрузки файла
+                    console.log('Im work!');
                 };
             };
 
