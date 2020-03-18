@@ -28,10 +28,17 @@
                                     <input class="float-right btn btn-outline-danger" type="submit" value="&#128465;">
                                 </form>
                             {% else %}
-                                <form method="POST" action="/friends/send_request/{{ match.id }}/">
-                                    {% csrf_token %}
-                                    <input class="float-right btn btn-outline-success" type="submit" value="+">
-                                </form>
+                                {% if is_in_requests %}
+                                    <form method="POST" action="/friends/accept_request/{{ match.id }}/">
+                                        {% csrf_token %}
+                                        <input class="float-right btn btn-outline-success" type="submit" value="&#10003;">
+                                    </form>
+                                {% else %}
+                                    <form method="POST" action="/friends/send_request/{{ match.id }}/">
+                                        {% csrf_token %}
+                                        <input class="float-right btn btn-outline-success" type="submit" value="+">
+                                    </form>
+                                {% endif %}
                             {% endif %}
                         </li>
                     {% endfor %}

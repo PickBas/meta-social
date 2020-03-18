@@ -290,6 +290,9 @@ def friends_search(request) -> render:
 
             matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
+            inbox = [i.from_user for i in request.user.profile.friendship_inbox_requests()]
+            for match in matches:
+                context['is_in_requests'] = True if match in inbox else False
 
     return render(request, 'friends/search.html', context)
 
@@ -301,6 +304,7 @@ def friends_requests(request) -> render:
     :param request: request
     :return: render
     """
+    print(i.to_user for i in request.user.profile.friendship_inbox_requests())
     context = get_menu_context('friends', 'Заявки в друзья')
     context['pagename'] = 'Заявки в друзья'
     return render(request, 'friends/requests.html', context)
@@ -352,7 +356,6 @@ def send_friendship_request(request, user_id) -> redirect:
     :param user_id: id
     :return: redirect
     """
-    # TODO: Запретить повторяющиеся заявки, и себе
 
     users_item = User.objects.get(id=user_id)
 
