@@ -22,7 +22,15 @@
           {% if c_user == user %}
             <hr class="mt-0">
             <a href="/accounts/profile/{{ c_user.id }}/edit_profile/" class="btn btn-block btn-primary">Редактировать</a>
+          {% else %}
+              <hr class="mt-0">
+              {% if pass_add_to_friends %}
+              <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
+                {% csrf_token %}
+                <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
+            </form>
           {% endif %}
+        {% endif %}
         </div>
       </div>
       <div class="card mt-3">

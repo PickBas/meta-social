@@ -147,6 +147,14 @@ def profile(request, user_id) -> render:
 
     PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
 
+    pass_add_to_friends = False
+
+    if user_item != request.user:
+        if request.user not in user_item.profile.friends():
+            pass_add_to_friends = True
+
+    context['pass_add_to_friends'] = pass_add_to_friends
+
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
 
