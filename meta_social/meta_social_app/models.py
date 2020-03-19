@@ -41,6 +41,41 @@ class Profile(models.Model):
 
     blacklist = models.ManyToManyField(User, 'blacklist')
 
+    def check_online_with_last_log(self) -> bool:
+        """
+        Checking onlime status using last login/logout
+        :param self: User
+        :return: bool
+        """
+        if self.user.last_login is None or self.last_logout is None:
+            return False
+
+        if self.user.last_login.hour >= self.last_logout.hour and \
+                self.user.last_login.minute >= self.last_logout.minute and \
+                self.user.last_login.second >= self.last_logout.second:
+            return True
+        if self.user.last_login.hour >= self.last_logout.hour and \
+                self.user.last_login.minute > self.last_logout.minute:
+            return True
+        if self.user.last_login.hour > self.last_logout.hour:
+            return True
+
+        return False
+
+    def check_online_with_afk(self) -> bool:
+        """
+        Checking user afk. If user is, online status is changed to offline
+        :return: bool
+        """
+        if self.check_online_with_last_log():
+            if timezone.now().hour - self.last_act.hour == 0 and \
+                    timezone.now().minute - self.last_act.minute >= 5:
+                return False
+            if timezone.now().hour - self.last_act.hour >= 1:
+                return False
+            return True
+        return False
+
     def get_social_accounts(self) -> list:
         """
         Getting social accounts
