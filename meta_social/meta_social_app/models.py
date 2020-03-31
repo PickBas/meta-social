@@ -155,6 +155,9 @@ class Profile(models.Model):
 
 
 def save_image_from_url(profile, image_url):
+    """
+    Saving image from url to profile model
+    """
     img_temp = NamedTemporaryFile(delete=True)
     img_temp.write(urlopen(image_url).read())
     img_temp.flush()
