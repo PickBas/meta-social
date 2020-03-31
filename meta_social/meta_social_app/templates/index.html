@@ -2,6 +2,12 @@
 {% load cropping %}
 
 {% block center %}
+<style>
+    .kollaz{
+    display: flex;
+    flex-wrap: wrap;
+    }
+</style>
     <div class="card">
         <div class="card-body text-left">
             {% include 'post_menu.html' %}
@@ -104,12 +110,13 @@
                     <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
                     <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
                     <p class="card-text mt-2">{{ post.text }}</p>
-
+                    <div class="kollaz">
                     {% if post.get_images %}
                         {% for post_img in post.get_images %}
-                            <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                            <img src="{{ post_img.image.url }}"  class="mb-1">
                         {% endfor %}
                     {% endif %}
+                        </div>
 
                     <hr class="mt-1 mb-1">
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>

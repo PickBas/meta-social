@@ -163,6 +163,9 @@ class Post(models.Model):
     def get_images(self):
         return PostImages.objects.filter(post=self)
 
+    def get_images_count(self):
+        return PostImages.objects.filter(post=self).count()
+
 
 class PostImages(models.Model):
     """
