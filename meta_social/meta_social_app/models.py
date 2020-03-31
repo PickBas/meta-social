@@ -112,6 +112,9 @@ class Profile(models.Model):
     def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 
+    def friendship_requests_count(self):
+        return len(self.friendship_inbox_requests())
+
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
 
@@ -147,6 +150,13 @@ class Profile(models.Model):
             posts += com.posts()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
+    
+    def get_unread_messages_count(self):
+        """
+        Get amount unread messages
+        Сообщения ещё не сделаны тч возвращает 0
+        """
+        return 0
 
 
 class Post(models.Model):
