@@ -3,6 +3,12 @@
 {% load cropping %}
 
 {% block content %}
+<style>
+    .kollaz{
+    display: flex;
+    flex-wrap: wrap;
+    }
+</style>
   <div class="row text-left">
     <div class="col-xl-3">
       <div class="card">
@@ -14,10 +20,6 @@
             transition: 0.7s;
             opacity: 0.7;
           }
-          .kollaz{
-            display: flex;
-            flex-wrap: wrap;
-           }
         </style>
         {% if user == c_user %}
           <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
@@ -117,7 +119,7 @@
               <div class="kollaz">
               {% if post.get_images %}
                 {% for post_img in post.get_images %}
-                {% if post.get_images_count > 1 %}
+                {% if post.get_images.count > 1 %}
                   <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
                 {%else%}
                    <img src="{{ post_img.image.url }}" width="100%" class="mb-1">

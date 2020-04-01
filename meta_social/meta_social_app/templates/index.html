@@ -113,9 +113,11 @@
                     <div class="kollaz">
                     {% if post.get_images %}
                         {% for post_img in post.get_images %}
-                        {% if post.get_images_count > 1 %}
-                            <img src="{{ post_img.image.url }}"  class="mb-1">
-                        {% endif %}
+                        {% if post.get_images.count > 1 %}
+                  <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                {%else%}
+                   <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                {% endif %}
                         {% endfor %}
                     {% endif %}
                         </div>
