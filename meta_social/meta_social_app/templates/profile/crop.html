@@ -18,7 +18,7 @@
             <!--{% if image %}
                 <img src="{% cropped_thumbnail image "cropping" %}" />
             {% endif %}-->
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" id="crop_form">
                 {% csrf_token %}
                 {{ form.image }} 
                 {{ form.cropping }}
@@ -27,4 +27,30 @@
             </form>
         </div>
     </div>
+    <script>
+        function watchProperty(obj, name, handler) {
+            if ('watch' in obj) {
+                obj.watch(name, handler);
+            } else if ('onpropertychange' in obj) {
+                name= name.toLowerCase();
+                obj.onpropertychange= function() {
+                    if (window.event.propertyName.toLowerCase()===name)
+                        handler.call(obj);
+                };
+            } else {
+                var o= obj[name];
+                setInterval(function() {
+                    var n= obj[name];
+                    if (o!==n) {
+                        o= n;
+                        handler.call(obj);
+                    }
+                }, 200);
+            }
+        }
+
+        watchProperty(document.getElementById('id_image'), 'value', function() {
+            crop_form.submit();
+        });
+    </script>
 {% endblock  %}
