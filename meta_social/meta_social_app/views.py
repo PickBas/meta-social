@@ -31,6 +31,7 @@ def get_menu_context(page: str, pagename: str) -> dict:
         'profile',
         'newsfeed',
         'friends',
+        'post',
     ]
 
     if page not in available_pages:
@@ -229,6 +230,14 @@ class EditProfile(View):
         get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
+
+
+def post_view(request, post_id):
+    context = get_menu_context('post', 'Пост')
+    context['pagename'] = 'Пост'
+    post = Post.objects.get(id=post_id)
+    context['post'] = post
+    return render(request, 'full_post.html', context)
 
 
 @login_required

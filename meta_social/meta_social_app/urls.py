@@ -25,6 +25,7 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
     path('post/create/', post_new),
+    path('post/<int:post_id>/', post_view)
 ]
 
 if settings.DEBUG:
