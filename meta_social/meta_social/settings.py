@@ -95,14 +95,14 @@ WSGI_APPLICATION = 'meta_social.wsgi.application'
 
 DATABASES = {
     'default': {
-         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-         'NAME': 'DB',
-         'USER': 'postgres',
-         'PASSWORD': 'postgres',
-         'HOST': 'db',
-         'PORT': '5432',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'DB',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': '5432',
     },
-     'old_sqlite3': {
+    'old_sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
@@ -173,4 +173,4 @@ THUMBNAIL_PROCESSORS = (
     'image_cropping.thumbnail_processors.crop_corners',
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-IMAGE_CROPPING_THUMB_SIZE = (800, 800)
+IMAGE_CROPPING_THUMB_SIZE = (256, 256)

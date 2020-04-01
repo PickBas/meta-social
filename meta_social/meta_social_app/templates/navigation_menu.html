@@ -1,0 +1,46 @@
+<nav class="nav nav-pills flex-column text-left" style="font-size: 12pt;">
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'profile' %}active{% endif %}" href="/accounts/profile/{{ user.id }}/">
+            Моя страница
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'newsfeed' %}active{% endif %}" href="/">
+            Новости
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link disabled" href="#">
+            Сообщения
+            {% if user.profile.get_unread_messages_count %}
+                {% if page == 'messages' %}
+                    <span class="badge badge-light float-right mt-1">{{ user.profile.get_unread_messages_count }}</span>
+                {% else %}
+                    <span class="badge badge-primary float-right mt-1">{{ user.profile.get_unread_messages_count }}</span>
+                {% endif %}
+            {% endif %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'friends' %}active{% endif %}" href="/friends/{{ user.id }}/">
+            Друзья
+            {% if user.profile.friendship_requests_count %}
+                {% if page == 'friends' %}
+                    <span class="badge badge-light float-right mt-1">{{ user.profile.friendship_requests_count }}</span>
+                {% else %}
+                    <span class="badge badge-primary float-right mt-1">{{ user.profile.friendship_requests_count }}</span>
+                {% endif %}
+            {% endif %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link disabled" href="#">
+            Сообщества
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link disabled" href="#">
+            Музыка
+        </a>
+    </li>
+</nav>

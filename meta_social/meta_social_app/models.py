@@ -11,6 +11,11 @@ from django.utils import timezone
 from django_countries.fields import CountryField
 from django.template.defaultfilters import slugify
 from image_cropping import ImageRatioField, ImageCropField
+from allauth.account.signals import user_signed_up
+from allauth.socialaccount.models import SocialAccount
+from django.core.files import File
+from urllib.request import urlopen
+from tempfile import NamedTemporaryFile
 
 
 class Profile(models.Model):
@@ -26,7 +31,7 @@ class Profile(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
     image = ImageCropField(blank=True, upload_to='avatars/users', default='avatars/users/0.png')
-    cropping = ImageRatioField('image', '250x250')
+    cropping = ImageRatioField('image', '256x256')
 
     job = models.CharField(null=True, max_length=100)
     biography = models.CharField(max_length=500, null=True)
@@ -112,6 +117,9 @@ class Profile(models.Model):
     def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 
+    def friendship_requests_count(self):
+        return len(self.friendship_inbox_requests())
+
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
 
@@ -147,6 +155,44 @@ class Profile(models.Model):
             posts += com.posts()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
+    
+    def get_unread_messages_count(self):
+        """
+        Get amount unread messages
+        Сообщения ещё не сделаны тч возвращает 0
+        """
+        return 0
+
+
+def save_image_from_url(profile, image_url):
+    """
+    Saving image from url to profile model
+    """
+    img_temp = NamedTemporaryFile(delete=True)
+    img_temp.write(urlopen(image_url).read())
+    img_temp.flush()
+
+    profile.image.save('image_{profile.id}', File(img_temp))
+
+
+@receiver(user_signed_up)
+def create_user_profile(sender, **kwargs) -> None:
+    """
+    creating user profile
+    """
+
+    profile = Profile(user=kwargs['user'])
+    provider = 'vk' if kwargs['user'].socialaccount_set.filter(provider='vk').exists() else 'facebook'
+
+    data = SocialAccount.objects.filter(user=kwargs['user'], provider=provider)
+
+    if data:
+        picture = data[0].get_avatar_url()
+        
+        if picture:
+            save_image_from_url(profile, picture)
+    
+    profile.save()
 
 
 class Post(models.Model):
@@ -163,6 +209,9 @@ class Post(models.Model):
     def get_images(self):
         return PostImages.objects.filter(post=self)
 
+    def get_images_count(self):
+        return PostImages.objects.filter(post=self).count()
+
 
 class PostImages(models.Model):
     """
@@ -178,23 +227,6 @@ class Communities(models.Model):
     """
     community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_community')
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs) -> None:
-    """
-    creating user profile
-    """
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs) -> None:
-    """
-    Saving user profile
-    """
-    instance.profile.save()
 
 
 class Community(models.Model):
