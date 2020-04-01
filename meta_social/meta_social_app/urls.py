@@ -24,6 +24,8 @@ urlpatterns = [
     path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
+    path('community/<int:community_id>/', community),
+
     path('post/create/', post_new),
 ]
 

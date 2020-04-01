@@ -31,6 +31,9 @@ def get_menu_context(page: str, pagename: str) -> dict:
         'profile',
         'newsfeed',
         'friends',
+        'community',
+        'music',
+        'messages',
     ]
 
     if page not in available_pages:
@@ -440,3 +443,14 @@ def crop_image(request, user_id):
     context['image'] = image
 
     return render(request, 'profile/crop.html', context)
+
+
+def community(request, community_id):
+    context = get_menu_context('community', 'Сообщество')
+
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    context['postform'] = PostForm()
+    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+    return render(request, 'community/community_page.html', context)
