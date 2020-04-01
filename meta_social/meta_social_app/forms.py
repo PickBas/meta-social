@@ -95,3 +95,12 @@ class PostImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
+
+
+class AddCommentForm(forms.Form):
+    comment = forms.CharField(max_length=500,
+                              required=True,
+                              widget=forms.Textarea(attrs={
+                                  'placeholder': 'Ваш комментарий',
+                                  'style': 'width: 90%;'
+                              }))

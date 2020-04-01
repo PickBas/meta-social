@@ -163,6 +163,12 @@ class Post(models.Model):
     def get_images(self):
         return PostImages.objects.filter(post=self)
 
+    def comments(self):
+        return Comment.objects.filter(post=self)
+
+    def amount_of_comments(self):
+        return len(self.comments())
+
 
 class PostImages(models.Model):
     """
@@ -263,3 +269,13 @@ class FriendshipRequest(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='3+')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='4+')
     already_sent = models.BooleanField(default=False)
+
+
+class Comment(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    text = models.CharField(max_length=500)
+
+    post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+

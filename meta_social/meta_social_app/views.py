@@ -12,12 +12,12 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile
+from .models import Profile, Comment
 from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, AddCommentForm
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -232,12 +232,31 @@ class EditProfile(View):
         return render(request, self.template_name, context)
 
 
-def post_view(request, post_id):
-    context = get_menu_context('post', 'Пост')
-    context['pagename'] = 'Пост'
-    post = Post.objects.get(id=post_id)
-    context['post'] = post
-    return render(request, 'full_post.html', context)
+class PostView(View):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template_name = 'full_post.html'
+
+    def post(self, request, **kwargs):
+        context = get_menu_context('post', 'Пост')
+        context['pagename'] = 'Пост'
+        form = AddCommentForm(request.POST)
+        context['form'] = form
+        context['post'] = Post.objects.get(id=kwargs['post_id'])
+        comment_item = Comment(
+            text=form.data['comment'],
+            post=Post.objects.get(id=kwargs['post_id']),
+            user=request.user
+        )
+        comment_item.save()
+        return render(request, self.template_name, context)
+
+    def get(self, request, **kwargs):
+        context = get_menu_context('post', 'Пост')
+        context['pagename'] = 'Пост'
+        context['post'] = Post.objects.get(id=kwargs['post_id'])
+        context['form'] = AddCommentForm()
+        return render(request, self.template_name, context)
 
 
 @login_required

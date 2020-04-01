@@ -15,8 +15,26 @@
             {% endif %}
 
             <hr class="mt-1 mb-1">
-            <a href="post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
             <span class="text-muted mb-0 float-right">{{ post.date }}</span>
         </div>
     </div>
+    <form method="post" action="/post/{{ post.id }}/">
+            {% csrf_token %}
+            {{ form.comment }}
+            <input class="btn btn-primary" type="submit" value="Оставить комментарий">
+    </form>
+    {% if post.comments %}
+            {% for comment in post.comments %}
+                <div class="media" style="margin: 20px; border-style: outset">
+                <img src="{% cropped_thumbnail comment.post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                        <div class="media-body">
+                            <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
+                            <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+                        </div>
+                    <p style="text-align: right; margin: 3px">Создан в {{ comment.date }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Комментариев нет</p>
+        {% endif %}
 {% endblock %}
