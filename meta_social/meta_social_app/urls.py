@@ -16,13 +16,13 @@ urlpatterns = [
     path('friends/<int:user_id>/', friends_list),
     path('friends/search/', friends_search),
     path('friends/requests/', friends_requests),
-    path('friends/blacklist/', friends_blacklist),
+    path('friends/<int:user_id>/blacklist/', friends_blacklist),
 
     path('friends/send_request/<int:user_id>/', send_friendship_request),
     path('friends/accept_request/<int:request_id>/', accept_request),
     path('friends/remove_friend/<int:user_id>/', remove_friend),
-    path('friends/add_blacklist/<int:user_id>/', blacklist_remove),
-    path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
+    path('friends/add_blacklist/<int:user_id>/', blacklist_add),
+    path('friends/remove_blacklist/<int:user_id>/', blacklist_remove),
 
     path('community/<int:community_id>/', community),
 

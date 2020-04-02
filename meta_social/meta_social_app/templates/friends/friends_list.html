@@ -21,6 +21,10 @@
                                 {% csrf_token %}
                                 <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
                             </form>
+                            <form method="POST" action="/friends/add_blacklist/{{ friend.id }}/">
+                                {% csrf_token %}
+                                <input class="float-right btn btn-outline-secondary mr-2" type="submit" value="&#x1f6c7;">
+                            </form>
                         </li>
                     {% endfor %}
                 </ul>

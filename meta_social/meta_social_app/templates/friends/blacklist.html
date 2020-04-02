@@ -1,7 +1,35 @@
 {% extends 'base_menu.html' %}
 
+{% load cropping %}
+
 {% block center %}
-    <h5>В разработке</h5>
+  <div class="card">
+      <div class="card-body">
+          {% if user == c_user %}
+              <h5>Черный список</h5>
+          {% else %}
+              <h5>Forbidden</h5>
+          {% endif %}
+          <hr>
+
+          {% if c_user.profile.friends %}
+              <ul class="list-group list-group-flush">
+                  {% for friend in c_user.profile.friends %}
+                      <li class="list-group-item">
+                          <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                          <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
+                          <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                              {% csrf_token %}
+                              <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
+                          </form>
+                      </li>
+                  {% endfor %}
+              </ul>
+          {% else %}
+              Никого нет в черном списке
+          {% endif %}
+      </div>
+  </div>
 {% endblock %}
 
 {% block right %}

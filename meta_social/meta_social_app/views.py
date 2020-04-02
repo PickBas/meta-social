@@ -285,13 +285,18 @@ def friends_requests(request) -> render:
 
 
 @login_required
-def friends_blacklist(request) -> render:
+def friends_blacklist(request, user_id) -> render:
     """
     Friends_blacklist view
+    :param user_id: user in blacklist od
     :param request: request
     :return: render
     """
     context = get_menu_context('friends', 'Черный список')
+    c_user = User.objects.get(id=user_id)
+    context['c_user'] = c_user
+    # for i in c_user.profile.blacklist.all():
+    #     print(i.username)
     return render(request, 'friends/blacklist.html', context)
 
 
@@ -402,7 +407,11 @@ def blacklist_add(request, user_id):
     :param user_id: id
     """
     if request.method == 'POST':
-        pass
+        main_user = User.objects.get(id=request.user.id)
+        user_for_blacklist = User.objects.get(id=user_id)
+        main_user.profile.blacklist.add(user_for_blacklist)
+        main_user.save()
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
