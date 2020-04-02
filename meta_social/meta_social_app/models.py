@@ -175,10 +175,21 @@ def save_image_from_url(profile, image_url):
     profile.image.save('image_{profile.id}', File(img_temp))
 
 
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+
 @receiver(user_signed_up)
-def create_user_profile(sender, **kwargs) -> None:
+def set_user_avatar(sender, **kwargs) -> None:
     """
-    creating user profile
+    Creating user profile
     """
 
     profile = Profile(user=kwargs['user'])
