@@ -116,7 +116,7 @@ def profile(request, user_id) -> render:
     pass_add_to_friends = False
 
     if user_item != request.user:
-        if request.user not in user_item.profile.friends():
+        if request.user not in user_item.profile.friends() and request.user not in user_item.profile.blacklist.all():
             pass_add_to_friends = True
 
     context['pass_add_to_friends'] = pass_add_to_friends
