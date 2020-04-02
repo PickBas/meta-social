@@ -407,6 +407,7 @@ def blacklist_add(request, user_id):
     :param user_id: id
     """
     if request.method == 'POST':
+        remove_friend(request, user_id)
         main_user = User.objects.get(id=request.user.id)
         user_for_blacklist = User.objects.get(id=user_id)
         main_user.profile.blacklist.add(user_for_blacklist)
@@ -423,7 +424,8 @@ def blacklist_remove(request, user_id):
     :param user_id: id
     """
     if request.method == 'POST':
-        pass
+        user_to_remove = User.objects.get(id=user_id)
+        request.user.profile.blacklist.remove(user_to_remove)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

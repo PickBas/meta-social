@@ -12,13 +12,13 @@
           {% endif %}
           <hr>
 
-          {% if c_user.profile.friends %}
+          {% if c_user.profile.blacklist.all %}
               <ul class="list-group list-group-flush">
-                  {% for friend in c_user.profile.friends %}
+                  {% for ex_friend in c_user.profile.blacklist.all %}
                       <li class="list-group-item">
-                          <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                          <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
-                          <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
+                          <img src="{% cropped_thumbnail ex_friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                          <a href="/accounts/profile/{{ ex_friend.id }}/" class="float-left ml-2">{{ ex_friend.username }}</a>
+                          <form method="POST" action="/friends/remove_blacklist/{{ ex_friend.id }}/">
                               {% csrf_token %}
                               <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
                           </form>
