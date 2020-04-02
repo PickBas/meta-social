@@ -133,7 +133,7 @@
           </div>
         {% endfor %}
       {% else %}
-          {% if pass_add_to_friends %}
+          {% if pass_add_to_friends or user == c_user %}
             <h5 class="mt-3 text-center">Нет постов</h5>
           {% else %}
             <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
