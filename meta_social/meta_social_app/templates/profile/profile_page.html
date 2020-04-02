@@ -61,41 +61,47 @@
           <h5 class="card-title float-left">{% if c_user.first_name or c_user.last_name %}{{ c_user.first_name }} {{ c_user.last_name }}{% else %}{{ c_user.username }}{% endif %}</h5>
           <small class="float-right text-muted">{% if is_online %}Онлайн{% else %}Оффлайн{% endif %}</small>
           <br><hr>
-          <p class="card-text">{{ c_user.profile.get_gender_display }}</p>
           <p class="card-text">
-            {% if c_user.profile.job %}
-                {{ c_user.profile.job }}
+            {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
+                Работа: {{ c_user.profile.job }}
             {% else %}
-                Место работы/учебы не указано
+                {% if c_user.profile.study and not c_user.profile.job %}
+                Учеба: {{ c_user.profile.study }}
+                {% else %}
+                    {% if not c_user.profile.study and not c_user.profile.job %}
+                        Место работы/учебы: -
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+          </p>
+           <p class="card-text">
+            {% if c_user.profile.job and c_user.profile.study %}
+                Учеба: {{ c_user.profile.study }}
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.biography %}
-                {{ c_user.profile.biography }}
+                Биография: {{ c_user.profile.biography }}
             {% else %}
-                Биография не указана
+                Биография: -
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.country %}
-                {{ c_user.profile.country.name }}
+                Страна: {{ c_user.profile.country.name }}
             {% else %}
-                Страна не указана
+                Страна: -
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.birth %}
-                {{ c_user.profile.birth }}
-            {% else %}
-                Дата рождения не указана
+                Дата рождения: {{ c_user.profile.birth }}
             {% endif %}
           </p>
           {% if c_user.profile.show_email %}
             <p class="card-text">
               {% if c_user.email %}
-                {{ c_user.email }}
-              {% else %}
-                Почта не указана
+                Почта: {{ c_user.email }}
               {% endif %}
             </p>
           {% endif %}

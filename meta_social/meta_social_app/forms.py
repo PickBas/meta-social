@@ -23,12 +23,13 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('job', 'biography', 'gender', 'country', 'birth', 'show_email')
+        fields = ('job', 'study', 'biography', 'gender', 'country', 'birth', 'show_email')
         widgets = {
-            'birth': forms.DateInput(attrs={'type': 'date', 'placeholder': 'Select a date'})
+            'birth': forms.DateInput(attrs={'type': 'date'})
         }
         labels = {
             'job': 'Работа',
+            'study': 'Учеба',
             'biography': 'Биография',
             'gender': 'Пол',
             'country': 'Страна',
