@@ -70,7 +70,8 @@ def index(request) -> render:
     context = get_menu_context('newsfeed', 'Главная')
     context['pagename'] = "Главная"
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -111,7 +112,8 @@ def profile(request, user_id) -> render:
     context['is_online'] = context['profile'].check_online_with_afk()
     get_last_act(request, user_item)
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     pass_add_to_friends = False
 
@@ -187,6 +189,7 @@ class EditProfile(View):
         super().__init__(**kwargs)
         self.template_name = 'profile/edit_profile.html'
         self.profile = None
+        self.previous_birth = None
 
     def post(self, request, **kwargs) -> redirect:
         """
@@ -196,23 +199,34 @@ class EditProfile(View):
         :return:
         """
 
-        user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=kwargs['user_id']))
+        self.previous_birth = User.objects.get(
+            id=kwargs['user_id']).profile.birth
+        user_form = UserUpdateForm(
+            request.POST, instance=User.objects.get(id=kwargs['user_id']))
         self.profile = Profile.objects.get(user=kwargs['user_id'])
 
-        self.profile.show_email = False if request.POST.get('show_email') is None else True
+        self.profile.show_email = False if request.POST.get(
+            'show_email') is None else True
 
         try:
-            img_manage = ImageManage(kwargs['user_id'], self.profile, request.FILES['avatar'])
+            img_manage = ImageManage(
+                kwargs['user_id'], self.profile, request.FILES['avatar'])
             img_manage.process_img()
         except Exception:
             pass
 
         profile_form = ProfileUpdateForm(request.POST,
-                                         instance=Profile.objects.get(user=kwargs['user_id']))
+                                         instance=self.profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+            tmp_user = User.objects.get(id=kwargs['user_id'])
+
+            if self.profile.birth is None:
+                self.profile.birth = self.previous_birth
+                self.profile.save()
+
             return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
     def get(self, request, **kwargs) -> render:
@@ -228,7 +242,10 @@ class EditProfile(View):
         context['user_form'] = UserUpdateForm(
             instance=User.objects.get(id=kwargs['user_id'])
         )
-        context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
+        context['profile_form'] = ProfileUpdateForm(
+            instance=Profile.objects.get(user=kwargs['user_id']))
+        self.previous_birth = User.objects.get(
+            id=kwargs['user_id']).profile.birth
         get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
@@ -262,9 +279,11 @@ def friends_search(request) -> render:
             query = request.POST.get('name')
             search_fields = ['username', 'first_name', 'last_name']
 
-            matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+            matches = User.objects.filter(search_filter(
+                search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
-            inbox = [i.from_user for i in request.user.profile.friendship_inbox_requests()]
+            inbox = [
+                i.from_user for i in request.user.profile.friendship_inbox_requests()]
             for match in matches:
                 context['is_in_requests'] = True if match in inbox else False
 
@@ -307,11 +326,13 @@ def post_new(request):
     :param request: request
     :return: HttpResponseRedirect
     """
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     if request.method == "POST":
         postForm = PostForm(request.POST)
-        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+        formset = PostImageFormSet(
+            request.POST, request.FILES, queryset=PostImages.objects.none())
 
         if postForm.is_valid() and formset.is_valid():
             post_form = postForm.save(commit=False)
@@ -364,7 +385,8 @@ def accept_request(request, request_id) -> redirect:
             request_item = FriendshipRequest.objects.get(to_user=request_id)
         except Exception:
             try:
-                request_item = FriendshipRequest.objects.get(from_user=request_id)
+                request_item = FriendshipRequest.objects.get(
+                    from_user=request_id)
             except Exception:
                 request_item = FriendshipRequest.objects.get(id=request_id)
         friends_item = Friend(
@@ -459,7 +481,8 @@ def crop_image(request, user_id):
 def community(request, community_id):
     context = get_menu_context('community', 'Сообщество')
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
