@@ -1,11 +1,12 @@
 """
 View module
 """
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import Http404
+from django.http import Http404, HttpResponse, JsonResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
@@ -238,12 +239,19 @@ def post_view(request, post_id):
     context['pagename'] = 'Пост'
     context['post'] = Post.objects.get(id=post_id)
     if request.method == "POST":
-        comment_item = Comment (
+        comment_item = Comment(
             text=request.POST.get('text'),
             post=Post.objects.get(id=post_id),
             user=request.user
         )
         comment_item.save()
+
+        return HttpResponse(json.dumps({'profile': str(comment_item.user.profile),
+                                        'username': comment_item.user.username,
+                                        'text': comment_item.text,
+                                        'date': str(comment_item.date)}),
+                            content_type="application/json")
+
     return render(request, 'full_post.html', context)
 
 

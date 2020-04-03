@@ -25,7 +25,7 @@
     <ul id="all_comments">
         {% if post.comments %}
                 {% for comment in post.comments %}
-                    <li>
+                    <li id="disp_comment">
                         <div class="media" style="margin: 20px; border-style: outset">
                         <img src="{% cropped_thumbnail comment.post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
                                 <div class="media-body">
@@ -54,10 +54,25 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     text: comment_text
                 },
-                success: function () {
+                success: function (response) {
+                    let json = $.parseJSON(response);
+                    console.log(json['profile']);
                     textar.value = "";
                     let qwe = '{{ post.comments.0.user.username}}';
-                    console.log(qwe);
+                    {#console.log(qwe);#}
+                    const li = document.createElement("li");
+                    let len =  $('ul#all_comments li').length;
+                    li.innerHTML = `
+                        <div class="media" style="margin: 20px; border-style: outset">
+                        <img src="" class="rounded-circle border border-dark" width=35 height=35>
+                                <div class="media-body">
+                                    <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ username }}</p>
+                                    <h5 style="text-align: left; margin-inline-start: 10px;">{{ text }}</h5>
+                                </div>
+                            <p style="text-align: right; margin: 3px">Создан в {{ date }}</p>
+                        </div>
+                    `;
+                    document.getElementById('all_comments').appendChild(li);
                 }
             })
         }
