@@ -26,9 +26,9 @@
             Друзья
             {% if user.profile.friendship_requests_count %}
                 {% if page == 'friends' %}
-                    <span class="badge badge-light float-right mt-1">{{ user.profile.friendship_requests_count }}</span>
+                    <span class="badge badge-light float-right mt-1" id="friendshipsCount">{{ user.profile.friendship_requests_count }}</span>
                 {% else %}
-                    <span class="badge badge-primary float-right mt-1">{{ user.profile.friendship_requests_count }}</span>
+                    <span class="badge badge-primary float-right mt-1" id="friendshipsCount">{{ user.profile.friendship_requests_count }}</span>
                 {% endif %}
             {% endif %}
         </a>

@@ -2,54 +2,117 @@
 {% load cropping %}
 
 {% block center %}
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Введите никнейм или имя пользователя."
-                            aria-label="Recipient's username" aria-describedby="button-addon2" name="name">
-                    <div class="input-group-append">
-                        <input class="btn btn-outline-success" type="submit" id="button-addon2" value="Найти">
-                    </div>
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Введите никнейм или имя пользователя."
+                    aria-label="Recipient's username" aria-describedby="button-addon2" name="name">
+                <div class="input-group-append">
+                    <input class="btn btn-outline-success" type="submit" id="button-addon2" value="Найти">
                 </div>
-            </form>
-            <hr>
+            </div>
+        </form>
+        <hr>
+        <ul class="list-group list-group-flush" id="searchList">
             {% if matches %}
-                <ul class="list-group list-group-flush">
-                    {% for match in matches %}
-                        <li class="list-group-item">
-                            <img src="{% cropped_thumbnail match.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                            <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
+                {% for match in matches %}
+                <li class="list-group-item">
+                    <img src="{% cropped_thumbnail match.profile "cropping" %}"
+                        class="rounded-circle border border-dark float-left" width=35 height=35>
+                    <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
-                            {% if match in user.profile.friends %}
-                                <form method="POST" action="/friends/remove_friend/{{ match.id }}/">
-                                    {% csrf_token %}
-                                    <input class="float-right btn btn-outline-danger" type="submit" value="&#128465;">
-                                </form>
-                            {% else %}
-                                {% if is_in_requests %}
-                                    <form method="POST" action="/friends/accept_request/{{ match.id }}/">
-                                        {% csrf_token %}
-                                        <input class="float-right btn btn-outline-success" type="submit" value="&#10003;">
-                                    </form>
-                                {% else %}
-                                    <form method="POST" action="/friends/send_request/{{ match.id }}/">
-                                        {% csrf_token %}
-                                        <input class="float-right btn btn-outline-success" type="submit" value="+">
-                                    </form>
-                                {% endif %}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                    {% if match in user.profile.friends %}
+                        <div>
+                            <button class="float-right btn btn-outline-danger"
+                                onclick="removeFriend(event, '/friends/remove_friend/{{ match.id }}/')">&#128465;</button>
+                        </div>
+                        {% else %}
+                        {% if is_in_requests %}
+                            <div>
+                                <button class="float-right btn btn-outline-success"
+                                    onclick="acceptRequest(event, '/friends/accept_request/{{ match.id }}/')">&#10003;</button>
+                            </div>
+                        {% else %}
+                            <div>
+                                <button class="float-right btn btn-outline-success"
+                                    onclick="sendRequest(event, '/friends/send_request/{{ match.id }}/')">+</button>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </li>
+                {% endfor %}
             {% else %}
-                <h4>Пусто</h4>
+                Пусто
             {% endif %}
-        </div>
+        </ul>
     </div>
+</div>
+
+<script>
+    function checkSearchList() {
+        let searchList = document.getElementById('searchList')
+
+        if (searchList.children.length == 0) {
+            searchList.innerHTML = "Пусто"
+        }
+    }
+
+    function sendRequest(e, link) {
+        $.ajax({
+            type: "POST",
+            url: link,
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function () {
+                e.target.parentNode.parentNode.remove()
+
+                checkSearchList()
+            }
+        })
+    }
+
+    function acceptRequest(e, link) {
+        $.ajax({
+            type: "POST",
+            url: link,
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function () {
+                e.target.parentNode.parentNode.remove()
+
+                let fr_counter = document.getElementById('friendshipsCount')
+                fr_counter.innerHTML = Number(fr_counter.innerHTML) - 1
+
+                if (fr_counter.innerHTML == '0') {
+                    fr_counter.remove()
+                }
+
+                checkSearchList()
+            }
+        })
+    }
+
+    function removeFriend(e, link) {
+        $.ajax({
+            type: "POST",
+            url: link,
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function () {
+                e.target.parentNode.parentNode.remove()
+
+                checkSearchList()
+            }
+        })
+    }
+</script>
 {% endblock %}
 
 {% block right %}
-    {% include 'friends/right_menu.html' %}
+{% include 'friends/right_menu.html' %}
 {% endblock %}
