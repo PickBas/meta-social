@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('post/create/', post_new),
     path('post/<int:post_id>/', post_view),
+    path('post/<int:post_id>/ajax/', post_ajax),
 ]
 
 if settings.DEBUG:

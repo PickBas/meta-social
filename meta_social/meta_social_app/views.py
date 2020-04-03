@@ -238,6 +238,12 @@ def post_view(request, post_id):
     context = get_menu_context('post', 'Пост')
     context['pagename'] = 'Пост'
     context['post'] = Post.objects.get(id=post_id)
+
+    return render(request, 'full_post.html', context)
+
+
+@login_required
+def post_ajax(request, post_id):
     if request.method == "POST":
         comment_item = Comment(
             text=request.POST.get('text'),
@@ -246,13 +252,11 @@ def post_view(request, post_id):
         )
         comment_item.save()
 
-        return HttpResponse(json.dumps({'profile': str(comment_item.user.profile),
-                                        'username': comment_item.user.username,
-                                        'text': comment_item.text,
-                                        'date': str(comment_item.date)}),
-                            content_type="application/json")
+        json_response = json.dumps({'username': comment_item.user.username,
+                                    'text': comment_item.text,
+                                    'date': str(comment_item.date)})
 
-    return render(request, 'full_post.html', context)
+        return HttpResponse(json_response, content_type="application/json")
 
 
 @login_required
