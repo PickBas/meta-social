@@ -6,16 +6,18 @@
         <div class="card-body">
             <h5>Входящие заявки</h5>
             {% if user.profile.friendship_inbox_requests %}
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" id="incomingList">
                     {% for req in user.profile.friendship_inbox_requests %}
                         <li class="list-group-item">
                             <img src="{% cropped_thumbnail req.from_user.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ req.from_user.id }}/" class="float-left ml-2">{{ req.from_user.username }}</a>
 
-                            <form method="POST" action="/friends/accept_request/{{ req.id }}/">
-                                {% csrf_token %}
-                                <input class="float-right btn btn-outline-success" type="submit" value="&#10003;">
-                            </form>
+                            <div>
+                                <button class="float-right btn btn-outline-success" 
+                                        onclick="acceptRequest(event, '/friends/accept_request/{{ req.from_user.id }}/')">
+                                    &#10003;
+                                </button>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
@@ -37,6 +39,32 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function acceptRequest (e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+                    e.target.parentNode.parentNode.remove()
+
+                    var fr_counter = document.getElementById('friendshipsCount')
+                    fr_counter.innerHTML = Number(fr_counter.innerHTML) - 1
+
+                    if (fr_counter.innerHTML == '0') {
+                        fr_counter.remove()
+                    }
+
+                    if (document.getElementById('incomingList').children.length == 0) {
+                        document.getElementById('incomingList').innerHTML = "Никто не хочет с вами дружить (("
+                    }
+                }
+            })
+        }
+    </script>
 {% endblock %}
 
 {% block right %}

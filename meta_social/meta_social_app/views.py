@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
@@ -338,16 +338,17 @@ def send_friendship_request(request, user_id) -> redirect:
             item = FriendshipRequest(
                 from_user=request.user,
                 to_user=User.objects.get(id=user_id),
-                already_sent=True
             )
 
             item.save()
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
+    
+    raise Http404()
 
 
 @login_required
-def accept_request(request, request_id) -> redirect:
+def accept_request(request, user_id) -> redirect:
     """
     Accept_request view
     :param request: request
@@ -355,13 +356,18 @@ def accept_request(request, request_id) -> redirect:
     :return: redirect
     """
     if request.method == 'POST':
-        try:
-            request_item = FriendshipRequest.objects.get(to_user=request_id)
-        except Exception:
-            try:
-                request_item = FriendshipRequest.objects.get(from_user=request_id)
-            except Exception:
-                request_item = FriendshipRequest.objects.get(id=request_id)
+        if not User.objects.filter(id=user_id).exists:
+            raise Http404()
+            
+        user_item = User.objects.get(id=user_id)
+
+        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+            request_item = FriendshipRequest.objects.get(from_user=user_item, to_user=request.user)
+        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+            request_item = FriendshipRequest.objects.get(from_user=request.user, to_user=user_item)
+        else:
+            raise Http404()
+
         friends_item = Friend(
             from_user=request_item.from_user,
             to_user=request_item.to_user,
@@ -369,7 +375,9 @@ def accept_request(request, request_id) -> redirect:
         friends_item.save()
         request_item.delete()
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
+    
+    raise Http404()
 
 
 @login_required
@@ -381,17 +389,21 @@ def remove_friend(request, user_id) -> redirect:
     :return: redirect
     """
     if request.method == 'POST':
-        try:
-            friend_item = Friend.objects.get(from_user=user_id)
-            friend_item.delete()
-        except Exception:
-            try:
-                friend_item = Friend.objects.get(to_user=user_id)
-                friend_item.delete()
-            except Exception:
-                friend_item = Friend.objects.get(id=user_id)
-                friend_item.delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if not User.objects.filter(id=user_id).exists():
+            raise Http404()
+
+        user_item = User.objects.get(id=user_id)
+
+        if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
+            Friend.objects.get(from_user=user_item, to_user=request.user).delete()
+        elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
+            Friend.objects.get(from_user=request.user, to_user=user_item).delete()
+        else:
+            raise Http404()
+        
+        return HttpResponse('Success')
+
+    raise Http404()
 
 
 @login_required
