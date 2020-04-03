@@ -108,7 +108,7 @@
         </div>
       {% endif %}
 
-      {% if c_user.profile.posts and pass_add_to_friends %}
+      {% if c_user.profile.posts and pass_add_to_friends or user == c_user %}
         {% for post in c_user.profile.posts %}
           <div class="card mt-3">
             <div class="card-body">
