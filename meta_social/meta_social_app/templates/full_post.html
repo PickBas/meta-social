@@ -18,23 +18,48 @@
             <span class="text-muted mb-0 float-right">{{ post.date }}</span>
         </div>
     </div>
-    <form method="post" action="/post/{{ post.id }}/">
-            {% csrf_token %}
-            {{ form.comment }}
-            <input class="btn btn-primary" type="submit" value="Оставить комментарий">
-    </form>
-    {% if post.comments %}
-            {% for comment in post.comments %}
-                <div class="media" style="margin: 20px; border-style: outset">
-                <img src="{% cropped_thumbnail comment.post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-                        <div class="media-body">
-                            <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
-                            <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+    <div class="form-group mt-2">
+        <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
+        <button class="btn btn-primary mt-2" onclick="proc_comment(event, '/post/{{ post.id }}/', )">Оставить комментарий</button>
+    </div>
+    <ul id="all_comments">
+        {% if post.comments %}
+                {% for comment in post.comments %}
+                    <li>
+                        <div class="media" style="margin: 20px; border-style: outset">
+                        <img src="{% cropped_thumbnail comment.post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                                <div class="media-body">
+                                    <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
+                                    <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+                                </div>
+                            <p style="text-align: right; margin: 3px">Создан в {{ comment.date }}</p>
                         </div>
-                    <p style="text-align: right; margin: 3px">Создан в {{ comment.date }}</p>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>Комментариев нет</p>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <p>Комментариев нет</p>
         {% endif %}
+    </ul>
+{% endblock %}
+
+{% block extra__js %}
+    <script>
+        function proc_comment(e, link){
+            let textar = document.getElementById('id_comment');
+            let comment_text = textar.value;
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    text: comment_text
+                },
+                success: function () {
+                    textar.value = "";
+                    let qwe = '{{ post.comments.0.user.username}}';
+                    console.log(qwe);
+                }
+            })
+        }
+    </script>
 {% endblock %}
