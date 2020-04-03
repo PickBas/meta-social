@@ -96,8 +96,9 @@
                             console.log('Ooops');
                     }
 
-                    let str_date = `Создан ${day} ${month} ${date_year[0]} г.`;
-                    console.log(str_date);
+                    let time = date_arr[1].split(":");
+
+                    let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${time[0]}:${time[1]}`;
 
                     li.innerHTML = `
                         <div class="media" style="margin: 20px; border-style: outset">
@@ -106,7 +107,7 @@
                                 <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария ${json['username']}</p>
                                 <h5 style="text-align: left; margin-inline-start: 10px;">${json['text']}</h5>
                             </div>
-                            <p style="text-align: right; margin: 3px">Создан ${json['date']}</p>
+                            <p style="text-align: right; margin: 3px">${str_date}</p>
                         </div>
                     `;
                     document.getElementById('all_comments').appendChild(li);
