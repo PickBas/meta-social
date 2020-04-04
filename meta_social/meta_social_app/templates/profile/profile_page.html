@@ -119,6 +119,9 @@
 
               <hr class="mt-1 mb-1">
               <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                <div id="like-section-{{ post.id }}">
+                  {% include 'likes.html' %}
+                </div>
             </div>
           </div>
         {% endfor %}

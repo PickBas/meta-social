@@ -5,9 +5,10 @@ View module
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import Http404
+from django.http import Http404, JsonResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
@@ -440,3 +441,22 @@ def crop_image(request, user_id):
     context['image'] = image
 
     return render(request, 'profile/crop.html', context)
+
+
+def like_post(request):
+    post = get_object_or_404(Post, id=request.POST.get('id'))
+    is_liked = False
+    if post.likes.filter(id=request.user.id).exist():
+        post.like.remove(request.user)
+        is_liked = False
+    else:
+        post.likes.add(request.user)
+        is_liked = True
+    context = {
+        'post': post,
+        'is_liked': is_liked,
+        'total_likes': post.total_likes()
+    }
+    if request.is_ajax():
+        html = render_to_string('likes.html', context, request=request)
+        return JsonResponse({'form': html})

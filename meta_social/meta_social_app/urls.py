@@ -25,6 +25,7 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
     path('post/create/', post_new),
+    path('like/', like_post, name = 'like_post')
 ]
 
 if settings.DEBUG:

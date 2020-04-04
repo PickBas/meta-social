@@ -156,12 +156,19 @@ class Post(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     text = models.TextField()
     date = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(User, blank=True, related_name='likes')
 
     def __str__(self):
         return self.text
 
     def get_images(self):
         return PostImages.objects.filter(post=self)
+
+    def total_likes(self):
+        return self.likes.count()
+
+    def is_liked(self):
+        return self.likes.filter(id=self.request.user.id).exists()
 
 
 class PostImages(models.Model):

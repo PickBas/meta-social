@@ -50,6 +50,25 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             crossorigin="anonymous"></script>
+    <script type = "text/javascript">
+        $(document).ready(function(event){
+            $(document).on('click', '#like', function(event){
+                event.preventDefault();
+                var pk = $(this).attr('value');
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "like_post" %},
+                    data: {'id': 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response){
+                        $('#like-section').html(response['form'])
+                        console.log($('#like-section').html(response['form']));
+                    },
+                    error: function(rs, e){
+                        console.log(rs.responseText);
+                    },
+                }),
+    </script>
     </body>
 </html>
 
