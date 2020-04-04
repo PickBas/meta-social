@@ -22,22 +22,24 @@
                             <img src="{% cropped_thumbnail match.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
-                            {% if match in user.profile.friends %}
+                            {% if match in user.profile.friends and not is_in_blacklist %}
                                 <form method="POST" action="/friends/remove_friend/{{ match.id }}/">
                                     {% csrf_token %}
                                     <input class="float-right btn btn-outline-danger" type="submit" value="&#128465;">
                                 </form>
                             {% else %}
-                                {% if is_in_requests %}
+                                {% if is_in_requests and not is_in_blacklist %}
                                     <form method="POST" action="/friends/accept_request/{{ match.id }}/">
                                         {% csrf_token %}
                                         <input class="float-right btn btn-outline-success" type="submit" value="&#10003;">
                                     </form>
                                 {% else %}
-                                    <form method="POST" action="/friends/send_request/{{ match.id }}/">
-                                        {% csrf_token %}
-                                        <input class="float-right btn btn-outline-success" type="submit" value="+">
-                                    </form>
+                                    {% if not is_in_blacklist %}
+                                        <form method="POST" action="/friends/send_request/{{ match.id }}/">
+                                            {% csrf_token %}
+                                            <input class="float-right btn btn-outline-success" type="submit" value="+">
+                                        </form>
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
                         </li>

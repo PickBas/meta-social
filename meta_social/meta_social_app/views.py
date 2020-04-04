@@ -5,7 +5,7 @@ View module
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
@@ -267,6 +267,7 @@ def friends_search(request) -> render:
             inbox = [i.from_user for i in request.user.profile.friendship_inbox_requests()]
             for match in matches:
                 context['is_in_requests'] = True if match in inbox else False
+                context['is_in_blacklist'] = True if request.user in match.profile.blacklist.all() else False
 
     return render(request, 'friends/search.html', context)
 
@@ -399,6 +400,7 @@ def remove_friend(request, user_id) -> redirect:
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+
 @login_required
 def blacklist_add(request, user_id):
     """
@@ -406,6 +408,7 @@ def blacklist_add(request, user_id):
     :param request: request
     :param user_id: id
     """
+    print("HERE")
     if request.method == 'POST':
         remove_friend(request, user_id)
         main_user = User.objects.get(id=request.user.id)
@@ -413,7 +416,9 @@ def blacklist_add(request, user_id):
         main_user.profile.blacklist.add(user_for_blacklist)
         main_user.save()
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
+
+    raise Http404()
 
 
 @login_required
