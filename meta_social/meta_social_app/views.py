@@ -448,3 +448,6 @@ def crop_image(request, user_id):
     context['image'] = image
 
     return render(request, 'profile/crop.html', context)
+
+def upload(request):
+    return render(request, 'index.html')
