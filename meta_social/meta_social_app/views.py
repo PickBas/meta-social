@@ -5,7 +5,7 @@ View module
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
@@ -360,7 +360,6 @@ def send_friendship_request(request, user_id) -> redirect:
             item = FriendshipRequest(
                 from_user=request.user,
                 to_user=User.objects.get(id=user_id),
-                already_sent=True
             )
 
             item.save()
@@ -369,7 +368,7 @@ def send_friendship_request(request, user_id) -> redirect:
 
 
 @login_required
-def accept_request(request, request_id) -> redirect:
+def accept_request(request, user_id) -> redirect:
     """
     Accept_request view
     :param request: request

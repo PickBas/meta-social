@@ -39,7 +39,13 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
 
+{% block right %}
+    {% include 'friends/right_menu.html' %}
+{% endblock %}
+
+{% block extra__js %}
     <script>
         function acceptRequest (e, link) {
             $.ajax({
@@ -65,8 +71,4 @@
             })
         }
     </script>
-{% endblock %}
-
-{% block right %}
-    {% include 'friends/right_menu.html' %}
 {% endblock %}

@@ -23,6 +23,11 @@
                                     &#128465;
                                 </button>
                             </div>
+                            <div>
+                                <button class="float-right btn btn-outline-secondary mr-2" onclick="addToBlackList(event, '/friends/add_blacklist/{{ friend.id }}/')">
+                                &#x1f6c7;
+                                </button>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
@@ -32,24 +37,7 @@
         </div>
     </div>
 
-    <script>
-        function removeFriend (e, link) {
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function () {
-                    e.target.parentNode.parentNode.remove()
 
-                    if (document.getElementById('friendslist').children.length == 0) {
-                        document.getElementById('friendslist').innerHTML = "Список друзей пуст."
-                    }
-                }
-            })
-        }
-    </script>
 {% endblock %}
 
 {% block right %}
@@ -76,10 +64,26 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function () {
-                    e.target.parentNode.remove();
+                    e.target.parentNode.parentNode.remove();
                     checkFriendList();
                 }
 
+            })
+        }
+        function removeFriend (e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+                    e.target.parentNode.parentNode.remove()
+
+                    if (document.getElementById('friendslist').children.length == 0) {
+                        document.getElementById('friendslist').innerHTML = "Список друзей пуст."
+                    }
+                }
             })
         }
     </script>
