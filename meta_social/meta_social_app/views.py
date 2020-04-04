@@ -265,18 +265,20 @@ def post_view(request, post_id):
 @login_required
 def post_ajax(request, post_id):
     if request.method == "POST":
-        comment_item = Comment(
-            text=request.POST.get('text'),
-            post=Post.objects.get(id=post_id),
-            user=request.user
-        )
-        comment_item.save()
+        if len(request.POST.get('text')) > 0:
+            comment_item = Comment(
+                text=request.POST.get('text'),
+                post=Post.objects.get(id=post_id),
+                user=request.user
+            )
+            comment_item.save()
 
-        json_response = json.dumps({'username': comment_item.user.username,
-                                    'text': comment_item.text,
-                                    'date': str(comment_item.date)})
+            json_response = json.dumps({'username': comment_item.user.username,
+                                        'text': comment_item.text,
+                                        'date': str(comment_item.date)})
 
-        return HttpResponse(json_response, content_type="application/json")
+            return HttpResponse(json_response, content_type="application/json")
+        raise Http404()
 
 
 @login_required
