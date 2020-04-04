@@ -78,11 +78,9 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function () {
-                    e.target.parentNode.parentNode.remove()
+                    e.target.parentNode.parentNode.remove();
 
-                    if (document.getElementById('friendslist').children.length == 0) {
-                        document.getElementById('friendslist').innerHTML = "Список друзей пуст."
-                    }
+                    checkFriendList();
                 }
             })
         }
