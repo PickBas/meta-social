@@ -33,13 +33,17 @@
             <a href="/accounts/profile/{{ c_user.id }}/edit_profile/" class="btn btn-block btn-primary">Редактировать</a>
           {% else %}
               <hr class="mt-0">
-              {% if pass_add_to_friends %}
-              <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
-                {% csrf_token %}
-                <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
-            </form>
+              {% if not is_in_blacklist %}
+                <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
+                  {% csrf_token %}
+                  <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
+                </form>
               {% else %}
+                {% if is_in_blacklist %}
                   <p class="btn btn-block btn-primary">Вы в черном списке</p>
+                {% else %}
+                  <p class="btn btn-block btn-primary">В друзьях</p>
+                  {% endif %}
           {% endif %}
         {% endif %}
         </div>
@@ -114,7 +118,7 @@
         </div>
       {% endif %}
 
-      {% if c_user.profile.posts and pass_add_to_friends or c_user == user %}
+      {% if c_user.profile.posts and not is_in_blacklist or c_user == user %}
         {% for post in c_user.profile.posts %}
           <div class="card mt-3">
             <div class="card-body">
@@ -140,7 +144,7 @@
           </div>
         {% endfor %}
       {% else %}
-          {% if pass_add_to_friends or c_user == user %}
+          {% if not is_in_blacklist or c_user == user %}
             <h5 class="mt-3 text-center">Нет постов</h5>
           {% else %}
             <h5 class="mt-3 text-center">Не доступно для просмотра</h5>

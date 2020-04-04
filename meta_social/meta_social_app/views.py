@@ -119,10 +119,15 @@ def profile(request, user_id) -> render:
 
     pass_add_to_friends = False
 
-    if user_item != request.user:
-        if request.user not in user_item.profile.friends() and request.user not in user_item.profile.blacklist.all():
-            pass_add_to_friends = True
+    is_in_blacklist = True
 
+    if user_item != request.user:
+        if request.user not in user_item.profile.friends():
+            pass_add_to_friends = True
+        if request.user not in user_item.profile.blacklist.all():
+            is_in_blacklist = False
+
+    context['is_in_blacklist'] = is_in_blacklist
     context['pass_add_to_friends'] = pass_add_to_friends
 
     context['postform'] = PostForm()
