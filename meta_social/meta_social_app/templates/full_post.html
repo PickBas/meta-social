@@ -1,0 +1,40 @@
+{% extends 'base_menu.html' %}
+{% load cropping %}
+
+{% block center %}
+    <div class="card mt-3">
+        <div class="card-body text-left">
+            <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+            <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+            <p class="card-text mt-2">{{ post.text }}</p>
+
+            {% if post.get_images %}
+                {% for post_img in post.get_images %}
+                    <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                {% endfor %}
+            {% endif %}
+
+            <hr class="mt-1 mb-1">
+            <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+        </div>
+    </div>
+    <form method="post" action="/post/{{ post.id }}/">
+            {% csrf_token %}
+            {{ form.comment }}
+            <input class="btn btn-primary" type="submit" value="Оставить комментарий">
+    </form>
+    {% if post.comments %}
+            {% for comment in post.comments %}
+                <div class="media" style="margin: 20px; border-style: outset">
+                <img src="{% cropped_thumbnail comment.post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                        <div class="media-body">
+                            <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
+                            <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+                        </div>
+                    <p style="text-align: right; margin: 3px">Создан в {{ comment.date }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Комментариев нет</p>
+        {% endif %}
+{% endblock %}
