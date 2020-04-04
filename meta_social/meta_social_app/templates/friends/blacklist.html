@@ -13,15 +13,12 @@
           <hr>
 
           {% if c_user.profile.blacklist.all %}
-              <ul class="list-group list-group-flush">
+              <ul class="list-group list-group-flush" id="ex-friends-list">
                   {% for ex_friend in c_user.profile.blacklist.all %}
                       <li class="list-group-item">
                           <img src="{% cropped_thumbnail ex_friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                           <a href="/accounts/profile/{{ ex_friend.id }}/" class="float-left ml-2">{{ ex_friend.username }}</a>
-                          <form method="POST" action="/friends/remove_blacklist/{{ ex_friend.id }}/">
-                              {% csrf_token %}
-                              <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
-                          </form>
+                          <button class="float-right btn btn-outline-secondary" onclick="removeFromBlacklist(event, '/friends/remove_blacklist/{{ ex_friend.id }}/')">&#128465;</button>
                       </li>
                   {% endfor %}
               </ul>
@@ -34,4 +31,31 @@
 
 {% block right %}
     {% include 'friends/right_menu.html' %}
+{% endblock %}
+
+{% block extra__js %}
+    <script>
+        function checkFriendList() {
+            let exFriendList = document.getElementById('ex-friends-list');
+            if (exFriendList.children.length == 0) {
+                exFriendList.innerHTML = "Никого нет в черном списке"
+            }
+        }
+
+        function removeFromBlacklist(e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+
+                    e.target.parentNode.remove();
+                    checkFriendList();
+                }
+
+            })
+        }
+    </script>
 {% endblock %}

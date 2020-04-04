@@ -12,7 +12,7 @@
             <hr>
 
             {% if c_user.profile.friends %}
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" id="friend-list">
                     {% for friend in c_user.profile.friends %}
                         <li class="list-group-item">
                             <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
@@ -56,4 +56,31 @@
 
         {% include 'friends/right_menu.html' %}
 
+{% endblock %}
+
+{% block extra__js %}
+    <script>
+
+        function checkFriendList() {
+            let friendList = document.getElementById('friend-list');
+            if (friendList.children.length == 0) {
+                friendList.innerHTML = "Список друзей пуст."
+            }
+        }
+
+        function addToBlackList(e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+                    e.target.parentNode.remove();
+                    checkFriendList();
+                }
+
+            })
+        }
+    </script>
 {% endblock %}

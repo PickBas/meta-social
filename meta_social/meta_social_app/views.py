@@ -283,6 +283,7 @@ def friends_search(request) -> render:
             inbox = [i.from_user for i in request.user.profile.friendship_inbox_requests()]
             for match in matches:
                 context['is_in_requests'] = True if match in inbox else False
+                context['is_in_blacklist'] = True if request.user in match.profile.blacklist.all() else False
 
     return render(request, 'friends/search.html', context)
 
@@ -301,13 +302,18 @@ def friends_requests(request) -> render:
 
 
 @login_required
-def friends_blacklist(request) -> render:
+def friends_blacklist(request, user_id) -> render:
     """
     Friends_blacklist view
+    :param user_id: user in blacklist od
     :param request: request
     :return: render
     """
     context = get_menu_context('friends', 'Черный список')
+    c_user = User.objects.get(id=user_id)
+    context['c_user'] = c_user
+    # for i in c_user.profile.blacklist.all():
+    #     print(i.username)
     return render(request, 'friends/blacklist.html', context)
 
 
@@ -421,6 +427,7 @@ def remove_friend(request, user_id) -> redirect:
     raise Http404()
 
 
+
 @login_required
 def blacklist_add(request, user_id):
     """
@@ -428,9 +435,17 @@ def blacklist_add(request, user_id):
     :param request: request
     :param user_id: id
     """
+
     if request.method == 'POST':
-        pass
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        remove_friend(request, user_id)
+        main_user = User.objects.get(id=request.user.id)
+        user_for_blacklist = User.objects.get(id=user_id)
+        main_user.profile.blacklist.add(user_for_blacklist)
+        main_user.save()
+
+        return HttpResponse('Success')
+
+    raise Http404()
 
 
 @login_required
@@ -441,9 +456,12 @@ def blacklist_remove(request, user_id):
     :param user_id: id
     """
     if request.method == 'POST':
-        pass
+        user_to_remove = User.objects.get(id=user_id)
+        request.user.profile.blacklist.remove(user_to_remove)
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
+
+    raise Http404()
 
 
 @login_required

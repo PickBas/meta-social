@@ -2,26 +2,25 @@
 {% load cropping %}
 
 {% block center %}
-<div class="card">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Введите никнейм или имя пользователя."
-                    aria-label="Recipient's username" aria-describedby="button-addon2" name="name">
-                <div class="input-group-append">
-                    <input class="btn btn-outline-success" type="submit" id="button-addon2" value="Найти">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Введите никнейм или имя пользователя."
+                            aria-label="Recipient's username" aria-describedby="button-addon2" name="name">
+                    <div class="input-group-append">
+                        <input class="btn btn-outline-success" type="submit" id="button-addon2" value="Найти">
+                    </div>
                 </div>
-            </div>
-        </form>
-        <hr>
-        <ul class="list-group list-group-flush" id="searchList">
+            </form>
+            <hr>
             {% if matches %}
-                {% for match in matches %}
-                <li class="list-group-item">
-                    <img src="{% cropped_thumbnail match.profile "cropping" %}"
-                        class="rounded-circle border border-dark float-left" width=35 height=35>
-                    <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
+                <ul class="list-group list-group-flush">
+                    {% for match in matches %}
+                        <li class="list-group-item">
+                            <img src="{% cropped_thumbnail match.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
                     {% if match in user.profile.friends %}
                         <div>
