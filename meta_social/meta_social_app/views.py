@@ -408,7 +408,7 @@ def blacklist_add(request, user_id):
     :param request: request
     :param user_id: id
     """
-    print("HERE")
+
     if request.method == 'POST':
         remove_friend(request, user_id)
         main_user = User.objects.get(id=request.user.id)
@@ -432,7 +432,9 @@ def blacklist_remove(request, user_id):
         user_to_remove = User.objects.get(id=user_id)
         request.user.profile.blacklist.remove(user_to_remove)
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
+
+    raise Http404()
 
 
 @login_required
