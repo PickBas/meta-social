@@ -33,7 +33,7 @@
             <a href="/accounts/profile/{{ c_user.id }}/edit_profile/" class="btn btn-block btn-primary">Редактировать</a>
           {% else %}
               <hr class="mt-0">
-              {% if not is_in_blacklist %}
+              {% if not is_in_blacklist and not is_friend %}
                 <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
                   {% csrf_token %}
                   <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
@@ -117,39 +117,36 @@
             {% include 'post_menu.html' %}
         </div>
       {% endif %}
-
-      {% if c_user.profile.posts and not is_in_blacklist or c_user == user %}
-        {% for post in c_user.profile.posts %}
-          <div class="card mt-3">
-            <div class="card-body">
-              <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-              <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
-              <p class="card-text mt-2">{{ post.text }}</p>
-              <div class="kollaz">
-              {% if post.get_images %}
-                {% for post_img in post.get_images %}
-                {% if post.get_images.count > 1 %}
-                  <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
-                {%else%}
-                   <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
-                {% endif %}
-                {% endfor %}
-              {% endif %}
-              </div>
-
-              <hr class="mt-1 mb-1">
-              <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
-              <span class="text-muted mb-0 float-right">{{ post.date }}</span>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-          {% if not is_in_blacklist or c_user == user %}
-            <h5 class="mt-3 text-center">Нет постов</h5>
-          {% else %}
+      {% if is_in_blacklist %}
             <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
+      {% else %}
+          {% if c_user.profile.posts and not is_in_blacklist %}
+            {% for post in c_user.profile.posts %}
+              <div class="card mt-3">
+                <div class="card-body">
+                  <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                  <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+                  <p class="card-text mt-2">{{ post.text }}</p>
+                  <div class="kollaz">
+                  {% if post.get_images %}
+                    {% for post_img in post.get_images %}
+                    {% if post.get_images.count > 1 %}
+                      <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                    {%else%}
+                       <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                    {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  </div>
+
+                  <hr class="mt-1 mb-1">
+                  <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
+                  <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                </div>
+              </div>
+            {% endfor %}
           {% endif %}
-      {% endif %}
+          {% endif %}
     </div>
   </div>
 <script>
