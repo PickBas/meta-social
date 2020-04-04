@@ -1,123 +1,158 @@
-<form method="POST" action="/post/create/" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="input-group">
-        {{ postform }}
-
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary all" type="submit" id="button-addon">
-                <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
-            </button>
-        </div>
-    </div>
-
-    <style>
-    .none-image {
-        border: 1px dashed;
-        border-radius: 7px;
+<style>
+    #drop-area.highlight {
+        border: 2px dashed black;
     }
 
-    .none-image:hover {
-        background-color: #DEDEDE;
+    .my-form {
+        margin-bottom: 10px;
     }
 
-    .none-image:active {
-        background-color: #D5D5D5;
+    #gallery {
+        margin-top: 10px;
+        margin-left: 2px;
     }
 
-    .none-image.hover {
-        background-color: #DEDEDE;
+    #gallery img {
+        width: 62px;
+        height: 45px;
+        margin-right: 5px;
+        margin-top: 5px;
+        vertical-align: middle;
     }
 
-    .none-image.active {
-        background-color: #D5D5D5;
+    .button {
+        display: inline-block;
+        padding: 10px;
+        background: #ccc;
+        cursor: pointer;
+        border-radius: 5px;
+        border: 1px solid #ccc;
     }
 
-    .hide-image {
+    .button:hover {
+        background: #ddd;
+    }
+
+    #fileElem {
         display: none;
     }
-    </style>
-    <div class="row ml-1 mr-1">
-        {% for i in '0123456789'|make_list %}
-            <div class="col ml-1 mr-1 mt-1 text-center none-image" style="height: 70px;" id="dropzone_{{ i }}">
-                <img src="https://image.flaticon.com/icons/svg/1578/1578253.svg" width=25 height=25 class="mt-4" id="up_image_{{ i }}">
-                <img src="https://image.flaticon.com/icons/svg/1828/1828666.svg" width=20 height=20 class="mt-4 hide-image" id="cl_image_{{ i }}">
+</style>
+<div id="drop-area" class="card">
+    <div class="card-body text-left">
+        <form method="POST" action="/post/create/" enctype="multipart/form-data" class="post-form">
+            {% csrf_token %}
+
+            <div class="input-group">
+                {{ postform }}
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary all" type="submit" id="button-addon">
+                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
+                    </button>
+                </div>
             </div>
-        {% endfor %}
+
+            <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+            <div id="gallery"></div>
+
+            {{ formset.management_form }}
+            <div style="display: none;">
+                {% for form in formset %}
+                    {{ form }} <br>
+                {% endfor %}
+            </div>
+        </form>
     </div>
+</div>
 
-    {{ formset.management_form }}
-    <div style="display: none;">
-        {% for form in formset %}
-            {{ form }} <br>
-        {% endfor %}
-    </div>
-    <script>
-        const dragAndDrop = () => {
-            let dropzones = document.getElementsByClassName('none-image');
+<script>
+    let dropArea = document.getElementById('drop-area')
 
-            function dragOver (evt) {
-                evt.preventDefault();  
-                evt.stopPropagation();
-            };
+    ;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    })
 
-            function dropImage (evt) {
-                evt.preventDefault();
-                evt.stopPropagation();
+    function preventDefaults(e) {
+        e.preventDefault()
+        e.stopPropagation()
+    }
 
-                if (evt.dataTransfer.files.length > 1) {
-                    alert('Нельзя отправить несколько файлов');
-                    return false;
-                };
+    ;
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false)
+    })
 
-                if (evt.dataTransfer.files[0].type.split('/')[0] != 'image') {
-                    alert('Это должна быть картинка');
-                    return false;
-                };
-                
-                let number = null;
+    ;
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false)
+    })
 
-                if (evt.target.classList.contains('none-image')) {
-                    number = evt.target.id.slice(-1);
-                } else {
-                    number = evt.target.parentNode.id.slice(-1);
-                };
+    function highlight(e) {
+        dropArea.classList.add('highlight')
+    }
 
-                let file_field = document.getElementById("id_form-" + number + "-image");
-                file_field.files = evt.dataTransfer.files;
-                document.getElementById("up_image_" + number).classList.add('hide-image');
-                document.getElementById("cl_image_" + number).classList.remove('hide-image');
-            };
+    function unhighlight(e) {
+        dropArea.classList.remove('highlight')
+    }
 
-            function clickImage (evt) {
-                let number = null;
+    dropArea.addEventListener('drop', handleDrop, false)
 
-                if (evt.target.classList.contains('none-image')) {
-                    number = evt.target.id.slice(-1);
-                } else {
-                    number = evt.target.parentNode.id.slice(-1);
-                };
+    function handleDrop(e) {
+        let dt = e.dataTransfer
+        let files = dt.files
 
-                if (document.getElementById("up_image_" + number).classList.contains('hide-image')) {
-                    document.getElementById("up_image_" + number).classList.remove('hide-image');
-                    document.getElementById("cl_image_" + number).classList.add('hide-image');
+        handleFiles(files)
+    }
 
-                    if (evt.target.classList.contains('none-image')) {
-                        evt.target.value = '';
-                    } else {
-                        evt.target.parentNode.value = '';
-                    };
-                } else {
-                    // TODO: Вызвать диалоговое окно загрузки файла
-                    console.log('Im work!');
-                };
-            };
+    function handleFiles(files) {
+        files = [...files]
+        files.forEach(uploadFile)
+    }
 
-            for (var i=0; i < dropzones.length; i++) {
-                dropzones[i].addEventListener('dragover', dragOver);
-                dropzones[i].addEventListener('drop', dropImage);
-                dropzones[i].addEventListener('click', clickImage);
-            };
-        };
-        dragAndDrop();
-    </script>
-</form>
+    function get_free_inputs() {
+        let inputs = []
+        for (var i = 0; i < 10; i++) {
+            let input = document.getElementById("id_form-" + i + "-image")
+            if (!input.value) {
+                inputs.push(input)
+            }
+        }
+        return inputs
+    }
+
+    function uploadFile(file) {
+        let inputs = get_free_inputs()
+        
+        if (inputs.length == 0) {
+            alert('Нельзя загрузить более 10 картинок')
+            return
+        }
+
+        const dT = new DataTransfer()
+        dT.items.add(file)
+        inputs[0].files = dT.files
+
+        let input_id = inputs[0].id[8]
+
+        previewFile(file, input_id)
+    }
+
+    function removeFile(e) {
+        let current_id = e.target.id[e.target.id.length - 1]
+
+        document.getElementById("id_form-" + current_id + "-image").value = ''
+        e.target.remove()
+    }
+
+    function previewFile(file, input_id) {
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onloadend = function () {
+            let img = document.createElement('img')
+            img.src = reader.result
+            img.id = "image_preview-" + input_id
+            img.onclick = removeFile
+            document.getElementById('gallery').appendChild(img)
+        }
+    }
+</script>

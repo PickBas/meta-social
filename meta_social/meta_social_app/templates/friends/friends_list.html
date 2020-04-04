@@ -12,15 +12,22 @@
             <hr>
 
             {% if c_user.profile.friends %}
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" id="friend-list">
                     {% for friend in c_user.profile.friends %}
                         <li class="list-group-item">
                             <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
-                            <form method="POST" action="/friends/remove_friend/{{ friend.id }}/">
-                                {% csrf_token %}
-                                <input class="float-right btn btn-outline-secondary" type="submit" value="&#128465;">
-                            </form>
+                            <div>
+                                <button class="float-right btn btn-outline-secondary"
+                                        onclick="removeFriend(event, '/friends/remove_friend/{{ friend.id }}/')">
+                                    &#128465;
+                                </button>
+                            </div>
+                            <div>
+                                <button class="float-right btn btn-outline-secondary mr-2" onclick="addToBlackList(event, '/friends/add_blacklist/{{ friend.id }}/')">
+                                &#x1f6c7;
+                                </button>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
@@ -29,10 +36,53 @@
             {% endif %}
         </div>
     </div>
+
+
 {% endblock %}
 
 {% block right %}
 
         {% include 'friends/right_menu.html' %}
 
+{% endblock %}
+
+{% block extra__js %}
+    <script>
+
+        function checkFriendList() {
+            let friendList = document.getElementById('friend-list');
+            if (friendList.children.length == 0) {
+                friendList.innerHTML = "Список друзей пуст."
+            }
+        }
+
+        function addToBlackList(e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+                    e.target.parentNode.parentNode.remove();
+                    checkFriendList();
+                }
+
+            })
+        }
+        function removeFriend (e, link) {
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function () {
+                    e.target.parentNode.parentNode.remove();
+
+                    checkFriendList();
+                }
+            })
+        }
+    </script>
 {% endblock %}

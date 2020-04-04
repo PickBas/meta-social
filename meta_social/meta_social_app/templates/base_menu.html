@@ -4,28 +4,9 @@
     <div class="container">
         <div class="row mt-3">
             <div class="col-sm-2 mr-2">
-                <nav class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link {% if page == 'profile' %}active{% endif %}" href="/accounts/profile/{{ user.id }}/">Моя страница</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if page == 'newsfeed' %}active{% endif %}" href="/">Новости</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Сообщения</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if page == 'friends' %}active{% endif %}" href="/friends/{{ user.id }}/">Друзья</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Сообщества</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Музыка</a>
-                    </li>
-                </nav>
+                {% include 'navigation_menu.html' %}
             </div>
-            <div class="col mr-2">
+            <div class="col mr-2 mb-3">
                 {% block center %}
                 {% endblock %}
             </div>

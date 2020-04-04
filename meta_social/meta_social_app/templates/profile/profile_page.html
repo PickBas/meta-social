@@ -3,6 +3,7 @@
 {% load cropping %}
 
 {% block content %}
+
   <div class="row text-left">
     <div class="col-xl-3">
       <div class="card">
@@ -14,15 +15,33 @@
             transition: 0.7s;
             opacity: 0.7;
           }
+          .kollaz{
+            display: flex;
+             flex-wrap: wrap;
+          }
         </style>
-        <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
-          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
-        </a>
+        {% if user == c_user %}
+          <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
+            <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
+          </a>
+        {% else %}
+          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top"></img>
+        {% endif %}
         <div class="card-body">
           {% if c_user == user %}
             <hr class="mt-0">
             <a href="/accounts/profile/{{ c_user.id }}/edit_profile/" class="btn btn-block btn-primary">Редактировать</a>
+          {% else %}
+              <hr class="mt-0">
+              {% if pass_add_to_friends %}
+              <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
+                {% csrf_token %}
+                <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
+            </form>
+              {% else %}
+                  <p class="btn btn-block btn-primary">Вы в черном списке</p>
           {% endif %}
+        {% endif %}
         </div>
       </div>
       <div class="card mt-3">
@@ -39,69 +58,80 @@
     <div class="col">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title float-left">{{ c_user.first_name }} {{ c_user.last_name }}</h5>
+          <h5 class="card-title float-left">{% if c_user.first_name or c_user.last_name %}{{ c_user.first_name }} {{ c_user.last_name }}{% else %}{{ c_user.username }}{% endif %}</h5>
           <small class="float-right text-muted">{% if is_online %}Онлайн{% else %}Оффлайн{% endif %}</small>
           <br><hr>
-          <p class="card-text">Пол: {{ c_user.profile.get_gender_display }}</p>
           <p class="card-text">
-            {% if c_user.profile.job %}
-                {{ c_user.profile.job }}
+            {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
+                Работа: {{ c_user.profile.job }}
             {% else %}
-                Место работы/учебы: не указано
+                {% if c_user.profile.study and not c_user.profile.job %}
+                Учеба: {{ c_user.profile.study }}
+                {% else %}
+                    {% if not c_user.profile.study and not c_user.profile.job %}
+                        Место работы/учебы: -
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+          </p>
+           <p class="card-text">
+            {% if c_user.profile.job and c_user.profile.study %}
+                Учеба: {{ c_user.profile.study }}
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.biography %}
-                {{ c_user.profile.biography }}
+                Биография: {{ c_user.profile.biography }}
             {% else %}
-                Биография: не указана
+                Биография: -
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.country %}
-                {{ c_user.profile.country.name }}
+                Страна: {{ c_user.profile.country.name }}
             {% else %}
-                Страна: не указана
+                Страна: -
             {% endif %}
           </p>
           <p class="card-text">
             {% if c_user.profile.birth %}
-                {{ c_user.profile.birth }}
-            {% else %}
-                Дата рождения: не указана
+                Дата рождения: {{ c_user.profile.birth }}
             {% endif %}
           </p>
           {% if c_user.profile.show_email %}
             <p class="card-text">
               {% if c_user.email %}
-                {{ c_user.email }}
-              {% else %}
-                Почта: не указана
+                Почта: {{ c_user.email }}
               {% endif %}
             </p>
           {% endif %}
         </div>
       </div>
 
-      <div class="card mt-3">
-        <div class="card-body">
-          {% include 'post_menu.html' %}
+      {% if c_user == user %}
+        <div class="mt-3">
+            {% include 'post_menu.html' %}
         </div>
-      </div>
+      {% endif %}
 
-      {% if c_user.profile.posts %}
+      {% if c_user.profile.posts and pass_add_to_friends or c_user == user %}
         {% for post in c_user.profile.posts %}
           <div class="card mt-3">
             <div class="card-body">
               <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
               <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
               <p class="card-text mt-2">{{ post.text }}</p>
-
+              <div class="kollaz">
               {% if post.get_images %}
                 {% for post_img in post.get_images %}
-                  <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                {% if post.get_images.count > 1 %}
+                  <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                {%else%}
+                   <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                {% endif %}
                 {% endfor %}
               {% endif %}
+              </div>
 
               <hr class="mt-1 mb-1">
               <span class="text-muted mb-0 float-right">{{ post.date }}</span>
@@ -109,8 +139,15 @@
           </div>
         {% endfor %}
       {% else %}
-        <h5 class="mt-3 text-center">Нет постов.</h5>
+          {% if pass_add_to_friends or c_user == user %}
+            <h5 class="mt-3 text-center">Нет постов</h5>
+          {% else %}
+            <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
+          {% endif %}
       {% endif %}
     </div>
   </div>
+<script>
+
+</script>
 {% endblock %}
