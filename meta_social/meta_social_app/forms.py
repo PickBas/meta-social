@@ -78,9 +78,11 @@ class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.fields['text'].label = ''
+        self.fields['text'].widget = forms.Textarea()
         self.fields['text'].widget.attrs['width'] = '100%'
         self.fields['text'].widget.attrs['class'] = 'form-control'
-        self.fields['text'].widget.attrs['aria-describedby'] = 'button-addon'
+        self.fields['text'].widget.attrs['rows'] = '1'
+        self.fields['text'].widget.attrs['style'] = 'resize: none; padding: 0px 2px;'
 
 
 class PostImageForm(forms.ModelForm):
