@@ -30,7 +30,8 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
-    image = ImageCropField(blank=True, upload_to='avatars/users', default='avatars/users/0.png')
+    image = ImageCropField(
+        blank=True, upload_to='avatars/users', default='avatars/users/0.png')
     cropping = ImageRatioField('image', '256x256')
 
     job = models.CharField(null=True, max_length=100)
@@ -42,8 +43,10 @@ class Profile(models.Model):
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
-    last_logout = models.DateTimeField(default=timezone.now, auto_now=False, auto_now_add=False)
-    last_act = models.DateTimeField(default=timezone.now, auto_now=False, auto_now_add=False)
+    last_logout = models.DateTimeField(
+        default=timezone.now, auto_now=False, auto_now_add=False)
+    last_act = models.DateTimeField(
+        default=timezone.now, auto_now=False, auto_now_add=False)
 
     blacklist = models.ManyToManyField(User, 'blacklist')
 
@@ -110,8 +113,10 @@ class Profile(models.Model):
         return len(self.posts())
 
     def friends(self):
-        friends = [i.to_user for i in list(Friend.objects.filter(from_user=self.user))]
-        friends += [i.from_user for i in list(Friend.objects.filter(to_user=self.user))]
+        friends = [i.to_user for i in list(
+            Friend.objects.filter(from_user=self.user))]
+        friends += [i.from_user for i in list(
+            Friend.objects.filter(to_user=self.user))]
 
         return friends
 
@@ -183,7 +188,8 @@ def create_user_profile(sender, **kwargs) -> None:
     """
 
     profile = Profile(user=kwargs['user'])
-    provider = 'vk' if kwargs['user'].socialaccount_set.filter(provider='vk').exists() else 'facebook'
+    provider = 'vk' if kwargs['user'].socialaccount_set.filter(
+        provider='vk').exists() else 'facebook'
 
     data = SocialAccount.objects.filter(user=kwargs['user'], provider=provider)
 
@@ -212,6 +218,7 @@ class Post(models.Model):
 
     def get_images_count(self):
         return PostImages.objects.filter(post=self).count()
+
     def comments(self):
         return Comment.objects.filter(post=self)
 
@@ -231,7 +238,8 @@ class Communities(models.Model):
     """
     Communities class
     """
-    community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_community')
+    community = models.OneToOneField(
+        to=User, on_delete=models.CASCADE, related_name='user_community')
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
 
@@ -244,7 +252,8 @@ class Community(models.Model):
     info = models.CharField(max_length=1000)
 
     # TODO: find default icon for communities
-    avatar = models.ImageField(upload_to='avatars/communities', null=True, blank=True, default='avatars/users/0.png')
+    avatar = models.ImageField(upload_to='avatars/communities',
+                               null=True, blank=True, default='avatars/users/0.png')
 
     def participants(self) -> list:
         """
@@ -282,24 +291,31 @@ class Participants(models.Model):
     """
     Participants class
     """
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user_in_community')
-    community = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='community_of_user')
+    user = models.OneToOneField(
+        to=User, on_delete=models.CASCADE, related_name='user_in_community')
+    community = models.OneToOneField(
+        to=User, on_delete=models.CASCADE, related_name='community_of_user')
 
 
 class Friend(models.Model):
     """
     Friend class
     """
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='1+')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='2+')
+    from_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='1+')
+    to_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='2+')
 
 
 class FriendshipRequest(models.Model):
     """
     FriendshipRequest class
     """
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='3+')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='4+')
+    from_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='3+')
+    to_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='4+')
+
 
 class Comment(models.Model):
     date = models.DateTimeField(auto_now=True)

@@ -1,11 +1,12 @@
 """
 View module
 """
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
@@ -17,7 +18,7 @@ from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, AddCommentForm
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -71,7 +72,8 @@ def index(request) -> render:
     context = get_menu_context('newsfeed', 'Главная')
     context['pagename'] = "Главная"
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -251,31 +253,30 @@ class EditProfile(View):
         return render(request, self.template_name, context)
 
 
-class PostView(View):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.template_name = 'full_post.html'
+@login_required
+def post_view(request, post_id):
+    context = get_menu_context('post', 'Пост')
+    context['pagename'] = 'Пост'
+    context['post'] = Post.objects.get(id=post_id)
 
-    def post(self, request, **kwargs):
-        context = get_menu_context('post', 'Пост')
-        context['pagename'] = 'Пост'
-        form = AddCommentForm(request.POST)
-        context['form'] = form
-        context['post'] = Post.objects.get(id=kwargs['post_id'])
+    return render(request, 'full_post.html', context)
+
+
+@login_required
+def post_ajax(request, post_id):
+    if request.method == "POST":
         comment_item = Comment(
-            text=form.data['comment'],
-            post=Post.objects.get(id=kwargs['post_id']),
+            text=request.POST.get('text'),
+            post=Post.objects.get(id=post_id),
             user=request.user
         )
         comment_item.save()
-        return render(request, self.template_name, context)
 
-    def get(self, request, **kwargs):
-        context = get_menu_context('post', 'Пост')
-        context['pagename'] = 'Пост'
-        context['post'] = Post.objects.get(id=kwargs['post_id'])
-        context['form'] = AddCommentForm()
-        return render(request, self.template_name, context)
+        json_response = json.dumps({'username': comment_item.user.username,
+                                    'text': comment_item.text,
+                                    'date': str(comment_item.date)})
+
+        return HttpResponse(json_response, content_type="application/json")
 
 
 @login_required
@@ -306,12 +307,15 @@ def friends_search(request) -> render:
             query = request.POST.get('name')
             search_fields = ['username', 'first_name', 'last_name']
 
-            matches = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+            matches = User.objects.filter(search_filter(
+                search_fields, query)).exclude(id=request.user.id)
             context['matches'] = matches
-            inbox = [i.from_user for i in request.user.profile.friendship_inbox_requests()]
+            inbox = [
+                i.from_user for i in request.user.profile.friendship_inbox_requests()]
             for match in matches:
                 context['is_in_requests'] = True if match in inbox else False
-                context['is_in_blacklist'] = True if request.user in match.profile.blacklist.all() else False
+                context['is_in_blacklist'] = True if request.user in match.profile.blacklist.all(
+                ) else False
 
     return render(request, 'friends/search.html', context)
 
@@ -352,11 +356,13 @@ def post_new(request):
     :param request: request
     :return: HttpResponseRedirect
     """
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     if request.method == "POST":
         postForm = PostForm(request.POST)
-        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+        formset = PostImageFormSet(
+            request.POST, request.FILES, queryset=PostImages.objects.none())
 
         if postForm.is_valid() and formset.is_valid():
             post_form = postForm.save(commit=False)
@@ -410,9 +416,11 @@ def accept_request(request, user_id) -> redirect:
         user_item = User.objects.get(id=user_id)
 
         if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-            request_item = FriendshipRequest.objects.get(from_user=user_item, to_user=request.user)
+            request_item = FriendshipRequest.objects.get(
+                from_user=user_item, to_user=request.user)
         elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-            request_item = FriendshipRequest.objects.get(from_user=request.user, to_user=user_item)
+            request_item = FriendshipRequest.objects.get(
+                from_user=request.user, to_user=user_item)
         else:
             raise Http404()
 
@@ -443,16 +451,17 @@ def remove_friend(request, user_id) -> redirect:
         user_item = User.objects.get(id=user_id)
 
         if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
-            Friend.objects.get(from_user=user_item, to_user=request.user).delete()
+            Friend.objects.get(from_user=user_item,
+                               to_user=request.user).delete()
         elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
-            Friend.objects.get(from_user=request.user, to_user=user_item).delete()
+            Friend.objects.get(from_user=request.user,
+                               to_user=user_item).delete()
         else:
             raise Http404()
 
         return HttpResponse('Success')
 
     raise Http404()
-
 
 
 @login_required
@@ -520,7 +529,8 @@ def crop_image(request, user_id):
 def community(request, community_id):
     context = get_menu_context('community', 'Сообщество')
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
