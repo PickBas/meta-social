@@ -34,6 +34,7 @@ class Profile(models.Model):
     cropping = ImageRatioField('image', '256x256')
 
     job = models.CharField(null=True, max_length=100)
+    study = models.CharField(null=True, max_length=100)
     biography = models.CharField(max_length=500, null=True)
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
@@ -111,12 +111,13 @@ def profile(request, user_id) -> render:
     context['is_online'] = context['profile'].check_online_with_afk()
     get_last_act(request, user_item)
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(
+        PostImages, form=PostImageForm, extra=10)
 
     pass_add_to_friends = False
 
     if user_item != request.user:
-        if request.user not in user_item.profile.friends():
+        if request.user not in user_item.profile.friends() and request.user not in user_item.profile.blacklist.all():
             pass_add_to_friends = True
 
     context['pass_add_to_friends'] = pass_add_to_friends
@@ -187,6 +188,7 @@ class EditProfile(View):
         super().__init__(**kwargs)
         self.template_name = 'profile/edit_profile.html'
         self.profile = None
+        self.previous_birth = None
 
     def post(self, request, **kwargs) -> redirect:
         """
@@ -196,23 +198,34 @@ class EditProfile(View):
         :return:
         """
 
-        user_form = UserUpdateForm(request.POST, instance=User.objects.get(id=kwargs['user_id']))
+        self.previous_birth = User.objects.get(
+            id=kwargs['user_id']).profile.birth
+        user_form = UserUpdateForm(
+            request.POST, instance=User.objects.get(id=kwargs['user_id']))
         self.profile = Profile.objects.get(user=kwargs['user_id'])
 
-        self.profile.show_email = False if request.POST.get('show_email') is None else True
+        self.profile.show_email = False if request.POST.get(
+            'show_email') is None else True
 
         try:
-            img_manage = ImageManage(kwargs['user_id'], self.profile, request.FILES['avatar'])
+            img_manage = ImageManage(
+                kwargs['user_id'], self.profile, request.FILES['avatar'])
             img_manage.process_img()
         except Exception:
             pass
 
         profile_form = ProfileUpdateForm(request.POST,
-                                         instance=Profile.objects.get(user=kwargs['user_id']))
+                                         instance=self.profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+            tmp_user = User.objects.get(id=kwargs['user_id'])
+
+            if self.profile.birth is None:
+                self.profile.birth = self.previous_birth
+                self.profile.save()
+
             return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
     def get(self, request, **kwargs) -> render:
@@ -228,7 +241,10 @@ class EditProfile(View):
         context['user_form'] = UserUpdateForm(
             instance=User.objects.get(id=kwargs['user_id'])
         )
-        context['profile_form'] = ProfileUpdateForm(instance=Profile.objects.get(user=kwargs['user_id']))
+        context['profile_form'] = ProfileUpdateForm(
+            instance=Profile.objects.get(user=kwargs['user_id']))
+        self.previous_birth = User.objects.get(
+            id=kwargs['user_id']).profile.birth
         get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
@@ -338,17 +354,16 @@ def send_friendship_request(request, user_id) -> redirect:
             item = FriendshipRequest(
                 from_user=request.user,
                 to_user=User.objects.get(id=user_id),
+                already_sent=True
             )
 
             item.save()
 
-        return HttpResponse('Success')
-    
-    raise Http404()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
-def accept_request(request, user_id) -> redirect:
+def accept_request(request, request_id) -> redirect:
     """
     Accept_request view
     :param request: request
@@ -358,7 +373,7 @@ def accept_request(request, user_id) -> redirect:
     if request.method == 'POST':
         if not User.objects.filter(id=user_id).exists:
             raise Http404()
-            
+
         user_item = User.objects.get(id=user_id)
 
         if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
@@ -376,7 +391,7 @@ def accept_request(request, user_id) -> redirect:
         request_item.delete()
 
         return HttpResponse('Success')
-    
+
     raise Http404()
 
 
@@ -400,7 +415,7 @@ def remove_friend(request, user_id) -> redirect:
             Friend.objects.get(from_user=request.user, to_user=user_item).delete()
         else:
             raise Http404()
-        
+
         return HttpResponse('Success')
 
     raise Http404()
