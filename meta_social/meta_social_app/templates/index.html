@@ -2,6 +2,12 @@
 {% load cropping %}
 
 {% block center %}
+<style>
+    .hide{
+      display: none;
+     }
+</style>
+<script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
     <div class="card">
         <div class="card-body text-left">
             {% include 'post_menu.html' %}
@@ -112,8 +118,14 @@
                     {% endif %}
 
                     <hr class="mt-1 mb-1">
-                    <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
+                    <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left window" style="margin-left: 50px;"><i  class="far fa-comment fa-lg" ></i></a>
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                    <div class="input-group mb-3 com hide" style="padding-top: 20px">
+                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Button</button>
+                </div>
+                </div>
                 </div>
             </div>
         {% endfor %}
@@ -124,4 +136,15 @@
 
 {% block right %}
     Не знаю что сюда впихнуть
+
+<script>
+   let a = document.querySelector(".com");
+   let b = document.querySelector(".window");
+   b.addEventListener('click', function(e){
+   e.preventDefault();
+   a.classList.toggle("hide");
+   });
+
+
+</script>
 {% endblock %}
