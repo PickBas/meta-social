@@ -2,12 +2,12 @@
 {% load cropping %}
 
 {% block center %}
-<style>
-    .kollaz{
-    display: flex;
-    flex-wrap: wrap;
-    }
-</style>
+    <style>
+        .kollaz {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
     {% include 'post_menu.html' %}
     <div class="card mt-3">
         <div class="card-body">
@@ -80,13 +80,13 @@
                     </div>
                 </div>
                 <style>
-                .carousel-control-prev-icon {
-                    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%4169E1' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E");
-                }
+                    .carousel-control-prev-icon {
+                        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%4169E1' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E");
+                    }
 
-                .carousel-control-next-icon {
-                    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%4169E1' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
-                }
+                    .carousel-control-next-icon {
+                        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%4169E1' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
+                    }
                 </style>
                 <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -103,22 +103,24 @@
         {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                    <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark"
+                        width=35 height=35>
                     <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
                     <p class="card-text mt-2">{{ post.text }}</p>
                     <div class="kollaz">
-                    {% if post.get_images %}
-                        {% for post_img in post.get_images %}
-                        {% if post.get_images.count > 1 %}
-                  <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
-                {%else%}
-                   <img src="{{ post_img.image.url }}" width="70%" class="mb-1">
-                    {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                        </div>
+                        {% if post.get_images %}
+                            {% for post_img in post.get_images %}
+                                {% if post.get_images.count > 1 %}
+                                    <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                                {%else%}
+                                    <img src="{{ post_img.image.url }}" width="70%" class="mb-1">
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
 
                     <hr class="mt-1 mb-1">
+                    <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
                 </div>
             </div>
@@ -129,5 +131,5 @@
 {% endblock %}
 
 {% block right %}
-    Не знаю что сюда впихнуть
+Не знаю что сюда впихнуть
 {% endblock %}

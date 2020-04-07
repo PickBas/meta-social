@@ -45,7 +45,7 @@
             <div class="input-group">
                 {{ postform }}
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary all" type="submit" id="button-addon">
+                    <button class="btn btn-outline-secondary" type="submit">
                         <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
                     </button>
                 </div>
@@ -64,7 +64,11 @@
     </div>
 </div>
 
+<script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+
 <script>
+    autosize(document.getElementById("id_text"));
+
     let dropArea = document.getElementById('drop-area')
 
     ;

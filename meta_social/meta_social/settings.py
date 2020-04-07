@@ -104,6 +104,7 @@ DATABASES = {
     #},
     'default': {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
     #     'NAME': 'DB',
@@ -111,6 +112,14 @@ DATABASES = {
     #     'PASSWORD': 'postgres',
     #     'HOST': 'db',
     #     'PORT': '5432',
+=======
+    #      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #      'NAME': 'DB',
+    #      'USER': 'postgres',
+    #      'PASSWORD': 'postgres',
+    #      'HOST': 'db',
+    #      'PORT': '5432',
+>>>>>>> 96ae95fdef09326c57ad34aadcfbd4a3bc8183de
     # },
     # 'old_sqlite3': {
 >>>>>>> e7fa58711cbd54c83c619d6375571f7652f5c3a2
