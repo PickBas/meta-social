@@ -16,6 +16,10 @@ from allauth.socialaccount.models import SocialAccount
 from django.core.files import File
 from urllib.request import urlopen
 from tempfile import NamedTemporaryFile
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
 
 
 class Profile(models.Model):
@@ -232,6 +236,17 @@ class PostImages(models.Model):
     """
     post = models.ForeignKey(Post, models.CASCADE)
     image = models.ImageField(upload_to='post/images/')
+
+    def save(self):
+        img = Image.open(self.image)
+        output = BytesIO()
+
+        img.save(output, format='JPEG', quality=100)
+        output.seek(0)
+
+        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
+
+        super(PostImages, self).save()
 
 
 class Communities(models.Model):
