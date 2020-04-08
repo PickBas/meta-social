@@ -279,7 +279,8 @@ def post_ajax(request, post_id):
             )
             comment_item.save()
 
-            json_response = json.dumps({'username': comment_item.user.username,
+            json_response = json.dumps({'id': comment_item.user.id,
+                                        'username': comment_item.user.username,
                                         'text': comment_item.text,
                                         'date': str(comment_item.date)})
 

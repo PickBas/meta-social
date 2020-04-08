@@ -22,24 +22,23 @@
         <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
         <button class="btn btn-primary mt-2" onclick="proc_comment(event, '/post/{{ post.id }}/ajax/', )">Оставить комментарий</button>
     </div>
-    <ul id="all_comments">
+    <div id="all_comments">
         {% if post.comments %}
-                {% for comment in post.comments %}
-                    <li id="disp_comment">
-                        <div class="media" style="margin: 20px; border-style: outset">
-                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-                                <div class="media-body">
-                                    <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
-                                    <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
-                                </div>
+            {% for comment in post.comments %}
+                   <div class="card mb-2">
+                       <div class="card-body">
+                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
+                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.username }}</a></p>
+                            <div class="media-body">
+                                <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">{{ comment.text }}</h5>
+                            </div>
+                            <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
                         </div>
-                    </li>
-                {% endfor %}
-            {% else %}
-                <p>Комментариев нет</p>
+                   </div>
+            {% endfor %}
         {% endif %}
-    </ul>
+    </div>
 {% endblock %}
 
 {% block extra__js %}
@@ -58,7 +57,7 @@
                     textar.value = "";
                     let json = result;
 
-                    const li = document.createElement("li");
+                    const li = document.createElement("div");
                     let len =  $('ul#all_comments li').length;
 
                     let date_arr = json['date'].split(" ");
@@ -97,18 +96,30 @@
                     }
 
                     let time = date_arr[1].split(":");
+                    
+                    let hours = "";
 
-                    let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${time[0]}:${time[1]}`;
+                    if (time[0][0] == '0') {
+                        hours = time[0][1];
+                    } else {
+                        hours = time[0];
+                    }
+
+                    let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${hours}:${time[1]}`;
 
                     li.innerHTML = `
-                        <div class="media" style="margin: 20px; border-style: outset">
-                            <img src="{% cropped_thumbnail user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-                            <div class="media-body">
-                                <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария ${json['username']}</p>
-                                <h5 style="text-align: left; margin-inline-start: 10px;">${json['text']}</h5>
+                        <div class="card mb-2">
+                           <div class="card-body">
+                            <img src="{% cropped_thumbnail user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
+                               <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/${json['id']}/">${json['username']}</a></p>
+                                <div class="media-body">
+                                        <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">${json['text']}</h5>
+                                    </div>
+                                <hr class="mt-1 mb-1">
+                                <p style="text-align: right; margin: 3px">${str_date}</p>
+
                             </div>
-                            <p style="text-align: right; margin: 3px">${str_date}</p>
-                        </div>
+                       </div>
                     `;
                     document.getElementById('all_comments').appendChild(li);
                 }
