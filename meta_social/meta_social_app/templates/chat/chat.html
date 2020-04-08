@@ -1,0 +1,31 @@
+{% extends 'base_menu.html' %}
+{% block center %}
+
+<div class="card">
+        <div class="card-body">
+
+                <h5>Ваши чаты</h5>
+
+            {% if c_user.profile.friends %}
+                <ul class="list-group list-group-flush">
+                    {% for friend in c_user.profile.friends %}
+                        <li class="list-group-item">
+                            <img src="{{ friend.profile.avatar.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
+                            <form method="POST" action="/chat/go_to_chat/{{ friend.id }}/">
+                                {% csrf_token %}
+                                <input class="float-right btn btn-outline-secondary" type="submit" value="&#x04572;">
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                Друзей для чата нет(
+            {% endif %}
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

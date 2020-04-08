@@ -13,12 +13,12 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment
+from .models import Profile, Comment, Messages, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, AddMessage
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -548,4 +548,31 @@ def community(request, community_id):
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
 
     return render(request, 'community/community_page.html', context)
+
+
+def chat(request):
+    context = {}
+    context['c_user'] = User.objects.get(id=request.user.id)
+
+    return render(request, 'chat/chat.html', context)
+
+
+def send_message(request, chat_id):
+    context = {}
+    context['chat'] = Chat.objects.get(id=chat_id)
+    context['c_user'] = User.objects.get(id=request.user.id)
+    context['form'] = AddMessage()
+    form = AddMessage()
+
+    if request.method == 'POST':
+        form = AddMessage(request.POST)
+        if form.is_valid():
+            context['form'] = form
+            mes = Messages(user=request.user, message=form.data['message'], chat_id=chat_id)
+            context['chat'].get_messages().append(mes)
+
+    return render(request, 'chat/message.html', context)
+
+
+
 

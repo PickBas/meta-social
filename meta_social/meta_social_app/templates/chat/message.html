@@ -1,0 +1,25 @@
+{% extends 'base_menu.html' %}
+{% block center %}
+
+<div class="card">
+        <div class="card-body">
+            <h5>Ваши чаты</h5>
+            {% for item in chat %}
+                <li class="list-group-item">
+                    сообщение от {{ item.user }}
+                    <hr>
+                    {{ item.get_messages }}
+                </li>
+            {% endfor %}
+
+            <form method="post" action="/chat/go_to_chat/{{ chat.id}}/">
+            {% csrf_token %}
+            {{ form.message }}
+            <input class="btn btn-primary" type="submit" value="отправить сообщение">
+            </form>
+        </div>
+    </div>
+
+
+
+{% endblock %}

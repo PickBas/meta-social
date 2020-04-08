@@ -338,3 +338,16 @@ class Comment(models.Model):
 
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+
+class Messages(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+", null=True)
+    message = models.CharField(max_length=250)
+    chat_id = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="8+", null=True)
+
+class Chat(models.Model):
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+")
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="7+")
+
+    def get_messages(self):
+        return [i for i in Messages.objects.get(chat_id=self.id)]
