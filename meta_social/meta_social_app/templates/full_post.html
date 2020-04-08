@@ -29,9 +29,9 @@
                        <div class="card">
                        <div class="card-body">
                         <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 600px">
-                           <p style="text-align: left; margin-inline-start: 2px; margin-right: 100px;">  {{ comment.user.username }}</p>
+                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
                             <div class="media-body">
-                                    <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px ">{{ comment.text }}</h5>
                                 </div>
                             <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
