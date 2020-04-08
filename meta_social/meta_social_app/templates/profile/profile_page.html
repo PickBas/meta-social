@@ -11,10 +11,12 @@
           .rollover {
             transition: 0.3s;
           }
+
           .rollover:hover {
             transition: 0.7s;
             opacity: 0.7;
           }
+
           .kollaz{
             display: flex;
              flex-wrap: wrap;
@@ -51,6 +53,23 @@
       <div class="card mt-3">
         <div class="card-body">
           <h6 class="card-title">Друзья</h6>
+
+          {% if c_user.profile.friends %}
+                <ul class="list-group list-group-flush">
+                    {% for friend in c_user.profile.friends %}
+                  <div style="display: flex; flex-wrap: wrap;">
+                        <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
+                            <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>
+                          <br>
+
+                            <a href="/accounts/profile/{{ friend.id }}/" class=" ml-2" >{{ friend.username }}</a>
+                        </li>
+                    {% endfor %}
+                    </div>
+                </ul>
+            {% else %}
+                Список друзей пуст.
+            {% endif %}
         </div>
       </div>
       <div class="card mt-3 mb-3">
@@ -150,7 +169,4 @@
           {% endif %}
     </div>
   </div>
-<script>
-
-</script>
 {% endblock %}

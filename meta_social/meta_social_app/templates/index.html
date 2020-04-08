@@ -124,6 +124,12 @@
                     <i class="far fa-heart" style="margin-right: 10px"></i>
                   <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                    <div class="input-group mb-3 com hide" style="padding-top: 20px">
+                <input type="text" class="form-control" placeholder="Оставить комментарий" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Отправить</button>
+                </div>
+                </div>
                 </div>
             </div>
         {% endfor %}
