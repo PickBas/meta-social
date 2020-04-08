@@ -36,8 +36,6 @@
                         </div>
                     </li>
                 {% endfor %}
-            {% else %}
-                <p>Комментариев нет</p>
         {% endif %}
     </ul>
 {% endblock %}
@@ -97,8 +95,16 @@
                     }
 
                     let time = date_arr[1].split(":");
+                    
+                    let hours = "";
 
-                    let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${time[0]}:${time[1]}`;
+                    if (time[0][0] == '0') {
+                        hours = time[0][1];
+                    } else {
+                        hours = time[0];
+                    }
+
+                    let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${hours}:${time[1]}`;
 
                     li.innerHTML = `
                         <div class="media" style="margin: 20px; border-style: outset">
