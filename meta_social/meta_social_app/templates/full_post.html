@@ -25,16 +25,21 @@
     <ul id="all_comments">
         {% if post.comments %}
                 {% for comment in post.comments %}
-                    <li id="disp_comment">
-                        <div class="media" style="margin: 20px; border-style: outset">
-                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-                                <div class="media-body">
-                                    <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
+
+                       <div class="card">
+                       <div class="card-body">
+                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 600px">
+                           <p style="text-align: left; margin-inline-start: 2px; margin-right: 100px;">  {{ comment.user.username }}</p>
+                            <div class="media-body">
                                     <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
                                 </div>
+                            <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
+
                         </div>
-                    </li>
+                           </div>
+
+
                 {% endfor %}
         {% endif %}
     </ul>
