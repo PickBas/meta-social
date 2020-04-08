@@ -173,6 +173,9 @@ class Profile(models.Model):
         """
         return 0
 
+    def get_music_list(self):
+        return Music.objects.filter(user=self.user)
+
 
 def save_image_from_url(profile, image_url):
     """
@@ -338,3 +341,12 @@ class Comment(models.Model):
 
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+
+class Music(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+    audio_file = models.FileField(upload_to='music')
+
+    artist = models.CharField(default='Автор', max_length=100)
+    title = models.CharField(default='Название', max_length=100)

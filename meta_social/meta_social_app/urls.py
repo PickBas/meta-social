@@ -29,6 +29,8 @@ urlpatterns = [
     path('post/create/', post_new),
     path('post/<int:post_id>/', post_view),
     path('post/<int:post_id>/ajax/', post_ajax),
+
+    path('music/<int:user_id>/', music_list)
 ]
 
 if settings.DEBUG:

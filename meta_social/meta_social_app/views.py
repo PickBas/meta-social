@@ -17,8 +17,8 @@ from .models import Profile, Comment
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Friend, Post, FriendshipRequest, PostImages
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
+from .models import Friend, Post, FriendshipRequest, PostImages, Music
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, UploadMusicForm
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -549,3 +549,20 @@ def community(request, community_id):
 
     return render(request, 'community/community_page.html', context)
 
+
+def music_list(request, user_id):
+    context = get_menu_context('music', 'Музыка')
+
+    if request.method == 'POST':
+        form = UploadMusicForm(request.POST, request.FILES)
+        if form.is_valid():
+            music = form.save(commit=False)
+
+            music.user = request.user
+            music.save()
+
+    context['c_user'] = User.objects.get(id=user_id)
+    context['music_list'] = User.objects.get(id=user_id).profile.get_music_list()
+    context['form'] = UploadMusicForm()
+
+    return render(request, 'music/music_list.html', context)

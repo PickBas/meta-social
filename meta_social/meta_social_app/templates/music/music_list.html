@@ -1,0 +1,51 @@
+{% extends 'base_menu.html' %}
+{% load crispy_forms_tags %}
+
+{% block center %}
+    {% if c_user == user %}
+        <div class="card">
+            <div class="card-header">
+                Загрузить музыку
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                    <input type="submit" value="Отправить">
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mt-3">
+        <div class="card-header">
+            Плеер
+        </div>
+        <div class="card-body">
+            <audio id="audio-player" class="w-100" controls></audio>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header">
+            Список музыки
+        </div>
+        <div class="card-body">
+            {% for music in music_list %}
+                <button onclick="setMusic('{{ music.audio_file.url }}')">{{ music.artist }} - {{ music.title }}</button>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function setMusic(link) {
+            let audio_player = document.getElementById('audio-player')
+            audio_player.src = link
+        }
+    </script>
+{% endblock %}
+
+{% block right %}
+    <h5>Неизвестная пустота</h5>
+{% endblock %}

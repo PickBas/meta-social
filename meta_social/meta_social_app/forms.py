@@ -5,8 +5,9 @@ Forms module
 
 from django import forms
 from django.contrib.auth.models import User
+from django.core.validators import ValidationError
 
-from .models import Profile, Post, PostImages
+from .models import Profile, Post, PostImages, Music
 from image_cropping import ImageCropWidget
 from crispy_forms.helper import FormHelper
 
@@ -98,3 +99,9 @@ class PostImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
+
+
+class UploadMusicForm(forms.ModelForm):
+    class Meta:
+        model = Music
+        fields = ('audio_file', 'artist', 'title', )
