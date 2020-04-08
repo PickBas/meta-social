@@ -31,7 +31,7 @@ urlpatterns = [
     path('post/<int:post_id>/ajax/', post_ajax),
 
     path('chat/', chat),
-    path('chat/go_to_chat/<int:chat_id>/', send_message),
+    path('chat/go_to_chat/<int:user_id>/', send_message),
 
 ]
 

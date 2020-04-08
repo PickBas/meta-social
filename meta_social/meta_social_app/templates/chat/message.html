@@ -4,15 +4,15 @@
 <div class="card">
         <div class="card-body">
             <h5>Ваши чаты</h5>
-            {% for item in chat %}
+            {% for item in mes %}
                 <li class="list-group-item">
-                    сообщение от {{ item.user }}
+                    сообщение от {{ item.from_user }}
                     <hr>
-                    {{ item.get_messages }}
+                    {{ item.message }}
                 </li>
             {% endfor %}
 
-            <form method="post" action="/chat/go_to_chat/{{ chat.id}}/">
+            <form method="post" action="/chat/go_to_chat/{{ c_user.id }}/">
             {% csrf_token %}
             {{ form.message }}
             <input class="btn btn-primary" type="submit" value="отправить сообщение">

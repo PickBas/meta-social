@@ -13,7 +13,7 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment, Messages, Chat
+from .models import Profile, Comment, Messages
 from PIL import Image
 from django.forms import modelformset_factory
 
@@ -557,21 +557,21 @@ def chat(request):
     return render(request, 'chat/chat.html', context)
 
 
-def send_message(request, chat_id):
+def send_message(request, user_id):
     context = {}
-    context['chat'] = Chat.objects.get(id=chat_id)
     context['c_user'] = User.objects.get(id=request.user.id)
     context['form'] = AddMessage()
-    form = AddMessage()
-
     if request.method == 'POST':
         form = AddMessage(request.POST)
-        if form.is_valid():
-            context['form'] = form
-            mes = Messages(user=request.user, message=form.data['message'], chat_id=chat_id)
-            context['chat'].get_messages().append(mes)
+
+    if form.is_valid():
+        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
+        mes.save()
+        context['mes'] = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
+        form.clean()
 
     return render(request, 'chat/message.html', context)
+
 
 
 
