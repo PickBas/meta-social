@@ -1,0 +1,18 @@
+{% extends 'base_menu.html' %}
+{% load crispy_forms_tags %}
+
+{% block center %}
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form | crispy }}
+                <input class="btn btn-primary" type="submit" value="Добавить">
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block right %}
+    {% include 'music/right_menu.html' %}
+{% endblock %}

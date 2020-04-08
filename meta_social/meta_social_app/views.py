@@ -553,6 +553,15 @@ def community(request, community_id):
 def music_list(request, user_id):
     context = get_menu_context('music', 'Музыка')
 
+    context['c_user'] = User.objects.get(id=user_id)
+    context['music_list'] = User.objects.get(id=user_id).profile.get_music_list()
+
+    return render(request, 'music/music_list.html', context)
+
+
+def music_upload(request):
+    context = get_menu_context('music', 'Загрузка музыки')
+
     if request.method == 'POST':
         form = UploadMusicForm(request.POST, request.FILES)
         if form.is_valid():
@@ -560,9 +569,7 @@ def music_list(request, user_id):
 
             music.user = request.user
             music.save()
-
-    context['c_user'] = User.objects.get(id=user_id)
-    context['music_list'] = User.objects.get(id=user_id).profile.get_music_list()
+    
     context['form'] = UploadMusicForm()
 
-    return render(request, 'music/music_list.html', context)
+    return render(request, 'music/music_upload.html', context)

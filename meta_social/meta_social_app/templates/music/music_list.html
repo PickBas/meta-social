@@ -2,38 +2,18 @@
 {% load crispy_forms_tags %}
 
 {% block center %}
-    {% if c_user == user %}
-        <div class="card">
-            <div class="card-header">
-                Загрузить музыку
-            </div>
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form | crispy }}
-                    <input type="submit" value="Отправить">
-                </form>
-            </div>
-        </div>
-    {% endif %}
-
     <div class="card mt-3">
-        <div class="card-header">
-            Плеер
-        </div>
         <div class="card-body">
             <audio id="audio-player" class="w-100" controls></audio>
         </div>
     </div>
 
     <div class="card mt-3">
-        <div class="card-header">
-            Список музыки
-        </div>
-        <div class="card-body">
+        <div class="card-body text-left">
             {% for music in music_list %}
-                <button onclick="setMusic('{{ music.audio_file.url }}')">{{ music.artist }} - {{ music.title }}</button>
-                <hr>
+                <button class="btn btn-outline-success" onclick="setMusic('{{ music.audio_file.url }}')">&#9658;</button>
+                <span>{{ music.artist }} - {{ music.title }}</span>
+                <br class="mb-3">
             {% endfor %}
         </div>
     </div>
@@ -47,5 +27,5 @@
 {% endblock %}
 
 {% block right %}
-    <h5>Неизвестная пустота</h5>
+    {% include 'music/right_menu.html' %}
 {% endblock %}

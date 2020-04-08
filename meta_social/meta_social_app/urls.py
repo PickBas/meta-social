@@ -30,7 +30,8 @@ urlpatterns = [
     path('post/<int:post_id>/', post_view),
     path('post/<int:post_id>/ajax/', post_ajax),
 
-    path('music/<int:user_id>/', music_list)
+    path('music/<int:user_id>/', music_list),
+    path('music/upload/', music_upload),
 ]
 
 if settings.DEBUG:
