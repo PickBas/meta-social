@@ -8,6 +8,7 @@
             flex-wrap: wrap;
         }
     </style>
+<script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
     {% include 'post_menu.html' %}
     <div class="card mt-3">
         <div class="card-body">
@@ -120,7 +121,8 @@
                     </div>
 
                     <hr class="mt-1 mb-1">
-                    <a href="/post/{{ post.id }}" class="text-muted mb-0 float-left">Comment</a>
+                    <i class="far fa-heart" style="margin-right: 10px"></i>
+                  <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
                 </div>
             </div>
