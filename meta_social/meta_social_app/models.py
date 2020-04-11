@@ -33,7 +33,6 @@ class Profile(models.Model):
     )
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-
     image = ImageCropField(
         blank=True, upload_to='avatars/users', default='avatars/users/0.png')
     cropping = ImageRatioField('image', '256x256')
@@ -56,7 +55,7 @@ class Profile(models.Model):
 
     def check_online_with_last_log(self) -> bool:
         """
-        Checking onlime status using last login/logout
+        Checking online status using last login/logout
         :param self: User
         :return: bool
         """
@@ -133,8 +132,6 @@ class Profile(models.Model):
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
 
-    def amount_posts(self):
-        return Post.amount_of_comments()
 
     def amount_of_friends(self) -> int:
         """

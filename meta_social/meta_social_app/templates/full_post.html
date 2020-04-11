@@ -15,6 +15,7 @@
             {% endif %}
 
             <hr class="mt-1 mb-1">
+
             <span class="text-muted mb-0 float-right">{{ post.date }}</span>
         </div>
     </div>
@@ -22,6 +23,7 @@
         <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
         <button class="btn btn-primary mt-2" onclick="proc_comment(event, '/post/{{ post.id }}/ajax/', )">Оставить комментарий</button>
     </div>
+    <p>Всего {{ post.amount_of_comments }} комментариев</p>
     <div id="all_comments">
         {% if post.comments %}
             {% for comment in post.comments %}
