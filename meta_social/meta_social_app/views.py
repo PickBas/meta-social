@@ -388,6 +388,19 @@ def post_new(request):
 
 
 @login_required
+def post_remove(request, post_id) -> HttpResponseRedirect:
+    """
+    Removing a post using Ajax
+    :param request: request
+    :param post_id: id of a post want to be deleted
+    :return: HttpResponseRedirect
+    """
+    if request.method == "POST":
+        Post.objects.get(id=post_id).delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
 def send_friendship_request(request, user_id) -> redirect:
     """
     Sending friendship request view
@@ -570,7 +583,7 @@ def music_upload(request):
 
             music.user = request.user
             music.save()
-    
+
     context['form'] = UploadMusicForm()
 
     return render(request, 'music/music_upload.html', context)

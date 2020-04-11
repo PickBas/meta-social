@@ -29,6 +29,7 @@ urlpatterns = [
     path('post/create/', post_new),
     path('post/<int:post_id>/', post_view),
     path('post/<int:post_id>/ajax/', post_ajax),
+    path('post/<int:post_id>/remove/', post_remove),
 
     path('music/<int:user_id>/', music_list),
     path('music/upload/', music_upload),
