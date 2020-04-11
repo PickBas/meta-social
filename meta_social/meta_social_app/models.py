@@ -133,6 +133,9 @@ class Profile(models.Model):
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
 
+    def amount_posts(self):
+        return Post.amount_of_comments()
+
     def amount_of_friends(self) -> int:
         """
         Get amount of friends
