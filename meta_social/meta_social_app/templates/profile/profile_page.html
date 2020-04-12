@@ -145,7 +145,7 @@
                 <div class="card-body">
                   <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
                   <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
-                  <p class="card-text mt-2">{{ post.text }}</p>
+                  <p class="card-text mt-2" id="id-post-text">{{ post.text }}</p>
                   <div class="kollaz">
                   {% if post.get_images %}
                     {% for post_img in post.get_images %}
@@ -175,11 +175,11 @@
                                 </button>
                               </div>
                               <div class="modal-body">
-                                <textarea class="form-control" style="min-width: 100%" id="text-post">{{ post.text }}</textarea>
+                                <textarea class="form-control" style="min-width: 100%" id="updated-post-text">{{ post.text }}</textarea>
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                                <button type="button" class="btn btn-primary">Сохранить</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="edit_post(event, '/post/{{ post.id }}/edit/')">Сохранить</button>
                               </div>
                             </div>
                           </div>
@@ -213,7 +213,8 @@
 
 {% block extra__js %}
     <script>
-        autosize(document.getElementById("text-post"));
+        autosize(document.getElementById("updated-post-text"));
+
         function remove_post(e, link) {
             $.ajax({
                 type: "POST",
@@ -227,5 +228,22 @@
             })
 
         }
+
+        function edit_post(e, link) {
+            let edited_text = document.getElementById("updated-post-text");
+            let old_text = document.getElementById("id-post-text");
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    text: edited_text.value
+                },
+                success: function() {
+                    old_text.innerText = edited_text.value;
+                }
+            })
+        }
+
     </script>
 {% endblock %}

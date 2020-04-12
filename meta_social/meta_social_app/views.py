@@ -401,6 +401,17 @@ def post_remove(request, post_id) -> HttpResponseRedirect:
 
 
 @login_required
+def post_edit(request, post_id) -> HttpResponseRedirect:
+    """
+    Editing text of a post
+    :param request: request
+    :param post_id: id of a post want to be edited
+    :return: HttpResponseRedirect
+    """
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
 def send_friendship_request(request, user_id) -> redirect:
     """
     Sending friendship request view
