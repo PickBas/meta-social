@@ -74,10 +74,10 @@
     ;
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, preventDefaults, false);
-    })
+    });
 
     function preventDefaults(e) {
-        e.preventDefault()
+        e.preventDefault();
         e.stopPropagation()
     }
 
@@ -89,7 +89,7 @@
     ;
     ['dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, unhighlight, false)
-    })
+    });
 
     function highlight(e) {
         dropArea.classList.add('highlight')
@@ -99,24 +99,24 @@
         dropArea.classList.remove('highlight')
     }
 
-    dropArea.addEventListener('drop', handleDrop, false)
+    dropArea.addEventListener('drop', handleDrop, false);
 
     function handleDrop(e) {
-        let dt = e.dataTransfer
-        let files = dt.files
+        let dt = e.dataTransfer;
+        let files = dt.files;
 
         handleFiles(files)
     }
 
     function handleFiles(files) {
-        files = [...files]
+        files = [...files];
         files.forEach(uploadFile)
     }
 
     function get_free_inputs() {
-        let inputs = []
+        let inputs = [];
         for (var i = 0; i < 10; i++) {
-            let input = document.getElementById("id_form-" + i + "-image")
+            let input = document.getElementById("id_form-" + i + "-image");
             if (!input.value) {
                 inputs.push(input)
             }
@@ -125,37 +125,37 @@
     }
 
     function uploadFile(file) {
-        let inputs = get_free_inputs()
+        let inputs = get_free_inputs();
         
         if (inputs.length == 0) {
-            alert('Нельзя загрузить более 10 картинок')
+            alert('Нельзя загрузить более 10 картинок');
             return
         }
 
-        const dT = new DataTransfer()
-        dT.items.add(file)
-        inputs[0].files = dT.files
+        const dT = new DataTransfer();
+        dT.items.add(file);
+        inputs[0].files = dT.files;
 
-        let input_id = inputs[0].id[8]
+        let input_id = inputs[0].id[8];
 
         previewFile(file, input_id)
     }
 
     function removeFile(e) {
-        let current_id = e.target.id[e.target.id.length - 1]
+        let current_id = e.target.id[e.target.id.length - 1];
 
-        document.getElementById("id_form-" + current_id + "-image").value = ''
+        document.getElementById("id_form-" + current_id + "-image").value = '';
         e.target.remove()
     }
 
     function previewFile(file, input_id) {
-        let reader = new FileReader()
-        reader.readAsDataURL(file)
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
         reader.onloadend = function () {
-            let img = document.createElement('img')
-            img.src = reader.result
-            img.id = "image_preview-" + input_id
-            img.onclick = removeFile
+            let img = document.createElement('img');
+            img.src = reader.result;
+            img.id = "image_preview-" + input_id;
+            img.onclick = removeFile;
             document.getElementById('gallery').appendChild(img)
         }
     }
