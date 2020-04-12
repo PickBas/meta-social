@@ -175,7 +175,7 @@
                                 </button>
                               </div>
                               <div class="modal-body">
-                                <textarea class="form-control" style="min-width: 100%">{{ post.text }}</textarea>
+                                <textarea class="form-control" style="min-width: 100%" id="text-post">{{ post.text }}</textarea>
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
@@ -213,6 +213,7 @@
 
 {% block extra__js %}
     <script>
+        autosize(document.getElementById("text-post"));
         function remove_post(e, link) {
             $.ajax({
                 type: "POST",
