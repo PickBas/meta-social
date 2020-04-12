@@ -162,7 +162,23 @@
                    <i class="far fa-heart" style="margin-right: 10px"></i>
                   <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                     {% if c_user == user %}
-                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;" onclick="remove_post(event, '/post/{{ post.id }}/remove/')"><i class="fas fa-ban"></i></button>
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#exampleModal"><i class="fas fa-ban"></i></button>
+                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Удалить пост?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                                <button type="button" class="btn btn-primary" onclick="remove_post(event, '/post/{{ post.id }}/remove/')" data-dismiss="modal">Да</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                     {% endif %}
                   <span class="text-muted mb-0 float-right">{{ post.date }}</span>
                 </div>
@@ -184,7 +200,7 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function () {
-                    e.target.parentNode.parentNode.parentNode.remove();
+                    e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
                 }
             })
 
