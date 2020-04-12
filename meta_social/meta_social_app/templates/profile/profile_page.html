@@ -162,12 +162,33 @@
                    <i class="far fa-heart" style="margin-right: 10px"></i>
                   <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                     {% if c_user == user %}
-                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#exampleModal"><i class="fas fa-ban"></i></button>
-                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#editPostModal"><i class="far fa-edit"></i></button>
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#removingPostModal"><i class="fas fa-ban"></i></button>
+
+                        <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Удалить пост?</h5>
+                                <h5 class="modal-title" id="editPostModalLabel">Modal title</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <textarea class="form-control" style="min-width: 100%">{{ post.text }}</textarea>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                <button type="button" class="btn btn-primary">Сохранить</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal fade" id="removingPostModal" tabindex="-1" role="dialog" aria-labelledby="removingPostModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="removingPostModalLabel">Удалить пост?</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                   <span aria-hidden="true">&times;</span>
                                 </button>
