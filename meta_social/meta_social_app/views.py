@@ -408,6 +408,12 @@ def post_edit(request, post_id) -> HttpResponseRedirect:
     :param post_id: id of a post want to be edited
     :return: HttpResponseRedirect
     """
+
+    if request.method == 'POST':
+        post_to_edit = Post.objects.get(id=post_id)
+        post_to_edit.text = request.POST.get('text')
+        post_to_edit.save()
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
