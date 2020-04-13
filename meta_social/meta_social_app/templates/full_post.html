@@ -65,11 +65,6 @@ cursor: pointer;
     <div class="form-group mt-2" style="position: relative">
         <div class="file-upload">
 
-<label>
-<input type="file" name="file" onchange="getFileName ();" id="uploaded-file">
-<span><i class="far fa-file-image pin"></i></span>
-</label>
-</div>
 
 <div id="file-name"></div>
          <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
@@ -101,14 +96,7 @@ cursor: pointer;
 
 {% block extra__js %}
     <script>
-    function getFileName () {
 
-var file = document.getElementById ('uploaded-file').value;
-
-file = file.replace (/\\/g, «/»).split ('/').pop ();
-
-document.getElementById ('file-name').innerHTML = 'Имя файла: ' + file;
-}
         function proc_comment(e, link){
             let textar = document.getElementById('id_comment');
             let comment_text = textar.value;
