@@ -244,6 +244,10 @@ class PostImages(models.Model):
         img = Image.open(self.image)
         output = BytesIO()
 
+        new_size = (1280, (img.size[1] * 1280) // img.size[0])
+
+        img = img.resize(new_size, Image.ANTIALIAS)
+
         img.save(output, format='JPEG', quality=100)
         output.seek(0)
 
