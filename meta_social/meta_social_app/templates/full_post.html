@@ -1,9 +1,53 @@
 {% extends 'base_menu.html' %}
 {% load cropping %}
-
 {% block center %}
+<style>
+    .close {
+position: absolute;
+right: 32px;
+top: 20px;
+width: 32px;
+height: 32px;
+opacity: 0.3;
+}
+.close:hover {
+opacity: 1;
+cursor: pointer;
+}
+.close:before, .close:after {
+position: absolute;
+left: 15px;
+content: ' ';
+height: 33px;
+width: 2px;
+background-color: #333;
+}
+.close:before {
+transform: rotate(45deg);
+}
+.close:after {
+transform: rotate(-45deg);
+}
+
+.file-upload input[type="file"]{
+display: none;/* скрываем input file */
+}
+
+.file-upload label {
+position: absolute;
+right: 20px;
+top: 10px;
+width: 12px;
+height: 16px;
+cursor: pointer;
+}
+
+
+</style>
+<script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
     <div class="card mt-3">
         <div class="card-body text-left">
+            <span > <a href="/accounts/profile/{{ post.user.id }}/" class="close"> </a></span>
             <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
             <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
             <p class="card-text mt-2">{{ post.text }}</p>
@@ -18,31 +62,53 @@
             <span class="text-muted mb-0 float-right">{{ post.date }}</span>
         </div>
     </div>
-    <div class="form-group mt-2">
-        <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
+    <div class="form-group mt-2" style="position: relative">
+        <div class="file-upload">
+
+<label>
+<input type="file" name="file" onchange="getFileName ();" id="uploaded-file">
+<span><i class="far fa-file-image pin"></i></span>
+</label>
+</div>
+
+<div id="file-name"></div>
+         <textarea class="form-control" rows="3" placeholder="Комментарий" name="comment" id="id_comment"></textarea>
         <button class="btn btn-primary mt-2" onclick="proc_comment(event, '/post/{{ post.id }}/ajax/', )">Оставить комментарий</button>
     </div>
-    <div id="all_comments">
+    <ul id="all_comments">
         {% if post.comments %}
-            {% for comment in post.comments %}
-                   <div class="card mb-2">
+                {% for comment in post.comments %}
+
+                       <div class="card">
                        <div class="card-body">
-                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
-                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.username }}</a></p>
+
+                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 600px">
+                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
                             <div class="media-body">
-                                <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">{{ comment.text }}</h5>
-                            </div>
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px ">{{ comment.text }}</h5>
+                                </div>
                             <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
+
                         </div>
-                   </div>
-            {% endfor %}
+                           </div>
+
+
+                {% endfor %}
         {% endif %}
-    </div>
+    </ul>
 {% endblock %}
 
 {% block extra__js %}
     <script>
+    function getFileName () {
+
+var file = document.getElementById ('uploaded-file').value;
+
+file = file.replace (/\\/g, «/»).split ('/').pop ();
+
+document.getElementById ('file-name').innerHTML = 'Имя файла: ' + file;
+}
         function proc_comment(e, link){
             let textar = document.getElementById('id_comment');
             let comment_text = textar.value;
@@ -57,7 +123,7 @@
                     textar.value = "";
                     let json = result;
 
-                    const li = document.createElement("div");
+                    const li = document.createElement("li");
                     let len =  $('ul#all_comments li').length;
 
                     let date_arr = json['date'].split(" ");
@@ -96,7 +162,7 @@
                     }
 
                     let time = date_arr[1].split(":");
-                    
+
                     let hours = "";
 
                     if (time[0][0] == '0') {
@@ -108,18 +174,14 @@
                     let str_date = `Создан ${day} ${month} ${date_year[0]} г. ${hours}:${time[1]}`;
 
                     li.innerHTML = `
-                        <div class="card mb-2">
-                           <div class="card-body">
-                            <img src="{% cropped_thumbnail user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
-                               <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/${json['id']}/">${json['username']}</a></p>
-                                <div class="media-body">
-                                        <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">${json['text']}</h5>
-                                    </div>
-                                <hr class="mt-1 mb-1">
-                                <p style="text-align: right; margin: 3px">${str_date}</p>
-
+                        <div class="media" style="margin: 20px; border-style: outset">
+                            <img src="{% cropped_thumbnail user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                            <div class="media-body">
+                                <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария ${json['username']}</p>
+                                <h5 style="text-align: left; margin-inline-start: 10px;">${json['text']}</h5>
                             </div>
-                       </div>
+                            <p style="text-align: right; margin: 3px">${str_date}</p>
+                        </div>
                     `;
                     document.getElementById('all_comments').appendChild(li);
                 }
