@@ -19,7 +19,7 @@ from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, AddMessage
+from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -552,26 +552,29 @@ def community(request, community_id):
 
 
 def chat(request):
-    context = {}
-    context['c_user'] = User.objects.get(id=request.user.id)
+    context = {'c_user': User.objects.get(id=request.user.id)}
 
     return render(request, 'chat/chat.html', context)
 
 
-def send_message(request, user_id):
-    context = {'c_user': User.objects.get(id=request.user.id), 'form': AddMessage(), 'send_id': user_id}
+@login_required
+def show_messages(request, user_id):
+    context = {'c_user': User.objects.get(id=request.user.id), 'send_id': user_id}
+
     mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
     mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
     merged_lists = chain(mes1, mes2)
     sorted_lists = sorted(merged_lists, key=lambda item: item.date)
     context['mes'] = sorted_lists
+
+    return render(request, 'chat/message.html', context)
+
+
+@login_required
+def send_message(request, user_id):
     if request.method == 'POST':
-        form = AddMessage(request.POST)
-
-        if form.is_valid():
-            mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
-            mes.save()
-            form.clean()
-
-        return render(request, 'chat/message.html', context)
-
+        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=request.POST.get('text'))
+        mes.save()
+        json_response = json.dumps({'sender': mes.from_user.username})
+        return HttpResponse(json_response, content_type='application/json')
+    raise Http404()

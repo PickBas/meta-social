@@ -4,22 +4,19 @@
 <div class="card">
         <div class="card-body">
             <h5>Ваши чаты</h5>
-        {% if mes %}
-            {% for item in mes %}
-                <li class="list-group-item">
-                    сообщение от {{ item.from_user }}
-                    <hr>
-                    {{ item.message }}
-                </li>
-            {% endfor %}
-            {% else %}
-            <p>Это будет ваше первое сообщение</p>
-        {% endif %}
-
-
-
+        <ul id="all-messages">
+            {% if mes %}
+                {% for item in mes %}
+                    <li class="list-group-item">
+                        сообщение от {{ item.from_user }}
+                        <hr>
+                        {{ item.message }}
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
             <textarea id="message-text"></textarea>
-            <button class="btn btn-primary" type="submit">Отправка сообщений</button>
+            <button class="btn btn-primary" type="submit" onclick="send_mess(event, '/chat/go_to_chat/{{ send_id }}/send_mes/')">Отправка сообщений</button>
 
         </div>
     </div>
@@ -29,22 +26,29 @@
 {% endblock %}
 {% block extra__js %}
     <script>
-    function proc_comment(e, link){
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    text: comment_text
-                },
-                success: function () {
-
-
-
-
-                }
-            })
-        }
+    function send_mess(e, link){
+        let textar = document.getElementById("message-text");
+        $.ajax({
+            type: "POST",
+            url: link,
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                text: textar.value
+            },
+            success: function (result) {
+                const li = document.createElement("div");
+                li.innerHTML = `
+                    <li class="list-group-item">
+                        сообщение от ${result['sender']}
+                        <hr>
+                        ${textar.value}
+                    </li>
+                `
+                document.getElementById('all-messages').appendChild(li);
+                textar.value = "";
+            }
+        })
+    }
     </script>
 
 

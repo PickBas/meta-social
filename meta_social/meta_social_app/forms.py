@@ -98,13 +98,3 @@ class PostImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
-
-
-class AddMessage(forms.Form):
-    message = forms.CharField(max_length=250,
-                              required=True,
-                              widget=forms.Textarea(attrs={
-                                  'placeholder': 'Сообщение',
-                                  'style': 'width: 90%; height: 10%;'
-
-                              }))
