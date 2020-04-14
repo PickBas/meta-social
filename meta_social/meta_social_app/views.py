@@ -2,6 +2,7 @@
 View module
 """
 import json
+from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -570,8 +571,11 @@ def send_message(request, user_id):
     if form.is_valid():
         mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
         mes.save()
-        context['mes'] = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
-        context['mes_to'] = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
+        mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
+        mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
+        merged_lists = chain(mes1, mes2)
+        sorted_lists = sorted(merged_lists, key=lambda item: item.date)
+        context['mes'] = sorted_lists
         form.clean()
 
     return render(request, 'chat/message.html', context)

@@ -11,13 +11,7 @@
                     {{ item.message }}
                 </li>
             {% endfor %}
-            {% for item in mes_to %}
-                <li class="list-group-item">
-                    сообщение от {{ item.from_user }}
-                    <hr>
-                    {{ item.message }}
-                </li>
-            {% endfor %}
+
             <form method="post" action="/chat/go_to_chat/{{ send_id }}/">
             {% csrf_token %}
             {{ form.message }}
