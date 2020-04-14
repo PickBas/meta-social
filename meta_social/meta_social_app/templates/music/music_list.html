@@ -2,9 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% block center %}
+<script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
     <div class="card mt-3">
         <div class="card-body">
             <audio id="audio-player" class="w-100" controls></audio>
+            <button><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -20,9 +22,11 @@
 
     <script>
         function setMusic(link) {
-            let audio_player = document.getElementById('audio-player')
-            audio_player.src = link
+            let audio_player = document.getElementById('audio-player');
+            audio_player.src = link;
+            audio_player.autoplay = true;
         }
+
     </script>
 {% endblock %}
 
