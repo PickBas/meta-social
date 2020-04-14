@@ -559,24 +559,19 @@ def chat(request):
 
 
 def send_message(request, user_id):
-    context = {}
-    context['c_user'] = User.objects.get(id=request.user.id)
-    context['form'] = AddMessage()
-    context['send_id'] = user_id
-
-
+    context = {'c_user': User.objects.get(id=request.user.id), 'form': AddMessage(), 'send_id': user_id}
+    mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
+    mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
+    merged_lists = chain(mes1, mes2)
+    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
+    context['mes'] = sorted_lists
     if request.method == 'POST':
         form = AddMessage(request.POST)
 
-    if form.is_valid():
-        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
-        mes.save()
-        mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
-        mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
-        merged_lists = chain(mes1, mes2)
-        sorted_lists = sorted(merged_lists, key=lambda item: item.date)
-        context['mes'] = sorted_lists
-        form.clean()
+        if form.is_valid():
+            mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
+            mes.save()
+            form.clean()
 
-    return render(request, 'chat/message.html', context)
+        return render(request, 'chat/message.html', context)
 

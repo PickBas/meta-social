@@ -4,6 +4,7 @@
 <div class="card">
         <div class="card-body">
             <h5>Ваши чаты</h5>
+        {% if mes %}
             {% for item in mes %}
                 <li class="list-group-item">
                     сообщение от {{ item.from_user }}
@@ -11,6 +12,10 @@
                     {{ item.message }}
                 </li>
             {% endfor %}
+            {% else %}
+            <p>ybrt,ufdzjg</p>
+        {% endif %}
+
 
             <form method="post" action="/chat/go_to_chat/{{ send_id }}/">
             {% csrf_token %}
