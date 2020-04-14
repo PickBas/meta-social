@@ -143,7 +143,30 @@
                    <i class="far fa-heart" style="margin-right: 10px"></i>
                   <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                   <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+
                 </div>
+                  <ul id="all_comments" style="padding-left: 0;">
+        {% if post.comments %}
+                {% for comment in post.comments %}
+
+                       <div class="card" style="font-size: 15px; width: 100%; height: 130px; ">
+                       <div class="card-body" style="">
+
+                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 600px">
+                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
+                            <div class="media-body">
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">{{ comment.text }}</h5>
+                                </div>
+                            <hr class="mt-1 mb-1">
+                            <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
+
+                        </div>
+                           </div>
+
+
+                {% endfor %}
+        {% endif %}
+    </ul>
               </div>
             {% endfor %}
           {% endif %}
