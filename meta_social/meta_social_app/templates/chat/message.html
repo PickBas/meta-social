@@ -13,17 +13,42 @@
                 </li>
             {% endfor %}
             {% else %}
-            <p>ybrt,ufdzjg</p>
+            <p>Это будет ваше первое сообщение</p>
         {% endif %}
 
 
-            <form method="post" action="/chat/go_to_chat/{{ send_id }}/">
-            {% csrf_token %}
-            {{ form.message }}
-            <input class="btn btn-primary" type="submit" value="отправить сообщение">
-            </form>
+
+            <textarea id="message-text"></textarea>
+            <button class="btn btn-primary" type="submit">Отправка сообщений</button>
+
         </div>
     </div>
+
+
+
+{% endblock %}
+{% block extra__js %}
+    <script>
+    function proc_comment(e, link){
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    text: comment_text
+                },
+                success: function () {
+
+
+
+
+                }
+            })
+        }
+    </script>
+
+
+
 
 
 
