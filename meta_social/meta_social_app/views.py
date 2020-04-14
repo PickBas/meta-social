@@ -561,6 +561,9 @@ def send_message(request, user_id):
     context = {}
     context['c_user'] = User.objects.get(id=request.user.id)
     context['form'] = AddMessage()
+    context['send_id'] = user_id
+
+
     if request.method == 'POST':
         form = AddMessage(request.POST)
 
@@ -568,11 +571,8 @@ def send_message(request, user_id):
         mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=form.data['message'])
         mes.save()
         context['mes'] = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
+        context['mes_to'] = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
         form.clean()
 
     return render(request, 'chat/message.html', context)
-
-
-
-
 

@@ -173,6 +173,13 @@ class Profile(models.Model):
         """
         return 0
 
+    def get_incoming_messages(self):
+        return Messages.objects.filter(to_user=self.user)
+
+
+    def get_outcoming_messages(self):
+        return Messages.objects.filter(from_user=self.user)
+
 
 def save_image_from_url(profile, image_url):
     """
@@ -341,7 +348,8 @@ class Comment(models.Model):
 
 
 class Messages(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+", null=True)
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+", null=True)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+")
     message = models.CharField(max_length=250)
+    date = models.DateTimeField(auto_now=True)
 
