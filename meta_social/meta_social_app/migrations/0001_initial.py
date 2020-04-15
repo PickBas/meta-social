@@ -29,8 +29,6 @@ class Migration(migrations.Migration):
             name='Profile',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', image_cropping.fields.ImageCropField(blank=True, default='avatars/users/0.png', upload_to='avatars/users')),
-                ('cropping', image_cropping.fields.ImageRatioField('image', '256x256', adapt_rotation=False, allow_fullsize=False, free_crop=False, help_text=None, hide_image_field=False, size_warning=False, verbose_name='cropping')),
                 ('job', models.CharField(max_length=100, null=True)),
                 ('study', models.CharField(max_length=100, null=True)),
                 ('biography', models.CharField(max_length=500, null=True)),
