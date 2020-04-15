@@ -2,6 +2,7 @@
 View module
 """
 import json
+from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -13,7 +14,7 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment
+from .models import Profile, Comment, Messages
 from PIL import Image
 from django.forms import modelformset_factory
 
@@ -528,10 +529,7 @@ def change_avatar(request):
     return render(request, 'profile/change_avatar.html', context)
 
 
-def upload(request):
-    return render(request, 'index.html')
-
-
+@login_required
 def community(request, community_id):
     context = get_menu_context('community', 'Сообщество')
 
@@ -544,6 +542,7 @@ def community(request, community_id):
     return render(request, 'community/community_page.html', context)
 
 
+@login_required
 def music_list(request, user_id):
     context = get_menu_context('music', 'Музыка')
 
@@ -553,6 +552,7 @@ def music_list(request, user_id):
     return render(request, 'music/music_list.html', context)
 
 
+@login_required
 def music_upload(request):
     context = get_menu_context('music', 'Загрузка музыки')
 
@@ -567,3 +567,33 @@ def music_upload(request):
     context['form'] = UploadMusicForm()
 
     return render(request, 'music/music_upload.html', context)
+
+
+@login_required
+def chat(request):
+    context = {'c_user': User.objects.get(id=request.user.id)}
+
+    return render(request, 'chat/chat.html', context)
+
+
+@login_required
+def show_messages(request, user_id):
+    context = {'c_user': User.objects.get(id=request.user.id), 'send_id': user_id}
+
+    mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
+    mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
+    merged_lists = chain(mes1, mes2)
+    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
+    context['mes'] = sorted_lists
+
+    return render(request, 'chat/message.html', context)
+
+
+@login_required
+def send_message(request, user_id):
+    if request.method == 'POST':
+        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=request.POST.get('text'))
+        mes.save()
+        json_response = json.dumps({'sender': mes.from_user.username})
+        return HttpResponse(json_response, content_type='application/json')
+    raise Http404()

@@ -34,6 +34,10 @@ urlpatterns = [
 
     path('music/<int:user_id>/', music_list),
     path('music/upload/', music_upload),
+
+    path('chat/', chat),
+    path('chat/go_to_chat/<int:user_id>/', show_messages),
+    path('chat/go_to_chat/<int:user_id>/send_mes/', send_message),
 ]
 
 if settings.DEBUG:

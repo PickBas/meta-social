@@ -174,6 +174,12 @@ class Profile(models.Model):
     def get_music_list(self):
         return Music.objects.filter(user=self.user)
 
+    def get_incoming_messages(self):
+        return Messages.objects.filter(to_user=self.user)
+
+    def get_outcoming_messages(self):
+        return Messages.objects.filter(from_user=self.user)
+
 
 def save_image_from_url(profile, image_url):
     """
@@ -353,3 +359,10 @@ class Music(models.Model):
 
     artist = models.CharField(default='Автор', max_length=100)
     title = models.CharField(default='Название', max_length=100)
+
+
+class Messages(models.Model):
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+", null=True)
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+", null=True)
+    message = models.CharField(max_length=250, null=True)
+    date = models.DateTimeField(auto_now=True)
