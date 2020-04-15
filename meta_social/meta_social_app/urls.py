@@ -11,7 +11,7 @@ urlpatterns = [
     path('track/logout/<int:user_id>/', logout_track),
     path('accounts/profile/<int:user_id>/', profile),
     path('accounts/profile/<int:user_id>/edit_profile/', login_required(EditProfile.as_view())),
-    path('accounts/profile/<user_id>/change_avatar/', crop_image, name='crop'),
+    path('accounts/profile/<user_id>/change_avatar/', crop_image_user, name='crop'),
 
     path('friends/<int:user_id>/', friends_list),
     path('friends/search/', friends_search),
@@ -25,8 +25,13 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_add),
 
     path('community/<int:community_id>/', community),
+    path('community/list/', community_list),
+    path('community/create/', community_create),
+    path('community/<int:community_id>/join/', community_join),
+    path('community/<int:community_id>/leave/', community_leave),
 
     path('post/create/', post_new),
+    path('post/create/<int:community_id>/', post_community_new),
 ]
 
 if settings.DEBUG:

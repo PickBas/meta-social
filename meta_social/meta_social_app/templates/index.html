@@ -103,8 +103,8 @@
         {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
-                    <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+                    <img src="{% cropped_thumbnail post.get_owner "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                    <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
                     <p class="card-text mt-2">{{ post.text }}</p>
                     <div class="kollaz">
                     {% if post.get_images %}

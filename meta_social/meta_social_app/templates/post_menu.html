@@ -39,7 +39,7 @@
 </style>
 <div id="drop-area" class="card">
     <div class="card-body text-left">
-        <form method="POST" action="/post/create/" enctype="multipart/form-data" class="post-form">
+        <form method="POST" action="{{ action_type }}" enctype="multipart/form-data" class="post-form">
             {% csrf_token %}
 
             <div class="input-group">

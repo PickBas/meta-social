@@ -6,7 +6,7 @@ Forms module
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import Profile, Post, PostImages
+from .models import Profile, Post, PostImages, Community
 from image_cropping import ImageCropWidget
 from crispy_forms.helper import FormHelper
 
@@ -95,3 +95,10 @@ class PostImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
+
+
+class CommunityCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Community
+        fields = ('name', 'info', 'country', )
