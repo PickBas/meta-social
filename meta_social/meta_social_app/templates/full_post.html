@@ -3,7 +3,7 @@
 {% block center %}
     <div class="card mt-3">
         <div class="card-body text-left">
-            <img src="{{ post.user.profile }}" class="rounded-circle border border-dark" width=35 height=35>
+            <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
             <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
             <p class="card-text mt-2">{{ post.text }}</p>
 

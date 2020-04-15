@@ -1,5 +1,4 @@
 {% extends 'community/base.html' %}
-{% load cropping %}
 
 {% block center %}
   <div class="row text-left">
@@ -33,7 +32,7 @@
       {% for post in user.profile.posts %}
       <div class="card mt-3">
         <div class="card-body">
-          <img src="{% cropped_thumbnail post.user.profile 'cropping' %}" class="rounded-circle border border-dark"
+          <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark"
             width=35 height=35>
           <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
           <p class="card-text mt-2">{{ post.text }}</p>
@@ -72,7 +71,7 @@
       </style>
       <!-- TODO: Подставлять модель/ссылки для сообщества вместо пользователя -->
       <a href="/accounts/profile/{{ user.id }}/change_avatar/">
-        <img src="{% cropped_thumbnail user.profile 'cropping' %}" class="card-img-top rollover" />
+        <img src="{{ user.profile.image.url }}" class="card-img-top rollover" />
       </a>
       <div class="card-body">
         <hr class="mt-0">
