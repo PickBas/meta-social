@@ -1,5 +1,4 @@
 {% extends 'base_menu.html' %}
-{% load cropping %}
 
 {% block center %}
     <style>
@@ -104,7 +103,7 @@
         {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark"
+                    <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark"
                         width=35 height=35>
                     <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
                     <p class="card-text mt-2">{{ post.text }}</p>

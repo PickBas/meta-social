@@ -7,8 +7,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import ValidationError
 
+from PIL import Image
 from .models import Profile, Post, PostImages, Music
-from image_cropping import ImageCropWidget
 from crispy_forms.helper import FormHelper
 
 
@@ -48,22 +48,19 @@ class UserUpdateForm(forms.ModelForm):
         fields = ('first_name', 'last_name')
 
 
-class CropImageForm(forms.ModelForm):
-    """
-        Form for cropping image
-    """
+class UpdateAvatarForm(forms.ModelForm):
+    base_image = forms.ImageField(required=True)
+
     class Meta:
         model = Profile
-        fields = ('cropping', 'image')
-        widgets = {
-            'image': ImageCropWidget,
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super(CropImageForm, self).__init__(*args, **kwargs)
+        fields = ('base_image', )
 
-        # TODO: Сделать нормальный размер кропинга
-        self.fields['cropping'].widget.attrs['width'] = '100%'
+
+class CropAvatarForm(forms.Form):
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
 
 
 class PostForm(forms.ModelForm):

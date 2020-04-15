@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'meta_social_app',
     'crispy_forms',
     'django_countries',
-    'easy_thumbnails',
-    'image_cropping',
     # 'django_s3_storage',
 
     'allauth',
@@ -169,12 +167,6 @@ ACCOUNT_EMAIL_REQUIRED = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
-THUMBNAIL_PROCESSORS = (
-    'image_cropping.thumbnail_processors.crop_corners',
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
-
-IMAGE_CROPPING_THUMB_SIZE = (256, 256)
 
 DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
 

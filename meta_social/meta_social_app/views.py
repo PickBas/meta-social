@@ -18,7 +18,9 @@ from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages, Music
-from .forms import ProfileUpdateForm, UserUpdateForm, CropImageForm, PostForm, PostImageForm, UploadMusicForm
+from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, UpdateAvatarForm
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -135,57 +137,6 @@ def profile(request, user_id) -> render:
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
 
     return render(request, 'profile/profile_page.html', context)
-
-
-class ImageManage:
-    """
-    Processing images class
-    """
-
-    def __init__(self, user_id, profile, image):
-        self.file_sys = FileSystemStorage()
-        self.path = 'avatars/users/' + str(user_id) + '.'
-        self.profile = profile
-        self.image = image
-
-    def remove_old_avatar(self) -> None:
-        """
-        Removing old avatar
-        :return: None
-        """
-        if self.profile.avatar.name != 'avatars/users/0.png':
-            self.file_sys.delete(self.profile.avatar.path)
-
-    def save_avatar(self) -> None:
-        """
-        Saving new avatar
-        :return: None
-        """
-        self.file_sys.save(self.path, self.image)
-        self.profile.avatar = self.path
-        self.profile.save()
-
-    def resize_image(self) -> None:
-        """
-        Resizing image to 200x200
-        :return: None
-        """
-        self.image = Image.open(self.profile.avatar)
-        size = (200, 200)
-        self.image = self.image.resize(size, Image.ANTIALIAS)
-        self.image.save(self.profile.avatar.path)
-
-    def process_img(self) -> None:
-        """
-        Process image
-        :return: None
-        """
-        if self.image.size <= 5000000 and self.image.content_type.split('/')[0] == 'image':
-            img_extension = self.image.name.split('.')[1]
-            self.path += img_extension
-            self.remove_old_avatar()
-            self.save_avatar()
-            self.resize_image()
 
 
 class EditProfile(View):
@@ -540,29 +491,41 @@ def blacklist_remove(request, user_id):
 
 
 @login_required
-def crop_image(request, user_id):
-    """
-    Function for cropping image
-    :param request: request
-    :return: HttpResponseRedirect
-    """
-    if int(request.user.id) != int(user_id):
-        raise Http404()
-
-    image = get_object_or_404(Profile, pk=user_id) if user_id else None
-    form = CropImageForm(instance=image)
+def change_avatar(request):
+    context = get_menu_context('profile', 'Смена аватарки')
 
     if request.method == 'POST':
-        form = CropImageForm(request.POST, request.FILES, instance=image)
-        if form.is_valid():
-            image = form.save()
-            return HttpResponseRedirect(reverse('crop', args=(image.pk,)))
+        avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=request.user.profile)
+        crop_form = CropAvatarForm(request.POST)
+        if crop_form.is_valid() and avatar_form.is_valid():
+            avatar_form.save()
 
-    context = get_menu_context('profile', 'Смена аватарки')
-    context['form'] = form
-    context['image'] = image
+            x = float(request.POST.get('x'))
+            y = float(request.POST.get('y'))
+            w = float(request.POST.get('width'))
+            h = float(request.POST.get('height'))
 
-    return render(request, 'profile/crop.html', context)
+            if request.FILES.get('base_image'):
+                image = Image.open(request.FILES.get('base_image'))
+            else:
+                image = Image.open(request.user.profile.base_image)
+            cropped_image = image.crop((x, y, w + x, h + y))
+            resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+
+            io = BytesIO()
+
+            resized_image.save(io, 'JPEG', quality=60)
+
+            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()), save=False)
+            request.user.profile.save()
+    else:
+        avatar_form = UpdateAvatarForm()
+        crop_form = CropAvatarForm()
+
+    context['avatar_form'] = avatar_form
+    context['crop_form'] = crop_form
+
+    return render(request, 'profile/change_avatar.html', context)
 
 
 def upload(request):

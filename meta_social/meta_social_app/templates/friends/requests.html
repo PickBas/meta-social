@@ -1,5 +1,4 @@
 {% extends 'base_menu.html' %}
-{% load cropping %}
 
 {% block center %}
     <div class="card">
@@ -9,7 +8,7 @@
                 <ul class="list-group list-group-flush" id="incomingList">
                     {% for req in user.profile.friendship_inbox_requests %}
                         <li class="list-group-item">
-                            <img src="{% cropped_thumbnail req.from_user.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <img src="{{ req.from_user.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ req.from_user.id }}/" class="float-left ml-2">{{ req.from_user.username }}</a>
 
                             <div>
@@ -29,7 +28,7 @@
                 <ul class="list-group list-group-flush">
                     {% for req in user.profile.friendship_outbox_requests %}
                         <li class="list-group-item">
-                            <img src="{% cropped_thumbnail req.to_user.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                            <img src="{{ req.to_user.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ req.to_user.id }}/" class="float-left ml-2">{{ req.to_user.username }}</a>
                         </li>
                     {% endfor %}

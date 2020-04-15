@@ -1,10 +1,9 @@
 {% extends 'base_menu.html' %}
-{% load cropping %}
 
 {% block center %}
     <div class="card mt-3">
         <div class="card-body text-left">
-            <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+            <img src="{{ post.user.profile }}" class="rounded-circle border border-dark" width=35 height=35>
             <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
             <p class="card-text mt-2">{{ post.text }}</p>
 
@@ -27,7 +26,7 @@
             {% for comment in post.comments %}
                    <div class="card mb-2">
                        <div class="card-body">
-                        <img src="{% cropped_thumbnail comment.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
+                        <img src="{{ comment.user.profile }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
                            <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.username }}</a></p>
                             <div class="media-body">
                                 <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">{{ comment.text }}</h5>
@@ -110,7 +109,7 @@
                     li.innerHTML = `
                         <div class="card mb-2">
                            <div class="card-body">
-                            <img src="{% cropped_thumbnail user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
+                            <img src="{{ user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 640px">
                                <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px"><a href="/accounts/profile/${json['id']}/">${json['username']}</a></p>
                                 <div class="media-body">
                                         <h5 style="text-align: left; margin-inline-start: 10px; padding-top: 5px;">${json['text']}</h5>

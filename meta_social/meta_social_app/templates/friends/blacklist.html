@@ -1,7 +1,5 @@
 {% extends 'base_menu.html' %}
 
-{% load cropping %}
-
 {% block center %}
   <div class="card">
       <div class="card-body">
@@ -16,7 +14,7 @@
               <ul class="list-group list-group-flush" id="ex-friends-list">
                   {% for ex_friend in c_user.profile.blacklist.all %}
                       <li class="list-group-item">
-                          <img src="{% cropped_thumbnail ex_friend.profile "cropping" %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                          <img src="{{ ex_friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                           <a href="/accounts/profile/{{ ex_friend.id }}/" class="float-left ml-2">{{ ex_friend.username }}</a>
                           <button class="float-right btn btn-outline-secondary" onclick="removeFromBlacklist(event, '/friends/remove_blacklist/{{ ex_friend.id }}/')">&#128465;</button>
                       </li>
