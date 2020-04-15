@@ -13,7 +13,7 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile
+from .models import Profile, Like
 from PIL import Image
 from django.forms import modelformset_factory
 
@@ -231,6 +231,25 @@ class EditProfile(View):
 
         return render(request, self.template_name, context)
 
+@login_required
+def post_view(request, post_id):
+    context = {}
+    context = get_menu_context('post', 'Пост')
+    context['pagename'] = 'Пост'
+    context['post'] = Post.objects.get(id=post_id)
+
+    try:
+        userlike = Like.objects.get(user=request.user, post_id=context['post'])
+    except:
+        userlike = None
+
+    if userlike:
+        context['liked_by_user'] = True
+    else:
+        context['liked_by_user'] = False
+
+    return render(request, 'full_post.html', context)
+
 
 @login_required
 def friends_list(request, user_id) -> render:
@@ -443,20 +462,26 @@ def crop_image(request, user_id):
     return render(request, 'profile/crop.html', context)
 
 
-def like_post(request):
-    post = get_object_or_404(Post, id=request.POST.get('id'))
+@login_required
+def like_post(request, post_id):
     is_liked = False
-    if post.likes.filter(id=request.user.id).exist():
-        post.like.remove(request.user)
-        is_liked = False
-    else:
-        post.likes.add(request.user)
-        is_liked = True
-    context = {
-        'post': post,
-        'is_liked': is_liked,
-        'total_likes': post.total_likes()
-    }
-    if request.is_ajax():
-        html = render_to_string('likes.html', context, request=request)
-        return JsonResponse({'form': html})
+    if request.method == 'POST':
+        post_item = Post.objects.get(id=post_id)
+        if request.user not in [i.user for i in post_item.likes()]:
+            like_item = Like(
+                post=post_item,
+                user=request.user
+            )
+            is_liked = True
+            like_item.save()
+        else:
+            like_item = Like.objects.get(
+                post=post_item,
+                user=request.user
+            )
+            is_liked = False
+            like_item.delete()
+        data = {
+            'is_liked': is_liked,
+        }
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

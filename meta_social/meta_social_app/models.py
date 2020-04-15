@@ -148,6 +148,9 @@ class Profile(models.Model):
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
+    def likes(self):
+        return Like.objects.filter(user=self.user)
+
 
 class Post(models.Model):
     """
@@ -164,12 +167,14 @@ class Post(models.Model):
     def get_images(self):
         return PostImages.objects.filter(post=self)
 
-    def total_likes(self):
-        return self.likes.count()
+    def like(self):
+        return "/like/" + str(self.id) + '/'
 
-    def is_liked(self):
-        return self.likes.filter(id=self.request.user.id).exists()
+    def likes(self):
+        return Like.objects.filter(post=self)
 
+    def likes_count(self):
+        return len(self.likes())
 
 class PostImages(models.Model):
     """
@@ -270,3 +275,8 @@ class FriendshipRequest(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='3+')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='4+')
     already_sent = models.BooleanField(default=False)
+
+class Like(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    post = models.ForeignKey(to=Post, on_delete=models.CASCADE)

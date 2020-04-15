@@ -1,13 +1,13 @@
-{{ total_likes }}{{ total_likes|pluralize }}
-<form action='{% url "like_post" %}' method="post">
-{% csrf_token %}
-{% if is_liked %}
-    <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-like btn-danger" style="padding: 1px 10px;">
-        ♥ {{ post.likes_count }}
-    </button>
-{% else %}
-    <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-like btn-primary" style="padding: 1px 10px;">
-        ♥ {{  post.likes_count }}
-    </button>
-{% endif %}
-</form>
+<div style="padding: 1px 5px;">
+    <form method="post" action="{{ post.like }}" class="hr" style="float: left; margin: 0px;">
+        {% csrf_token %}
+
+        {% if liked_by_user %}
+        <input type="submit" value="{{ post.likes_count }}" class="btn btn-danger"
+               style="padding: 1px 5px;">
+        {% else %}
+        <input type="submit" value="{{ post.likes_count }}" class="btn btn-outline-danger"
+               style="padding: 1px 5px">
+        {% endif %}
+    </form>
+</div>
