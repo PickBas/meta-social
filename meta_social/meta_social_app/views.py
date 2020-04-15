@@ -642,7 +642,7 @@ def community_create(request):
             community.owner = request.user
             community.save()
             community.users.add(request.user)
-            request.user.communities.add(community)
+            request.user.profile.communities.add(community)
             return redirect('/community/{}/'.format(community.id))
     context['form'] = CommunityCreateForm()
     return render(request, 'community/community_create.html', context)
