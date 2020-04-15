@@ -1,6 +1,5 @@
 {% extends 'profile/base.html' %}
 {% load static %}
-{% load cropping %}
 
 {% block content %}
 <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
@@ -23,11 +22,11 @@
           }
         </style>
         {% if user == c_user %}
-          <a href="/accounts/profile/{{ c_user.id }}/change_avatar/">
-            <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top rollover"></img>
+          <a href="/accounts/profile/change_avatar/">
+            <img src="{{ c_user.profile.image.url }}" class="card-img-top rollover"></img>
           </a>
         {% else %}
-          <img src="{% cropped_thumbnail c_user.profile "cropping" %}" class="card-img-top"></img>
+          <img src="{{ c_user.profile.image.url }}" class="card-img-top"></img>
         {% endif %}
         <div class="card-body">
           {% if c_user == user %}
@@ -59,7 +58,7 @@
                     {% for friend in c_user.profile.friends %}
                   <div style="display: flex; flex-wrap: wrap;">
                         <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
-                            <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>
                           <br>
 
                             <a href="/accounts/profile/{{ friend.id }}/" class=" ml-2" >{{ friend.username }}</a>
@@ -143,7 +142,7 @@
             {% for post in c_user.profile.posts %}
               <div class="card mt-3">
                 <div class="card-body">
-                  <img src="{% cropped_thumbnail post.user.profile "cropping" %}" class="rounded-circle border border-dark" width=35 height=35>
+                  <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
                   <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
                     {% if c_user == user %}
                         <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#removingPostModal" class="float-right"><i class="fas fa-ban"></i></button>

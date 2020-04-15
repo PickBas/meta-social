@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_countries.fields import CountryField
 from django.template.defaultfilters import slugify
-from image_cropping import ImageRatioField, ImageCropField
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from django.core.files import File
@@ -34,9 +33,8 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
-    image = ImageCropField(
-        blank=True, upload_to='avatars/users', default='avatars/users/0.png')
-    cropping = ImageRatioField('image', '256x256')
+    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+    image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
 
     job = models.CharField(null=True, max_length=100)
     study = models.CharField(null=True, max_length=100)
@@ -185,6 +183,7 @@ def save_image_from_url(profile, image_url):
     img_temp.write(urlopen(image_url).read())
     img_temp.flush()
 
+    profile.base_image.save('image_{profile.id}', File(img_temp))
     profile.image.save('image_{profile.id}', File(img_temp))
 
 
