@@ -4,8 +4,6 @@ django-allauth
 Pillow
 django-simple-search
 django-countries
-easy_thumbnails
-django-image-cropping
 django-s3-storage
 
 # for postgresql
