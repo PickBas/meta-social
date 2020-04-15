@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.validators import ValidationError
 
 from PIL import Image
-from .models import Profile, Post, PostImages, Music
+from .models import Profile, Post, PostImages, Music, Community
 from crispy_forms.helper import FormHelper
 
 
@@ -102,3 +102,9 @@ class UploadMusicForm(forms.ModelForm):
     class Meta:
         model = Music
         fields = ('audio_file', 'artist', 'title', )
+
+
+class CommunityCreateForm(forms.ModelForm):
+    class Meta:
+        model = Community
+        fields = ('name', 'info', 'country', )

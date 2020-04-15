@@ -25,8 +25,14 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_remove),
 
     path('community/<int:community_id>/', community),
+    path('community/list/', community_list),
+    path('community/create/', community_create),
+    path('community/<int:community_id>/join/', community_join),
+    path('community/<int:community_id>/leave/', community_leave),
 
     path('post/create/', post_new),
+    path('post/create/<int:community_id>/', post_community_new),
+    
     path('post/<int:post_id>/', post_view),
     path('post/<int:post_id>/ajax/', post_ajax),
     path('post/<int:post_id>/remove/', post_remove),

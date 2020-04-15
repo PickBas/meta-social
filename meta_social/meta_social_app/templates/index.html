@@ -103,9 +103,9 @@
         {% for post in user.profile.get_newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
-                    <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark"
+                    <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark"
                         width=35 height=35>
-                    <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+                    <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
                     <p class="card-text mt-2">{{ post.text }}</p>
                     <div class="kollaz">
                         {% if post.get_images %}
@@ -123,12 +123,6 @@
                     <i class="far fa-heart" style="margin-right: 10px"></i>
                   <a href="/post/{{ post.id }}" class="text-muted mb-0"><i class="far fa-comment"></i></a>
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
-                    <div class="input-group mb-3 com hide" style="padding-top: 20px">
-                <input type="text" class="form-control" placeholder="Оставить комментарий" aria-label="Recipient's username" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Отправить</button>
-                </div>
-                </div>
                 </div>
                  <ul id="all_comments" style="padding-left: 0;">
         {% if post.comments %}
@@ -137,7 +131,7 @@
                        <div class="card" style="font-size: 15px; width: 100%; height: 130px; ">
                        <div class="card-body" style="">
 
-                        <img src="{{ comment.user.profile }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 630px">
+                        <img src="{{ comment.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 630px">
                            <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
                             <div class="media-body">
                                     <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">{{ comment.text }}</h5>

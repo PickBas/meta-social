@@ -1,0 +1,22 @@
+{% extends 'base_menu.html' %}
+{% load crispy_forms_tags %}
+{% block center %}
+
+<div class="card">
+    <div class="card-header">
+        Создание сообщества
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input type="submit">
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block right %}
+    {% include 'community/right_menu.html' %}
+{% endblock %}

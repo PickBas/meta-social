@@ -46,9 +46,9 @@ cursor: pointer;
 <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
     <div class="card mt-3">
         <div class="card-body text-left">
-            <span > <a href="/accounts/profile/{{ post.user.id }}/" class="close"> </a></span>
-            <img src="{{ post.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
-            <a href="/accounts/profile/{{ post.user.id }}/">{{ post.user.username }}</a>
+            <span > <a onClick="javascript:history.go(-1);" class="close"> </a></span>
+            <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+            <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
             <p class="card-text mt-2">{{ post.text }}</p>
 
             {% if post.get_images %}

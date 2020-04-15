@@ -2,7 +2,6 @@
 Modules module
 """
 
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -19,6 +18,34 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
+
+
+class Community(models.Model):
+    """
+    Community class
+    """
+    users = models.ManyToManyField(to=User, related_name='users')
+    owner = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, null=True)
+    info = models.CharField(max_length=1000, null=True)
+
+    base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
+    image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
+
+    country = CountryField(null=True)
+
+    def posts(self):
+        """
+        Get community's posts
+        """
+        return Post.objects.filter(community=self)
+
+    def amount_of_posts(self) -> int:
+        """
+        Get amount of posts
+        :return: int
+        """
+        return len(self.posts())
 
 
 class Profile(models.Model):
@@ -52,9 +79,11 @@ class Profile(models.Model):
 
     blacklist = models.ManyToManyField(User, 'blacklist')
 
+    communities = models.ManyToManyField(Community)
+
     def check_online_with_last_log(self) -> bool:
         """
-        Checking onlime status using last login/logout
+        Checking online status using last login/logout
         :param self: User
         :return: bool
         """
@@ -138,19 +167,6 @@ class Profile(models.Model):
         """
         return len(self.friends())
 
-    def communities(self):
-        """
-        Get communities
-        """
-        return Communities.objects.filter(user=self.user)
-
-    def amount_of_communities(self) -> int:
-        """
-        Get amount of communities
-        :return: int
-        """
-        return len(self.communities())
-
     def get_newsfeed(self) -> list:
         """
         Get user's news feed
@@ -159,8 +175,8 @@ class Profile(models.Model):
         posts = []
         for friend in self.friends():
             posts += list(friend.profile.posts())
-        for com in self.communities():
-            posts += com.posts()
+        for community in self.communities.all():
+            posts += community.posts()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
@@ -218,7 +234,8 @@ class Post(models.Model):
     """
     Post class
     """
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='Создатель')
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
+    community = models.ForeignKey(to=Community, on_delete=models.CASCADE, null=True)
     text = models.TextField()
     date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
 
@@ -228,6 +245,19 @@ class Post(models.Model):
 
     def __str__(self):
         return self.text
+
+    def get_owner(self):
+        return self.community if self.community else self.user.profile
+
+    def get_owner_name(self):
+        if self.community:
+            return self.community.name
+        return self.user.username
+
+    def get_link(self):
+        if self.community:
+            return '/community/' + str(self.community.id) + '/'
+        return '/accounts/profile/' + str(self.user.id) + '/'
 
     def get_images(self):
         return PostImages.objects.filter(post=self)
@@ -263,69 +293,6 @@ class PostImages(models.Model):
         self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
-
-
-class Communities(models.Model):
-    """
-    Communities class
-    """
-    community = models.OneToOneField(
-        to=User, on_delete=models.CASCADE, related_name='user_community')
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-
-
-class Community(models.Model):
-    """
-    Community class
-    """
-    community = models.OneToOneField(to=User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    info = models.CharField(max_length=1000)
-
-    # TODO: find default icon for communities
-    avatar = models.ImageField(upload_to='avatars/communities',
-                               null=True, blank=True, default='avatars/users/0.png')
-
-    def participants(self) -> list:
-        """
-        Get participants
-        :return: list
-        """
-        users = []
-        for com in Profile.communities():
-            if self.community == com:
-                users += Profile.user
-        return users
-
-    def amount_of_participants(self) -> int:
-        """
-        Get amount of participants
-        :return: int
-        """
-        return len(self.participants())
-
-    def posts(self):
-        """
-        Get community's posts
-        """
-        return Post.objects.filter(user=self.community)
-
-    def amount_of_posts(self) -> int:
-        """
-        Get amount of posts
-        :return: int
-        """
-        return len(self.posts())
-
-
-class Participants(models.Model):
-    """
-    Participants class
-    """
-    user = models.OneToOneField(
-        to=User, on_delete=models.CASCADE, related_name='user_in_community')
-    community = models.OneToOneField(
-        to=User, on_delete=models.CASCADE, related_name='community_of_user')
 
 
 class Friend(models.Model):

@@ -14,12 +14,12 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment, Messages
+from .models import Profile, Comment, Messages, Community
 from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages, Music
-from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, UpdateAvatarForm
+from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, UpdateAvatarForm, CommunityCreateForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -80,6 +80,7 @@ def index(request) -> render:
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+    context['action_type'] = '/post/create/'
 
     return render(request, 'index.html', context)
 
@@ -136,6 +137,8 @@ def profile(request, user_id) -> render:
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+    context['action_type'] = '/post/create/'
 
     return render(request, 'profile/profile_page.html', context)
 
@@ -370,6 +373,32 @@ def post_edit(request, post_id) -> HttpResponseRedirect:
 
 
 @login_required
+def post_new(request):
+    """
+    Function for creating post
+    :param request: request
+    :return: HttpResponseRedirect
+    """
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    if request.method == "POST":
+        postForm = PostForm(request.POST)
+        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+        if postForm.is_valid() and formset.is_valid():
+            post_form = postForm.save(commit=False)
+            post_form.user = request.user
+            post_form.save()
+
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    photo = PostImages(post=post_form, image=image)
+                    photo.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+@login_required
 def send_friendship_request(request, user_id) -> redirect:
     """
     Sending friendship request view
@@ -533,11 +562,14 @@ def change_avatar(request):
 def community(request, community_id):
     context = get_menu_context('community', 'Сообщество')
 
-    PostImageFormSet = modelformset_factory(
-        PostImages, form=PostImageForm, extra=10)
+    context['community'] = get_object_or_404(Community, id=community_id)
+
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+    context['action_type'] = '/post/create/{}/'.format(community_id)
 
     return render(request, 'community/community_page.html', context)
 
@@ -597,3 +629,75 @@ def send_message(request, user_id):
         json_response = json.dumps({'sender': mes.from_user.username})
         return HttpResponse(json_response, content_type='application/json')
     raise Http404()
+
+
+@login_required
+def community_create(request):
+    context = get_menu_context('community', 'Создание сообщества')
+
+    if request.method == 'POST':
+        form = CommunityCreateForm(request.POST)
+        if form.is_valid():
+            community = form.save(commit=False)
+            community.owner = request.user
+            community.save()
+            community.users.add(request.user)
+            request.user.communities.add(community)
+            return redirect('/community/{}/'.format(community.id))
+    context['form'] = CommunityCreateForm()
+    return render(request, 'community/community_create.html', context)
+
+
+@login_required
+def community_list(request):
+    context = get_menu_context('community', 'Список сообществ')
+
+    return render(request, 'community/community_list.html', context)
+
+
+@login_required
+def community_join(request, community_id):
+    community = get_object_or_404(Community, id=community_id)
+    if request.user not in community.users.all():
+        community.users.add(request.user)
+        request.user.profile.communities.add(community)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def community_leave(request, community_id):
+    community = get_object_or_404(Community, id=community_id)
+    if request.user in community.users.all():
+        community.users.remove(request.user)
+        request.user.profile.communities.remove(community)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def post_community_new(request, community_id):
+    """
+    Function for creating post
+    :param request: request
+    :return: HttpResponseRedirect
+    """
+
+    community = get_object_or_404(Community, id=community_id)
+
+    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+    if request.method == "POST":
+        postForm = PostForm(request.POST)
+        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+        if postForm.is_valid() and formset.is_valid():
+            post_form = postForm.save(commit=False)
+            post_form.community = community
+            post_form.save()
+
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    photo = PostImages(post=post_form, image=image)
+                    photo.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
