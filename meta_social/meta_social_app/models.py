@@ -218,9 +218,13 @@ class Post(models.Model):
     """
     Post class
     """
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='Создатель')
     text = models.TextField()
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
+
+    class Meta:
+        verbose_name = 'Посты'
+        verbose_name_plural = 'Посты'
 
     def __str__(self):
         return self.text
@@ -345,11 +349,15 @@ class FriendshipRequest(models.Model):
 
 
 class Comment(models.Model):
-    date = models.DateTimeField(auto_now=True)
-    text = models.CharField(max_length=500)
+    date = models.DateTimeField(auto_now=True, verbose_name='Дата')
+    text = models.CharField(max_length=500, verbose_name='Текст')
 
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарий'
 
 
 class Music(models.Model):
@@ -357,8 +365,12 @@ class Music(models.Model):
 
     audio_file = models.FileField(upload_to='music')
 
-    artist = models.CharField(default='Автор', max_length=100)
-    title = models.CharField(default='Название', max_length=100)
+    artist = models.CharField(default='Автор', max_length=100, verbose_name='Автор')
+    title = models.CharField(default='Название', max_length=100, verbose_name='Название')
+
+    class Meta:
+        verbose_name = 'Музыка'
+        verbose_name_plural = 'Музыка'
 
 
 class Messages(models.Model):
@@ -366,3 +378,7 @@ class Messages(models.Model):
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+", null=True)
     message = models.CharField(max_length=250, null=True)
     date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Сообщения'
+        verbose_name_plural = 'Сообщения'
