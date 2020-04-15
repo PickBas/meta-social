@@ -5,7 +5,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import django_countries.fields
-import image_cropping.fields
 
 
 class Migration(migrations.Migration):
