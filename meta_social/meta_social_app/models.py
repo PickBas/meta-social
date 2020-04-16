@@ -340,12 +340,11 @@ class Music(models.Model):
         verbose_name_plural = 'Музыка'
 
 
-class Messages(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+", null=True)
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+", null=True)
-    message = models.CharField(max_length=250, null=True)
+class Message(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
+    message = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name = 'Сообщения'
-        verbose_name_plural = 'Сообщения'
+    def __str__(self):
+        return self.author.username
+

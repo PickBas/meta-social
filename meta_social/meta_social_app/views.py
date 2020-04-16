@@ -15,7 +15,7 @@ from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment, Messages, Community
+from .models import Profile, Comment, Message, Community
 from PIL import Image
 from django.forms import modelformset_factory
 
