@@ -42,8 +42,7 @@ urlpatterns = [
     path('music/upload/', music_upload),
 
     path('chat/', chat),
-    path('chat/go_to_chat/<int:user_id>/', show_messages),
-    path('chat/go_to_chat/<int:user_id>/send_mes/', send_message),
+    path('chat/go_to_chat/<int:room_id>/', room),
 ]
 
 if settings.DEBUG:

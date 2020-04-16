@@ -10,6 +10,7 @@ from django.core.files.storage import FileSystemStorage
 from django.http import Http404, HttpResponse, JsonResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
+from django.utils.safestring import mark_safe
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
@@ -608,27 +609,10 @@ def chat(request):
     return render(request, 'chat/chat.html', context)
 
 
-@login_required
-def show_messages(request, user_id):
-    context = {'c_user': User.objects.get(id=request.user.id), 'send_id': user_id}
-
-    mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
-    mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
-    merged_lists = chain(mes1, mes2)
-    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
-    context['mes'] = sorted_lists
-
-    return render(request, 'chat/message.html', context)
-
-
-@login_required
-def send_message(request, user_id):
-    if request.method == 'POST':
-        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=request.POST.get('text'))
-        mes.save()
-        json_response = json.dumps({'sender': mes.from_user.username})
-        return HttpResponse(json_response, content_type='application/json')
-    raise Http404()
+def room(request, room_id):
+    return render(request, 'chat/message.html', {
+        'room_name': mark_safe(json.dumps(room_id))
+    })
 
 
 @login_required

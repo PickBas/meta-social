@@ -1,59 +1,49 @@
 {% extends 'base_menu.html' %}
 {% block center %}
 
-<div class="card">
-        <div class="card-body">
-            <h5>Ваши чаты</h5>
-        <ul id="all-messages">
-            {% if mes %}
-                {% for item in mes %}
-                    <li class="list-group-item">
-                        сообщение от {{ item.from_user }}
-                        <hr>
-                        {{ item.message }}
-                    </li>
-                {% endfor %}
-            {% endif %}
-        </ul>
-            <textarea id="message-text"></textarea>
-            <button class="btn btn-primary" type="submit" onclick="send_mess(event, '/chat/go_to_chat/{{ send_id }}/send_mes/')">Отправка сообщений</button>
-
-        </div>
+    <div class="card">
+        <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+        <input id="chat-message-input" type="text" size="100"><br>
+        <input id="chat-message-submit" type="button" value="Send">
+        {{ room_name|json_script:"room-name" }}
     </div>
-
-
-
-{% endblock %}
-{% block extra__js %}
     <script>
-    function send_mess(e, link){
-        let textar = document.getElementById("message-text");
-        $.ajax({
-            type: "POST",
-            url: link,
-            data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                text: textar.value
-            },
-            success: function (result) {
-                const li = document.createElement("div");
-                li.innerHTML = `
-                    <li class="list-group-item">
-                        сообщение от ${result['sender']}
-                        <hr>
-                        ${textar.value}
-                    </li>
-                `
-                document.getElementById('all-messages').appendChild(li);
-                textar.value = "";
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '\n');
+
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
             }
-        })
-    }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
     </script>
 
-
-
-
-
-
 {% endblock %}
+

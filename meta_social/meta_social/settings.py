@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_countries',
     # 'django_s3_storage',
-
+    'channels',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -88,20 +88,30 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 4
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
+ASGI_APPLICATION = 'meta_social.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'DB',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
-    },
-    'old_sqlite3': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'DB',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'postgres',
+    #     'HOST': 'db',
+    #     'PORT': '5432',
+    # },
+    # 'old_sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
