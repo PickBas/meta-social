@@ -290,7 +290,8 @@ class PostImages(models.Model):
         img.save(output, format='JPEG', quality=100)
         output.seek(0)
 
-        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
+        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
+                                          'image/jpeg', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
 
@@ -348,3 +349,11 @@ class Message(models.Model):
     def __str__(self):
         return self.author.username
 
+
+class Chat(models.Model):
+    participants = models.ManyToManyField(
+        Profile, related_name='chats', blank=True)
+    messages = models.ManyToManyField(Message, blank=True)
+
+    def __str__(self):
+        return "{}".format(self.pk)
