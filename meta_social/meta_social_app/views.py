@@ -20,7 +20,8 @@ from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Friend, Post, FriendshipRequest, PostImages, Music
-from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, UpdateAvatarForm, CommunityCreateForm
+from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
+    UpdateAvatarForm, CommunityCreateForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -399,6 +400,7 @@ def post_new(request):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
 @login_required
 def send_friendship_request(request, user_id) -> redirect:
     """
@@ -547,7 +549,8 @@ def change_avatar(request):
 
             resized_image.save(io, 'JPEG', quality=60)
 
-            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()), save=False)
+            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                                            save=False)
             request.user.profile.save()
     else:
         avatar_form = UpdateAvatarForm()
@@ -603,10 +606,34 @@ def music_upload(request):
 
 
 @login_required
-def chat(request):
-    context = {'c_user': User.objects.get(id=request.user.id)}
+def chat(request, user_id):
+    context = {}
+
+    c_user = User.objects.get(id=user_id)
+    context['c_user'] = c_user
 
     return render(request, 'chat/chat.html', context)
+
+
+@login_required
+def chat_move(request, user_id, friend_id):
+    c_user = User.objects.get(id=user_id)
+    c_friend = User.objects.get(id=friend_id)
+    if request.method == "POST":
+        for c_user_chat in c_user.profile.chats.all():
+            if c_user_chat in c_friend.profile.chats.all():
+                ex_chat = Chat.objects.get(id=c_user_chat.id)
+                return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
+
+        new_chat = Chat.objects.create(
+            first_user=c_user,
+            second_user=c_friend
+        )
+
+        new_chat.save()
+        c_user.profile.chats.add(new_chat)
+        c_friend.profile.chats.add(new_chat)
+        return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
 
 def room(request, room_id):

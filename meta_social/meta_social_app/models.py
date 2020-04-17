@@ -48,6 +48,24 @@ class Community(models.Model):
         return len(self.posts())
 
 
+class Message(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
+    message = models.TextField(null=True)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.author.username
+
+
+class Chat(models.Model):
+    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_part', blank=True, null=True)
+    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_part', blank=True, null=True)
+    messages = models.ManyToManyField(Message, blank=True)
+
+    def __str__(self):
+        return "{}".format(self.pk)
+
+
 class Profile(models.Model):
     """
     User profile class
@@ -80,6 +98,8 @@ class Profile(models.Model):
     blacklist = models.ManyToManyField(User, 'blacklist')
 
     communities = models.ManyToManyField(Community)
+
+    chats = models.ManyToManyField(Chat)
 
     def check_online_with_last_log(self) -> bool:
         """
@@ -339,21 +359,3 @@ class Music(models.Model):
     class Meta:
         verbose_name = 'Музыка'
         verbose_name_plural = 'Музыка'
-
-
-class Message(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
-    message = models.TextField(null=True)
-    date = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.author.username
-
-
-class Chat(models.Model):
-    participants = models.ManyToManyField(
-        Profile, related_name='chats', blank=True)
-    messages = models.ManyToManyField(Message, blank=True)
-
-    def __str__(self):
-        return "{}".format(self.pk)

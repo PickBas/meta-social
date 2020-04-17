@@ -41,7 +41,8 @@ urlpatterns = [
     path('music/<int:user_id>/', music_list),
     path('music/upload/', music_upload),
 
-    path('chat/', chat),
+    path('chats/<int:user_id>/', chat),
+    path('chats/<int:user_id>/<int:friend_id>/', chat_move),
     path('chat/go_to_chat/<int:room_id>/', room),
 ]
 

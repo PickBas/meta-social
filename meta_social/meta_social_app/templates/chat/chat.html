@@ -2,25 +2,30 @@
 {% block center %}
 
 <div class="card">
+        <div class="card">
         <div class="card-body">
-
+            {% if user == c_user %}
                 <h5>Ваши чаты</h5>
-
-            {% if c_user.profile.friends %}
-                <ul class="list-group list-group-flush">
-                    {% for friend in c_user.profile.friends %}
-                        <li class="list-group-item">
-                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                            <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
-                            <form method="POST" action="/chat/go_to_chat/{{ friend.id }}/">
-                                {% csrf_token %}
-                                <input class="float-right btn btn-outline-secondary" type="submit" value="&#x04572;">
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                Друзей для чата нет(
+                <hr>
+                {% if c_user.profile.friends %}
+                    <ul class="list-group list-group-flush" id="friend-list">
+                        {% for friend in c_user.profile.friends %}
+                            <li class="list-group-item">
+                                <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                                <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
+                                <div>
+                                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
+                                        {% csrf_token %}
+                                        <input class="float-right btn btn-outline-secondary" type="submit" value="text">
+                                     </form>
+                                </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Список друзей пуст.
+                {% endif %}
             {% endif %}
         </div>
     </div>
