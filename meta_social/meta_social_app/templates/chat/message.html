@@ -21,12 +21,14 @@
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
 
-            if(data.messages.length > 1) {
-                for (let i = 0; i < data.messages.length; ++i) {
-                    document.querySelector('#chat-log').value += (data.messages[i].author + ": " + data.messages[i].message + '\n');
+            if (data.messages.message !== undefined || data.messages[0].message !== undefined){
+                if (data.messages.length > 1) {
+                    for (let i = 0; i < data.messages.length; ++i) {
+                        document.querySelector('#chat-log').value += (data.messages[i].author + ": " + data.messages[i].message + '\n');
+                    }
+                } else {
+                    document.querySelector('#chat-log').value += (data.messages.author + ": " + data.messages.message + '\n');
                 }
-            } else {
-                document.querySelector('#chat-log').value += (data.messages.author + ": " + data.messages.message + '\n');
             }
         };
 
