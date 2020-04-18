@@ -5,6 +5,8 @@ Pillow
 django-simple-search
 django-countries
 django-s3-storage
+django-channels
+channels_redis
 
 # for postgresql
 gunicorn==20.0.4
