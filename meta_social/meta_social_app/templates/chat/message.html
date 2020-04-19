@@ -2,7 +2,7 @@
 {% block center %}
 
     <div class="card">
-        <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+        <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br>
         <input id="chat-message-input" type="text" size="100"><br>
         <input id="chat-message-submit" type="button" value="Send">
         {{ room_name|json_script:"room-name" }}
@@ -18,16 +18,20 @@
             + '/'
         );
 
+        function showMessages(message, author) {
+            document.querySelector('#chat-log').value += (author + ": " + message + '\n');
+        }
+
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
 
             if (data.messages.message !== undefined || data.messages[0].message !== undefined){
                 if (data.messages.length > 1) {
                     for (let i = 0; i < data.messages.length; ++i) {
-                        document.querySelector('#chat-log').value += (data.messages[i].author + ": " + data.messages[i].message + '\n');
+                            showMessages(data.messages[i].message, data.messages[i].author);
                     }
                 } else {
-                    document.querySelector('#chat-log').value += (data.messages.author + ": " + data.messages.message + '\n');
+                    showMessages(data.messages.message, data.messages.author);
                 }
             }
         };
