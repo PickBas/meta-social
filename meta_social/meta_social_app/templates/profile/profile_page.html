@@ -49,13 +49,11 @@
 
           {% if c_user.profile.friends %}
                 <ul class="list-group list-group-flush">
-                    {% for friend in c_user.profile.friends %}
+                    {% for friend in c_user.profile.friends%}
                   <div style="display: flex; flex-wrap: wrap;">
-                        <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
-                            <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>
+                        <li class="list-group-item" style="padding-left: 10px; padding-right: 10px;">
+                           <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.username }}" class=" ml-2" > <img src="{% cropped_thumbnail friend.profile "cropping" %}" class="rounded-circle border border-dark " style="margin-left: -10px" width=35 height=35></a>
                           <br>
-
-                            <a href="/accounts/profile/{{ friend.id }}/" class=" ml-2" >{{ friend.username }}</a>
                         </li>
                     {% endfor %}
                     </div>
