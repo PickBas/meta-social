@@ -602,36 +602,6 @@ def music_upload(request):
 
 
 @login_required
-def chat(request):
-    context = {'c_user': User.objects.get(id=request.user.id)}
-
-    return render(request, 'chat/chat.html', context)
-
-
-@login_required
-def show_messages(request, user_id):
-    context = {'c_user': User.objects.get(id=request.user.id), 'send_id': user_id}
-
-    mes1 = Messages.objects.filter(to_user=User.objects.get(id=user_id), from_user=request.user)
-    mes2 = Messages.objects.filter(from_user=User.objects.get(id=user_id), to_user=request.user)
-    merged_lists = chain(mes1, mes2)
-    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
-    context['mes'] = sorted_lists
-
-    return render(request, 'chat/message.html', context)
-
-
-@login_required
-def send_message(request, user_id):
-    if request.method == 'POST':
-        mes = Messages(from_user=request.user, to_user=User.objects.get(id=user_id), message=request.POST.get('text'))
-        mes.save()
-        json_response = json.dumps({'sender': mes.from_user.username})
-        return HttpResponse(json_response, content_type='application/json')
-    raise Http404()
-
-
-@login_required
 def community_create(request):
     context = get_menu_context('community', 'Создание сообщества')
 
@@ -701,3 +671,49 @@ def post_community_new(request, community_id):
                     photo.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def get_messages_list(from_user, to_user):
+    mes1 = Messages.objects.filter(to_user=from_user, from_user=to_user)
+    mes2 = Messages.objects.filter(from_user=from_user, to_user=to_user)
+    merged_lists = chain(mes1, mes2)
+    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
+
+    return sorted_lists
+
+
+@login_required
+def show_chat(request):
+    context = get_menu_context('messages', 'Сообщения')
+
+    context['first_user'] = request.user.profile.friends()[0] if request.user.profile.friends() else None
+    
+    if context['first_user']:
+        context['messages_list'] = get_messages_list(context['first_user'], request.user)
+    
+    return render(request, 'messages/test.html', context)
+
+
+@login_required
+def send_message(request, user_id):
+    to_user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST' and request.POST.get('text'):
+        mes = Messages(from_user=request.user, to_user=to_user, message=request.POST.get('text'))
+        mes.save()
+
+        messages = get_messages_list(to_user, request.user)
+
+        return render(request, 'messages/messages_list.html', {'messages_list': messages})
+    raise Http404()
+
+
+@login_required
+def get_messages(request, user_id):
+    to_user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        messages = get_messages_list(to_user, request.user)
+
+        return render(request, 'messages/messages_list.html', {'messages_list': messages})
+    raise Http404()

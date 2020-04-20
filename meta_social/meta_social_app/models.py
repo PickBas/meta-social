@@ -81,6 +81,13 @@ class Profile(models.Model):
 
     communities = models.ManyToManyField(Community)
 
+    def get_name(self):
+        if self.user.first_name:
+            if self.user.last_name:
+                return '{} {}'.format(self.user.first_name, self.user.last_name)
+            return self.user.first_name
+        return self.user.username
+
     def check_online_with_last_log(self) -> bool:
         """
         Checking online status using last login/logout
@@ -115,6 +122,11 @@ class Profile(models.Model):
                 return False
             return True
         return False
+
+    def get_status(self):
+        if self.check_online_with_afk():
+            return 'Онлайн'
+        return 'Оффлайн'
 
     def get_social_accounts(self) -> list:
         """

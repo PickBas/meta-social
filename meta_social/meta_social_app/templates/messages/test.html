@@ -1,0 +1,106 @@
+{% extends 'messages/base.html' %}
+
+{% block center %}
+    <div class="card" style="height: 750px">
+        {% if first_user %}
+            <div class="card-header bg-white">
+                <div class="row">
+                    <div class="col-5 text-right pr-0">
+                        <img src="{{ first_user.profile.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
+                    </div>
+                    <div class="col-7 text-left pl-2">
+                        <a href="/accounts/profile/{{ first_user.id }}/" id="chat_name">{{ first_user.profile.get_name }}</a>
+                        <br>
+                        <small class="text-muted" id="chat_status">{{ first_user.profile.get_status }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body text-center">
+                <div style="display: flex; flex-direction: column; flex-wrap: nowrap; overflow-y: scroll; overflow-x: hidden;" id="messages_list" class="h-100">
+                    {% include 'messages/messages_list.html' %}
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="input-group">
+                    <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="message-input"></textarea>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" onclick="sendMessage(event, '/messages/{{ first_user.id }}/send_mes/')" id='send_btn'>
+                            <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card-body">
+                Неизвестная пустота
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+
+    <script>
+        autosize(document.getElementById('message-input'))
+
+        function sendMessage(e, link) {
+            let text_area = document.getElementById('message-input')
+            $.ajax({
+                type: "POST",
+                url: link,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    text: text_area.value
+                },
+                success: function (result) {
+                    text_area.value = ""
+                    document.getElementById('messages_list').innerHTML = result
+                }
+            })
+        }
+    </script>
+{% endblock %}
+
+{% block right %}
+
+    <div class="card" style="max-height: 325px;">
+        <div class="card-body text-left">
+            <p>Друзья:</p>
+            {% if user.profile.friends %}
+                {% for friend in user.profile.friends %}
+                    <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+                    <a onclick="changeUser(event, '/messages/{{ friend.id }}/', '{{ friend.profile.image.url }}', '{{ friend.profile.get_status }}')"
+                       href="javascript:void(0)">
+                        {{ friend.profile.get_name }}
+                    </a>
+                    {% if not forloop.last %}<hr>{% endif %}
+                {% endfor %}
+            {% else %}
+                Нет друзей для чата
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function changeUser(e, link, img, status) {
+            $.ajax({
+                type: "POST",
+                url: link + 'get_mes/',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (result) {
+                    document.getElementById('messages_list').innerHTML = result
+
+                    document.getElementById('chat_avatar').src = img
+                    document.getElementById('chat_name').innerHTML = e.target.innerHTML
+                    document.getElementById('chat_status').innerHTML = status
+                    document.getElementById('send_btn').onclick = function (event) {
+                        sendMessage(event, link + 'send_mes/')
+                    }
+
+                    console.log(document.getElementById('send_btn'))
+                }
+            })
+        }
+    </script>
+{% endblock %}
