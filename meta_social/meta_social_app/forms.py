@@ -10,6 +10,7 @@ from django.core.validators import ValidationError
 from PIL import Image
 from .models import Profile, Post, PostImages, Music, Community
 from crispy_forms.helper import FormHelper
+from django_countries.fields import CountryField
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -104,7 +105,7 @@ class UploadMusicForm(forms.ModelForm):
         fields = ('audio_file', 'artist', 'title', )
 
 
-class CommunityCreateForm(forms.ModelForm):
-    class Meta:
-        model = Community
-        fields = ('name', 'info', 'country', )
+class CommunityCreateForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    info = forms.CharField(max_length=1000)
+    country = CountryField().formfield()

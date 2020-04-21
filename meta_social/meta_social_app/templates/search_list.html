@@ -1,9 +1,10 @@
 {% if users or communities or music %}
-    <ul class="list-group list-group-flush">
+    <ul class="list-group list-group-flush ml-1" style="max-height: 570px; overflow-y: scroll;">
         {% if users %}
             <li class="list-group-item">Друзья:</li>
             {% for match in users %}
                 <li class="list-group-item">
+                    <img src="{{ match.profile.image.url }}" class="rounded-circle" width="20" height="20">
                     <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
                 </li>
             {% endfor %}
@@ -13,6 +14,7 @@
             <li class="list-group-item">Сообщества:</li>
             {% for match in communities %}
                 <li class="list-group-item">
+                    <img src="{{ match.image.url }}" class="rounded-circle" width="20" height="20">
                     <a href="/community/{{ match.id }}/">{{ match.name }}</a>
                 </li>
             {% endfor %}
@@ -22,11 +24,12 @@
             <li class="list-group-item">Музыка:</li>
             {% for match in music %}
                 <li class="list-group-item">
-                    <p>{{ match.artist }} - {{ match.title }}</p>
+                    <img src="https://image.flaticon.com/icons/svg/651/651717.svg" class="rounded-circle" width="20" height="20">
+                    <span>{{ match.artist }} - {{ match.title }}</span>
                 </li>
             {% endfor %}
         {% endif %}
     </ul>
 {% else %}
-    <p class="mb-0">Ничего не найдено</p>
+    <p class="mb-0 ml-1">Ничего не найдено</p>
 {% endif %}

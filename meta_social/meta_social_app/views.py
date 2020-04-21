@@ -244,76 +244,6 @@ def post_ajax(request, post_id):
 
 
 @login_required
-def friends_list(request, user_id) -> render:
-    """
-    Friend_list view
-    :param request: request
-    :param user_id: id
-    :return: render
-    """
-    context = get_menu_context('friends', 'Список друзей')
-    context['c_user'] = User.objects.get(id=user_id)
-    get_last_act(request, context['c_user'])
-
-    return render(request, 'friends/friends_list.html', context)
-
-
-@login_required
-def friends_search(request) -> render:
-    """
-    Friends_search view
-    :param request: request
-    :return: render
-    """
-    context = get_menu_context('friends', 'Поиск друзей')
-    if request.method == 'POST':
-        if request.POST.get('name'):
-            query = request.POST.get('name')
-            search_fields = ['username', 'first_name', 'last_name']
-
-            matches = User.objects.filter(search_filter(
-                search_fields, query)).exclude(id=request.user.id)
-            context['matches'] = matches
-            inbox = [
-                i.from_user for i in request.user.profile.friendship_inbox_requests()]
-            for match in matches:
-                context['is_in_requests'] = True if match in inbox else False
-                context['is_in_blacklist'] = True if request.user in match.profile.blacklist.all(
-                ) else False
-
-    return render(request, 'friends/search.html', context)
-
-
-@login_required
-def friends_requests(request) -> render:
-    """
-    Friends_requests view
-    :param request: request
-    :return: render
-    """
-    print(i.to_user for i in request.user.profile.friendship_inbox_requests())
-    context = get_menu_context('friends', 'Заявки в друзья')
-    context['pagename'] = 'Заявки в друзья'
-    return render(request, 'friends/requests.html', context)
-
-
-@login_required
-def friends_blacklist(request, user_id) -> render:
-    """
-    Friends_blacklist view
-    :param user_id: user in blacklist od
-    :param request: request
-    :return: render
-    """
-    context = get_menu_context('friends', 'Черный список')
-    c_user = User.objects.get(id=user_id)
-    context['c_user'] = c_user
-    # for i in c_user.profile.blacklist.all():
-    #     print(i.username)
-    return render(request, 'friends/blacklist.html', context)
-
-
-@login_required
 def post_new(request):
     """
     Function for creating post
@@ -370,154 +300,6 @@ def post_edit(request, post_id) -> HttpResponseRedirect:
         post_to_edit.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def post_new(request):
-    """
-    Function for creating post
-    :param request: request
-    :return: HttpResponseRedirect
-    """
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
-
-    if request.method == "POST":
-        postForm = PostForm(request.POST)
-        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
-
-        if postForm.is_valid() and formset.is_valid():
-            post_form = postForm.save(commit=False)
-            post_form.user = request.user
-            post_form.save()
-
-            for form in formset.cleaned_data:
-                if form:
-                    image = form['image']
-                    photo = PostImages(post=post_form, image=image)
-                    photo.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-@login_required
-def send_friendship_request(request, user_id) -> redirect:
-    """
-    Sending friendship request view
-    :param request: request
-    :param user_id: id
-    :return: redirect
-    """
-
-    users_item = User.objects.get(id=user_id)
-
-    if request.method == 'POST':
-        if not [i.from_user for i in users_item.profile.friendship_inbox_requests()]:
-            item = FriendshipRequest(
-                from_user=request.user,
-                to_user=User.objects.get(id=user_id),
-            )
-
-            item.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def accept_request(request, user_id) -> redirect:
-    """
-    Accept_request view
-    :param request: request
-    :param request_id: id
-    :return: redirect
-    """
-    if request.method == 'POST':
-        if not User.objects.filter(id=user_id).exists:
-            raise Http404()
-
-        user_item = User.objects.get(id=user_id)
-
-        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=user_item, to_user=request.user)
-        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=request.user, to_user=user_item)
-        else:
-            raise Http404()
-
-        friends_item = Friend(
-            from_user=request_item.from_user,
-            to_user=request_item.to_user,
-        )
-        friends_item.save()
-        request_item.delete()
-
-        return HttpResponse('Success')
-
-    raise Http404()
-
-
-@login_required
-def remove_friend(request, user_id) -> redirect:
-    """
-    Remove_friend view
-    :param request: request
-    :param user_id: id
-    :return: redirect
-    """
-    if request.method == 'POST':
-        if not User.objects.filter(id=user_id).exists():
-            raise Http404()
-
-        user_item = User.objects.get(id=user_id)
-
-        if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
-            Friend.objects.get(from_user=user_item,
-                               to_user=request.user).delete()
-        elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
-            Friend.objects.get(from_user=request.user,
-                               to_user=user_item).delete()
-        else:
-            raise Http404()
-
-        return HttpResponse('Success')
-
-    raise Http404()
-
-
-@login_required
-def blacklist_add(request, user_id):
-    """
-    Blacklist_add view
-    :param request: request
-    :param user_id: id
-    """
-
-    if request.method == 'POST':
-        remove_friend(request, user_id)
-        main_user = User.objects.get(id=request.user.id)
-        user_for_blacklist = User.objects.get(id=user_id)
-        main_user.profile.blacklist.add(user_for_blacklist)
-        main_user.save()
-
-        return HttpResponse('Success')
-
-    raise Http404()
-
-
-@login_required
-def blacklist_remove(request, user_id):
-    """
-    Blacklist_remove view
-    :param request: request
-    :param user_id: id
-    """
-    if request.method == 'POST':
-        user_to_remove = User.objects.get(id=user_id)
-        request.user.profile.blacklist.remove(user_to_remove)
-
-        return HttpResponse('Success')
-
-    raise Http404()
 
 
 @login_required
@@ -638,8 +420,12 @@ def community_create(request):
     if request.method == 'POST':
         form = CommunityCreateForm(request.POST)
         if form.is_valid():
-            community = form.save(commit=False)
-            community.owner = request.user
+            community = Community(
+                name=request.POST.get('name'),
+                info=request.POST.get('info'),
+                country=request.POST.get('country'),
+                owner=request.user
+            )
             community.save()
             community.users.add(request.user)
             request.user.profile.communities.add(community)
@@ -719,4 +505,210 @@ def global_search(request):
         context['communities'] = Community.objects.filter(search_filter(search_fields, query))
 
         return render(request, 'search_list.html', context)
+    raise Http404()
+
+
+def get_render(request, context):
+    if not request.POST.get('query'):
+        return render(request, 'friends/list.html', context)
+
+    query = request.POST.get('query')
+    search_fields = ['username', 'first_name', 'last_name']
+
+    context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+
+    return render(request, 'friends/list.html', context)
+    
+
+@login_required
+def friends_list(request, user_id) -> render:
+    """
+    Friend_list view
+    :param request: request
+    :param user_id: id
+    :return: render
+    """
+    context = get_menu_context('friends', 'Список друзей')
+
+    context['c_user'] = User.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        return get_render(request, context)
+
+    return render(request, 'friends/friends_list.html', context)
+
+
+@login_required
+def friends_requests(request) -> render:
+    """
+    Friends_requests view
+    :param request: request
+    :return: render
+    """
+    context = get_menu_context('friends', 'Заявки в друзья')
+
+    context['c_user'] = request.user
+    context['friendship'] = {
+        'incoming': request.user.profile.friendship_inbox_requests(),
+        'outcoming': request.user.profile.friendship_outbox_requests(),
+    }
+
+    return render(request, 'friends/requests.html', context)
+
+
+@login_required
+def friends_blacklist(request, user_id) -> render:
+    """
+    Friends_blacklist view
+    :param user_id: user in blacklist od
+    :param request: request
+    :return: render
+    """
+    context = get_menu_context('friends', 'Черный список')
+
+    c_user = get_object_or_404(User, id=user_id)
+    context['c_user'] = c_user
+
+    return render(request, 'friends/blacklist.html', context)
+
+
+@login_required
+def send_friendship_request(request, user_id) -> redirect:
+    """
+    Sending friendship request view
+    :param request: request
+    :param user_id: id
+    :return: redirect
+    """
+
+    user_item = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        if not [i.from_user for i in user_item.profile.friendship_inbox_requests()]:
+            item = FriendshipRequest(
+                from_user=request.user,
+                to_user=user_item,
+            )
+
+            item.save()
+
+            return get_render(request, {'c_user': request.user})
+
+    raise Http404()
+
+
+@login_required
+def accept_request(request, user_id) -> redirect:
+    """
+    Accept_request view
+    :param request: request
+    :param request_id: id
+    :return: redirect
+    """
+    if request.method == 'POST':
+        user_item = get_object_or_404(User, id=user_id)
+
+        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+            request_item = FriendshipRequest.objects.get(
+                from_user=user_item, to_user=request.user)
+        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+            request_item = FriendshipRequest.objects.get(
+                from_user=request.user, to_user=user_item)
+        else:
+            raise Http404()
+
+        friends_item = Friend(
+            from_user=request_item.from_user,
+            to_user=request_item.to_user,
+        )
+        friends_item.save()
+        request_item.delete()
+
+        return get_render(request, {'c_user': request.user})
+
+    raise Http404()
+
+
+@login_required
+def cancel_request(request, user_id):
+    if request.method == 'POST':
+        user_item = get_object_or_404(User, id=user_id)
+
+        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+            request_item = FriendshipRequest.objects.get(
+                from_user=user_item, to_user=request.user)
+        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+            request_item = FriendshipRequest.objects.get(
+                from_user=request.user, to_user=user_item)
+        else:
+            raise Http404()
+
+        request_item.delete()
+
+        return get_render(request, {'c_user': request.user})
+
+    raise Http404()
+
+
+@login_required
+def remove_friend(request, user_id) -> redirect:
+    """
+    Remove_friend view
+    :param request: request
+    :param user_id: id
+    :return: redirect
+    """
+    if request.method == 'POST':
+        user_item = get_object_or_404(User, id=user_id)
+
+        if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
+            Friend.objects.get(from_user=user_item,
+                               to_user=request.user).delete()
+        elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
+            Friend.objects.get(from_user=request.user,
+                               to_user=user_item).delete()
+        else:
+            raise Http404()
+
+        return get_render(request, {'c_user': request.user})
+
+    raise Http404()
+
+
+@login_required
+def blacklist_add(request, user_id):
+    """
+    Blacklist_add view
+    :param request: request
+    :param user_id: id
+    """
+
+    if request.method == 'POST':
+        user_for_blacklist = get_object_or_404(User, id=user_id)
+
+        if user_for_blacklist in request.user.profile.friends():
+            remove_friend(request, user_id)
+
+        request.user.profile.blacklist.add(user_for_blacklist)
+        request.user.save()
+
+        return get_render(request, {'c_user': request.user})
+
+    raise Http404()
+
+
+@login_required
+def blacklist_remove(request, user_id):
+    """
+    Blacklist_remove view
+    :param request: request
+    :param user_id: id
+    """
+    if request.method == 'POST':
+        user_to_remove = get_object_or_404(User, id=user_id)
+
+        request.user.profile.blacklist.remove(user_to_remove)
+
+        return get_render(request, {'c_user': request.user})
+
     raise Http404()

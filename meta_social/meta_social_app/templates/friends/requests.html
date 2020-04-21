@@ -1,73 +1,62 @@
-{% extends 'base_menu.html' %}
+{% extends 'friends/base.html' %}
 
 {% block center %}
     <div class="card">
         <div class="card-body">
-            <h5>Входящие заявки</h5>
-            {% if user.profile.friendship_inbox_requests %}
-                <ul class="list-group list-group-flush" id="incomingList">
-                    {% for req in user.profile.friendship_inbox_requests %}
+            <h4 class="text-center">Входящие заявки:</h4>
+            <ul class="list-group list-group-flush text-left" id="incoming-requests-list">
+                {% if friendship.incoming %}
+                    {% for request in friendship.incoming %}
                         <li class="list-group-item">
-                            <img src="{{ req.from_user.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                            <a href="/accounts/profile/{{ req.from_user.id }}/" class="float-left ml-2">{{ req.from_user.username }}</a>
+                            <img src="{{ request.from_user.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <a href="/accounts/profile/{{ request.from_user.id }}/">{{ request.from_user.username }}</a>
 
-                            <div>
-                                <button class="float-right btn btn-outline-success" 
-                                        onclick="acceptRequest(event, '/friends/accept_request/{{ req.from_user.id }}/')">
-                                    &#10003;
-                                </button>
-                            </div>
+                            <button type="button" 
+                                    class="btn btn-outline-dark float-right" 
+                                    data-toggle="tooltip" 
+                                    data-placement="top" 
+                                    title="Принять заявку в друзья"
+                                    onclick="acceptRequest2(event, {{ request.from_user.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/447/447147.svg" width="20" height="20">
+                            </button>
+
+                            <button type="button" 
+                                    class="btn btn-outline-dark float-right mr-2" 
+                                    data-toggle="tooltip" 
+                                    data-placement="top" 
+                                    title="Отменить заявку в друзья"
+                                    onclick="cancelRequest2(event, {{ request.from_user.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/447/447147.svg" width="20" height="20">
+                            </button>
                         </li>
                     {% endfor %}
-                </ul>
-            {% else %}
-                Никто не хочет с вами дружить ((
-            {% endif %}
-            <h5 class="mt-3">Исходящие заявки</h5>
-            {% if user.profile.friendship_outbox_requests %}
-                <ul class="list-group list-group-flush">
-                    {% for req in user.profile.friendship_outbox_requests %}
+                {% else %}
+                    <p class="mb-0 text-center">Никто не хочет с вами дружить ((</p>
+                {% endif %}
+            </ul>
+            <br>
+            <h4 class="text-center">Исходящие заявки:</h4>
+            <ul class="list-group list-group-flush text-left" id="outcoming-requests-list">
+                {% if friendship.outcoming %}
+                    {% for request in friendship.outcoming %}
                         <li class="list-group-item">
-                            <img src="{{ req.to_user.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                            <a href="/accounts/profile/{{ req.to_user.id }}/" class="float-left ml-2">{{ req.to_user.username }}</a>
+                            <img src="{{ request.to_user.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <a href="/accounts/profile/{{ request.to_user.id }}/">{{ request.to_user.username }}</a>
+
+                            <button type="button" 
+                                    class="btn btn-outline-dark float-right" 
+                                    data-toggle="tooltip" 
+                                    data-placement="top" 
+                                    title="Отменить заявку в друзья"
+                                    onclick="cancelRequest2(event, {{ request.to_user.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
+                            </button>
                         </li>
                     {% endfor %}
-                </ul>
-            {% else %}
-                Пусто
-            {% endif %}
+                {% else %}
+                    <p class="mb-0 text-center">Исходящих заявок нет.</p>
+                {% endif %}
+            </ul>
         </div>
     </div>
-{% endblock %}
-
-{% block right %}
-    {% include 'friends/right_menu.html' %}
-{% endblock %}
-
-{% block extra__js %}
-    <script>
-        function acceptRequest (e, link) {
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function () {
-                    e.target.parentNode.parentNode.remove()
-
-                    var fr_counter = document.getElementById('friendshipsCount')
-                    fr_counter.innerHTML = Number(fr_counter.innerHTML) - 1
-
-                    if (fr_counter.innerHTML == '0') {
-                        fr_counter.remove()
-                    }
-
-                    if (document.getElementById('incomingList').children.length == 0) {
-                        document.getElementById('incomingList').innerHTML = "Никто не хочет с вами дружить (("
-                    }
-                }
-            })
-        }
-    </script>
-{% endblock %}
+{% endblock center %}
