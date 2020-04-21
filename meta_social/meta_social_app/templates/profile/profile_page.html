@@ -53,9 +53,9 @@
         <div class="card-body">
           <h6 class="card-title">Друзья</h6>
 
-          {% if c_user.profile.friends %}
+          {% if c_user.profile.friends.all %}
                 <ul class="list-group list-group-flush">
-                    {% for friend in c_user.profile.friends %}
+                    {% for friend in c_user.profile.friends.all %}
                   <div style="display: flex; flex-wrap: wrap;">
                         <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
                             <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>

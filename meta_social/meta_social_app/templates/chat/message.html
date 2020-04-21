@@ -107,11 +107,11 @@
 {% block right %}
     <div class="card" style="max-height: 325px;">
         <div class="card-body text-left">
-            <p>Друзья:</p>
+            <p>Чаты:</p>
             {% if user.profile.friends %}
-                {% for friend in user.profile.friends %}
+                {% for friend in user.profile.friends.all %}
                     <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
-                    <small class="float-right text-muted">{% if friend.from_user != user %} {% if friend.from_user.profile.is_online %}Онлайн{% else %}Оффлайн{% endif %}{% else %}{% if friend.to_user.profile.is_online %}Онлайн{% else %}Оффлайн{% endif %}{% endif %}</small>
+                    <small class="float-right text-muted">{% if friend.profile.check_online_with_afk %}Онлайн{% else %}Оффлайн{% endif %}</small>
                     <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
                         {% csrf_token %}
                         <a href="/chat/go_to_chat/{{ chat.id }}/" onclick="this.closest('form').submit();return false;">
