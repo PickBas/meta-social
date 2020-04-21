@@ -101,6 +101,13 @@ class Profile(models.Model):
 
     chats = models.ManyToManyField(Chat)
 
+    def get_name(self):
+        if self.user.first_name:
+            if self.user.last_name:
+                return '{} {}'.format(self.user.first_name, self.user.last_name)
+            return self.user.first_name
+        return self.user.username
+
     def check_online_with_last_log(self) -> bool:
         """
         Checking online status using last login/logout

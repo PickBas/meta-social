@@ -637,9 +637,11 @@ def chat_move(request, user_id, friend_id):
 
 
 def room(request, room_id):
-    return render(request, 'chat/message.html', {
-        'room_name': mark_safe(json.dumps(room_id))
-    })
+    context = {'room_name': mark_safe(json.dumps(room_id))}
+    c_room = Chat.objects.get(id=room_id)
+    context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+    context['messages_list'] = c_room.messages.all()
+    return render(request, 'chat/message.html', context)
 
 
 @login_required
