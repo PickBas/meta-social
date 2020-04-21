@@ -1,0 +1,32 @@
+{% if users or communities or music %}
+    <ul class="list-group list-group-flush">
+        {% if users %}
+            <li class="list-group-item">Друзья:</li>
+            {% for match in users %}
+                <li class="list-group-item">
+                    <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
+                </li>
+            {% endfor %}
+        {% endif %}
+        
+        {% if communities %}
+            <li class="list-group-item">Сообщества:</li>
+            {% for match in communities %}
+                <li class="list-group-item">
+                    <a href="/community/{{ match.id }}/">{{ match.name }}</a>
+                </li>
+            {% endfor %}
+        {% endif %}
+
+        {% if music %}
+            <li class="list-group-item">Музыка:</li>
+            {% for match in music %}
+                <li class="list-group-item">
+                    <p>{{ match.artist }} - {{ match.title }}</p>
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+{% else %}
+    <p class="mb-0">Ничего не найдено</p>
+{% endif %}

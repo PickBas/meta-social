@@ -701,3 +701,22 @@ def post_community_new(request, community_id):
                     photo.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def global_search(request):
+    if request.method == 'POST' and request.POST.get('query'):
+        context = {}
+        query = request.POST.get('query')
+
+        search_fields = ['username', 'first_name', 'last_name']
+        context['users'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+
+        search_fields = ['artist', 'title']
+        context['music'] = Music.objects.filter(search_filter(search_fields, query))
+
+        search_fields = ['name']
+        context['communities'] = Community.objects.filter(search_filter(search_fields, query))
+
+        return render(request, 'search_list.html', context)
+    raise Http404()
