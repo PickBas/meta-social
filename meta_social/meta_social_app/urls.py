@@ -44,6 +44,7 @@ urlpatterns = [
     path('chats/<int:user_id>/', chat),
     path('chats/<int:user_id>/<int:friend_id>/', chat_move),
     path('chat/go_to_chat/<int:room_id>/', room),
+    path('chat/go_to_chat/<int:room_id>/get_messages/', get_messages),
 ]
 
 if settings.DEBUG:

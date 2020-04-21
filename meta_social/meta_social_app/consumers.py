@@ -114,5 +114,5 @@ class ChatConsumer(WebsocketConsumer):
         message = event['message']
 
         async_to_sync(self.send(text_data=json.dumps({
-            'messages': message
+            'messages': message,
         })))

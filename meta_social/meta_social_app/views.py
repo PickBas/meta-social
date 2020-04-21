@@ -636,12 +636,22 @@ def chat_move(request, user_id, friend_id):
         return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
 
+@login_required
 def room(request, room_id):
     context = {'room_name': mark_safe(json.dumps(room_id))}
     c_room = Chat.objects.get(id=room_id)
     context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
     context['messages_list'] = c_room.messages.all()
     return render(request, 'chat/message.html', context)
+
+
+@login_required
+def get_messages(request, room_id):
+    if request.method == 'POST':
+        messages = Chat.objects.get(id=room_id).messages.all()
+
+        return render(request, 'chat/messages_list.html', {'messages_list': messages})
+    raise Http404()
 
 
 @login_required

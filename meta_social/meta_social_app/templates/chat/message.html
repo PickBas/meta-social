@@ -18,7 +18,7 @@
             <div style="display: flex; flex-direction: column; flex-wrap: nowrap; overflow-y: scroll; overflow-x: hidden;" id="messages_list" class="h-100">
                 {% if messages_list %}
                     {% for message in messages_list %}
-                        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %} >
+                        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
                             <div class="col-lg-1 col-sm-1">
                                 <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
                             </div>
@@ -46,14 +46,13 @@
             </div>
         </div>
     </div>
-    {{ room_name|json_script:"room-name" }}
 
     <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
 
     <script>
 
         autosize(document.getElementById('message-input'));
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const roomName = {{ room_name }};
 
         const chatSocket = new WebSocket(
             'ws://'
@@ -63,23 +62,21 @@
             + '/'
         );
 
-        function showMessages(message, author) {
-            document.querySelector('#chat-log').value += (author + ": " + message + '\n');
-        }
-
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-
-            if (data.messages.message !== undefined || data.messages[0].message !== undefined){
-                if (data.messages.length > 1) {
-                    for (let i = 0; i < data.messages.length; ++i) {
-                            showMessages(data.messages[i].message, data.messages[i].author);
+            let text_area = document.getElementById('chat-message-input');
+            $.ajax({
+                    type: "POST",
+                    url: '/chat/go_to_chat/' + roomName + '/get_messages/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        text: text_area.value,
+                    },
+                    success: function (result) {
+                        document.getElementById('messages_list').innerHTML = result;
                     }
-                } else {
-                    showMessages(data.messages.message, data.messages.author);
-                }
-            }
-        };
+                })
+        }
 
         chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
