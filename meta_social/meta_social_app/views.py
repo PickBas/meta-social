@@ -435,8 +435,21 @@ def community_create(request):
 
 
 @login_required
-def community_list(request):
+def community_list(request, user_id):
     context = get_menu_context('community', 'Список сообществ')
+
+    context['c_user'] = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        context['matching'] = True
+        if not request.POST.get('query'):
+            context['matching'] = False
+            return render(request, 'community/search.html', context)
+        query = request.POST.get('query')
+        search_fields = ['name']
+        context['c_matches'] = Community.objects.filter(search_filter(search_fields, query))
+
+        return render(request, 'community/search.html', context)
 
     return render(request, 'community/community_list.html', context)
 

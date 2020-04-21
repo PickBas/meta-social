@@ -25,7 +25,7 @@ urlpatterns = [
     path('friends/remove_blacklist/<int:user_id>/', blacklist_remove),
 
     path('community/<int:community_id>/', community),
-    path('community/list/', community_list),
+    path('community/list/<int:user_id>/', community_list),
     path('community/create/', community_create),
     path('community/<int:community_id>/join/', community_join),
     path('community/<int:community_id>/leave/', community_leave),
