@@ -1,87 +1,16 @@
-{% extends 'base_menu.html' %}
+{% extends 'friends/base.html' %}
 
 {% block center %}
     <div class="card">
         <div class="card-body">
             {% if user == c_user %}
-                <h5>Ваши друзья</h5>
-            {% else %}
-                <h5>Друзья пользователя {{ c_user.first_name }} {{ c_user.last_name }} ({{ c_user.username }})</h5>
+                <input type="text" class="form-control w-100" placeholder="Найти друзей" id="friends-search-input">
+                <hr>
             {% endif %}
-            <hr>
 
-            {% if c_user.profile.friends %}
-                <ul class="list-group list-group-flush" id="friend-list">
-                    {% for friend in c_user.profile.friends %}
-                        <li class="list-group-item">
-                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                            <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
-                            <div>
-                                <button class="float-right btn btn-outline-secondary"
-                                        onclick="removeFriend(event, '/friends/remove_friend/{{ friend.id }}/')">
-                                    &#128465;
-                                </button>
-                            </div>
-                            <div>
-                                <button class="float-right btn btn-outline-secondary mr-2" onclick="addToBlackList(event, '/friends/add_blacklist/{{ friend.id }}/')">
-                                &#x1F6AB;
-                                </button>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                Список друзей пуст.
-            {% endif %}
+            <ul class="list-group list-group-flush text-left" id="friends-list">
+                {% include 'friends/list.html' %}
+            </ul>
         </div>
     </div>
-
-
-{% endblock %}
-
-{% block right %}
-
-        {% include 'friends/right_menu.html' %}
-
-{% endblock %}
-
-{% block extra__js %}
-    <script>
-
-        function checkFriendList() {
-            let friendList = document.getElementById('friend-list');
-            if (friendList.children.length == 0) {
-                friendList.innerHTML = "Список друзей пуст."
-            }
-        }
-
-        function addToBlackList(e, link) {
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function () {
-                    e.target.parentNode.parentNode.remove();
-                    checkFriendList();
-                }
-
-            })
-        }
-        function removeFriend (e, link) {
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function () {
-                    e.target.parentNode.parentNode.remove();
-
-                    checkFriendList();
-                }
-            })
-        }
-    </script>
-{% endblock %}
+{% endblock center %}

@@ -1,0 +1,23 @@
+{% if matching %}
+    {% if c_matches %}
+        {% for match in c_matches %}
+            <li class="list-group-item">
+                <img src="{{ match.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                <a href="/community/{{ match.id }}/" class="float-left ml-2">{{ match.name }}</a>
+            </li>
+        {% endfor %}
+    {% else %}
+        Ничего не найдено.
+    {% endif %}
+{% else %}
+    {% if c_user.profile.communities.all %}
+        {% for community in user.profile.communities.all %}
+            <li class="list-group-item">
+                <img src="{{ community.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
+            </li>
+        {% endfor %}
+    {% else %}
+        Список сообществ пуст.
+    {% endif %}
+{% endif %}

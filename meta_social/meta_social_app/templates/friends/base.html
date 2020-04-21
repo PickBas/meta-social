@@ -1,0 +1,20 @@
+{% extends 'base_menu.html' %}
+
+{% load static %}
+
+{% block center %}
+{% endblock center %}
+
+{% block right %}
+    <ul class="list-group list-group-flush border">
+        <li class="list-group-item"><a href="/friends/{{ user.id }}/">Мои друзья</a></li>
+        {% if user == c_user %}
+            <li class="list-group-item"><a href="/friends/requests/">Заявки</a></li>
+        {% endif %}
+        <li class="list-group-item"><a href="/friends/{{ user.id }}/blacklist/">Черный список</a></li>
+    </ul>
+{% endblock right %}
+
+{% block extra__js %}
+    <script src="{% static 'js/manage_friends.js' %}"></script>
+{% endblock extra__js %}

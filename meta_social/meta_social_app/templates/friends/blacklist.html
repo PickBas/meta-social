@@ -1,59 +1,33 @@
-{% extends 'base_menu.html' %}
+{% extends 'friends/base.html' %}
 
 {% block center %}
-  <div class="card">
-      <div class="card-body">
-          {% if user == c_user %}
-              <h5>Черный список</h5>
-          {% else %}
-              <h5>Forbidden</h5>
-          {% endif %}
-          <hr>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="text-center">Черный список</h4>
 
-          {% if c_user.profile.blacklist.all %}
-              <ul class="list-group list-group-flush" id="ex-friends-list">
-                  {% for ex_friend in c_user.profile.blacklist.all %}
-                      <li class="list-group-item">
-                          <img src="{{ ex_friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                          <a href="/accounts/profile/{{ ex_friend.id }}/" class="float-left ml-2">{{ ex_friend.username }}</a>
-                          <button class="float-right btn btn-outline-secondary" onclick="removeFromBlacklist(event, '/friends/remove_blacklist/{{ ex_friend.id }}/')">&#128465;</button>
-                      </li>
-                  {% endfor %}
-              </ul>
-          {% else %}
-              Никого нет в черном списке
-          {% endif %}
-      </div>
-  </div>
-{% endblock %}
+            <ul class="list-group list-group-flush text-left" id="black-list">
+                {% if c_user.profile.blacklist.all %}
+                    {% for item in c_user.profile.blacklist.all %}
+                        <li class="list-group-item">
+                            <img src="{{ item.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <a href="/accounts/profile/{{ item.id }}/">{{ item.username }}</a>
 
-{% block right %}
-    {% include 'friends/right_menu.html' %}
-{% endblock %}
-
-{% block extra__js %}
-    <script>
-        function checkFriendList() {
-            let exFriendList = document.getElementById('ex-friends-list');
-            if (exFriendList.children.length == 0) {
-                exFriendList.innerHTML = "Никого нет в черном списке"
-            }
-        }
-
-        function removeFromBlacklist(e, link) {
-            $.ajax({
-                type: "POST",
-                url: link,
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function () {
-
-                    e.target.parentNode.remove();
-                    checkFriendList();
-                }
-
-            })
-        }
-    </script>
-{% endblock %}
+                            {% if c_user == user %}
+                                <button type="button" 
+                                        class="btn btn-outline-dark float-right" 
+                                        data-toggle="tooltip" 
+                                        data-placement="top" 
+                                        title="Удалить из черного списка"
+                                        onclick="removeBlacklist2(event, {{ item.id }})">
+                                    <img src="https://image.flaticon.com/icons/svg/597/597356.svg" width="20" height="20">
+                                </button>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <p class="mb-0 text-center">В черном сиске никого нет.</p>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endblock center %}

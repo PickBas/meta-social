@@ -25,7 +25,7 @@ class Community(models.Model):
     Community class
     """
     users = models.ManyToManyField(to=User, related_name='users')
-    owner = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=True)
     info = models.CharField(max_length=1000, null=True)
 
@@ -154,11 +154,17 @@ class Profile(models.Model):
     def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 
+    def friendship_inbox_users(self):
+        return [i.from_user for i in self.friendship_inbox_requests()]
+
     def friendship_requests_count(self):
         return len(self.friendship_inbox_requests())
 
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
+
+    def friendship_outbox_users(self):
+        return [i.to_user for i in self.friendship_outbox_requests()]
 
     def amount_of_friends(self) -> int:
         """
