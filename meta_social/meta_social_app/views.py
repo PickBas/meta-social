@@ -584,15 +584,16 @@ def send_friendship_request(request, user_id) -> redirect:
     user_item = get_object_or_404(User, id=user_id)
 
     if request.method == 'POST':
-        if not [i.from_user for i in user_item.profile.friendship_inbox_requests()]:
-            item = FriendshipRequest(
-                from_user=request.user,
-                to_user=user_item,
-            )
+        if not FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+            if not FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+                item = FriendshipRequest(
+                    from_user=request.user,
+                    to_user=user_item,
+                )
 
-            item.save()
+                item.save()
 
-            return get_render(request, {'c_user': request.user})
+                return get_render(request, {'c_user': request.user})
 
     raise Http404()
 
