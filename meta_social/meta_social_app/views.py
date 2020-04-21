@@ -113,7 +113,6 @@ def profile(request, user_id) -> render:
     context = get_menu_context('profile', 'Профиль')
     context['profile'] = Profile.objects.get(user=user_id)
     user_item = User.objects.get(id=user_id)
-
     context['c_user'] = user_item
     context['is_online'] = context['profile'].check_online_with_afk()
     get_last_act(request, user_item)
