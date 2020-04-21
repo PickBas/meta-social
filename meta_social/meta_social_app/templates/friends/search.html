@@ -21,7 +21,7 @@
                             <img src="{{ match.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ match.id }}/" class="float-left ml-2">{{ match.username }}</a>
 
-                    {% if match in user.profile.friends and not is_in_blacklist %}
+                    {% if match in user.profile.friends.all and not is_in_blacklist %}
                         <div>
                             <button class="float-right btn btn-outline-danger"
                                 onclick="removeFriend(event, '/friends/remove_friend/{{ match.id }}/')">&#128465;</button>

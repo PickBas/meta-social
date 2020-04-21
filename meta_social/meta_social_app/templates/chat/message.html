@@ -108,16 +108,16 @@
     <div class="card" style="max-height: 325px;">
         <div class="card-body text-left">
             <p>Друзья:</p>
-            {% if user.profile.chats %}
-                {% for chat in user.profile.chats.all %}
-                    <img src="{% if chat.first_user != user %}{{ chat.first_user.profile.image.url }}{% else %}{{ chat.second_user.profile.image.url }}{% endif %}" class="rounded-circle border border-dark" width=35 height=35>
-                    <a href="/chat/go_to_chat/{{ chat.id }}/">
-                        {% if chat.first_user != user %}
-                            {{ chat.first_user.profile.get_name }}
-                        {% else %}
-                            {{ chat.second_user.profile.get_name }}
-                        {% endif %}
-                    </a>
+            {% if user.profile.friends %}
+                {% for friend in user.profile.friends %}
+                    <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+                    <small class="float-right text-muted">{% if friend.from_user != user %} {% if friend.from_user.profile.is_online %}Онлайн{% else %}Оффлайн{% endif %}{% else %}{% if friend.to_user.profile.is_online %}Онлайн{% else %}Оффлайн{% endif %}{% endif %}</small>
+                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
+                        {% csrf_token %}
+                        <a href="/chat/go_to_chat/{{ chat.id }}/" onclick="this.closest('form').submit();return false;">
+                                {{ friend.profile.get_name }}
+                        </a>
+                    </form>
                     {% if not forloop.last %}<hr>{% endif %}
                 {% endfor %}
             {% else %}

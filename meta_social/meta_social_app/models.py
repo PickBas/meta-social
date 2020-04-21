@@ -96,9 +96,8 @@ class Profile(models.Model):
         default=timezone.now, auto_now=False, auto_now_add=False)
 
     blacklist = models.ManyToManyField(User, 'blacklist')
-
     communities = models.ManyToManyField(Community)
-
+    friends = models.ManyToManyField(User, related_name='friendlist')
     chats = models.ManyToManyField(Chat)
 
     def get_name(self):
@@ -170,14 +169,6 @@ class Profile(models.Model):
         """
         return len(self.posts())
 
-    def friends(self):
-        friends = [i.to_user for i in list(
-            Friend.objects.filter(from_user=self.user))]
-        friends += [i.from_user for i in list(
-            Friend.objects.filter(to_user=self.user))]
-
-        return friends
-
     def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 
@@ -187,20 +178,13 @@ class Profile(models.Model):
     def friendship_outbox_requests(self):
         return FriendshipRequest.objects.filter(from_user=self.user)
 
-    def amount_of_friends(self) -> int:
-        """
-        Get amount of friends
-        :return: int
-        """
-        return len(self.friends())
-
     def get_newsfeed(self) -> list:
         """
         Get user's news feed
         :return: list
         """
         posts = []
-        for friend in self.friends():
+        for friend in self.friends.all():
             posts += list(friend.profile.posts())
         for community in self.communities.all():
             posts += community.posts()
@@ -321,16 +305,6 @@ class PostImages(models.Model):
                                           'image/jpeg', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
-
-
-class Friend(models.Model):
-    """
-    Friend class
-    """
-    from_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='1+')
-    to_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='2+')
 
 
 class FriendshipRequest(models.Model):

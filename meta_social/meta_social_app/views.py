@@ -19,7 +19,7 @@ from .models import Profile, Comment, Message, Community, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Friend, Post, FriendshipRequest, PostImages, Music
+from .models import Post, FriendshipRequest, PostImages, Music
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
     UpdateAvatarForm, CommunityCreateForm
 from io import BytesIO
@@ -128,13 +128,13 @@ def profile(request, user_id) -> render:
     is_in_blacklist = False
 
     if user_item != request.user:
-        if request.user not in user_item.profile.friends():
+        if request.user not in user_item.profile.friends.all():
             pass_add_to_friends = True
         if request.user in user_item.profile.blacklist.all():
             is_in_blacklist = True
 
     context['is_in_blacklist'] = is_in_blacklist
-    context['is_friend'] = True if request.user in user_item.profile.friends() and request.user != user_item else False
+    context['is_friend'] = True if request.user in user_item.profile.friends.all() and request.user != user_item else False
     context['pass_add_to_friends'] = pass_add_to_friends
 
     context['postform'] = PostForm()
@@ -447,11 +447,10 @@ def accept_request(request, user_id) -> redirect:
         else:
             raise Http404()
 
-        friends_item = Friend(
-            from_user=request_item.from_user,
-            to_user=request_item.to_user,
-        )
-        friends_item.save()
+        first_user = User.objects.get(id=request_item.from_user.id)
+        second_user = User.objects.get(id=request_item.to_user.id)
+        first_user.profile.friends.add(second_user)
+        second_user.profile.friends.add(first_user)
         request_item.delete()
 
         return HttpResponse('Success')
@@ -473,12 +472,10 @@ def remove_friend(request, user_id) -> redirect:
 
         user_item = User.objects.get(id=user_id)
 
-        if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
-            Friend.objects.get(from_user=user_item,
-                               to_user=request.user).delete()
-        elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
-            Friend.objects.get(from_user=request.user,
-                               to_user=user_item).delete()
+        if user_item in request.user.profile.friends.all():
+            request.user.profile.friends.remove(user_item)
+            user_item.profile.friends.remove(request.user)
+
         else:
             raise Http404()
 

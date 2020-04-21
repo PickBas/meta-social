@@ -10,9 +10,9 @@
             {% endif %}
             <hr>
 
-            {% if c_user.profile.friends %}
+            {% if c_user.profile.friends.all %}
                 <ul class="list-group list-group-flush" id="friend-list">
-                    {% for friend in c_user.profile.friends %}
+                    {% for friend in c_user.profile.friends.all %}
                         <li class="list-group-item">
                             <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                             <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
