@@ -1,86 +1,90 @@
-{% if f_matches %}
-    {% for match in f_matches %}
-        <li class="list-group-item">
-            <img src="{{ match.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-            <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
+{% if matching %}
+    {% if f_matches %}
+        {% for match in f_matches %}
+            <li class="list-group-item">
+                <img src="{{ match.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
 
-            {% if c_user == user %}
-                {% if match in user.profile.friends %}
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Добавить в черный список"
-                            onclick="addBlacklist(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
-                    </button>
+                {% if c_user == user %}
+                    {% if match in user.profile.friends %}
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Добавить в черный список"
+                                onclick="addBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+                        </button>
 
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right mr-2" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Удалить из друзей"
-                            onclick="removeFriend(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
-                    </button>
-                {% elif match in user.profile.blacklist.all %}
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Удалить из черного списка"
-                            onclick="removeBlacklist(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/597/597356.svg" width="20" height="20">
-                    </button>
-                {% elif match in user.profile.friendship_inbox_users %}
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Принять заявку в друзья"
-                            onclick="acceptRequest(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/447/447147.svg" width="20" height="20">
-                    </button>
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right mr-2" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Удалить из друзей"
+                                onclick="removeFriend(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.blacklist.all %}
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Удалить из черного списка"
+                                onclick="removeBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/597/597356.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.friendship_inbox_users %}
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Принять заявку в друзья"
+                                onclick="acceptRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/447/447147.svg" width="20" height="20">
+                        </button>
 
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right mr-2" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Отменить заявку в друзья"
-                            onclick="cancelRequest(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
-                    </button>
-                {% elif match in user.profile.friendship_outbox_users %}
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Отменить заявку в друзья"
-                            onclick="cancelRequest(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
-                    </button>
-                {% else %}
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Добавить в черный список"
-                            onclick="addBlacklist(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
-                    </button>
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right mr-2" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Отменить заявку в друзья"
+                                onclick="cancelRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.friendship_outbox_users %}
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Отменить заявку в друзья"
+                                onclick="cancelRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
+                        </button>
+                    {% else %}
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Добавить в черный список"
+                                onclick="addBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+                        </button>
 
-                    <button type="button" 
-                            class="btn btn-outline-dark float-right mr-2" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Добавить в друзья"
-                            onclick="addFriend(event, {{ match.id }})">
-                        <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
-                    </button>
+                        <button type="button" 
+                                class="btn btn-outline-dark float-right mr-2" 
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Добавить в друзья"
+                                onclick="addFriend(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
+                        </button>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </li>
-    {% endfor %}
+            </li>
+        {% endfor %}
+    {% else %}
+        <p class="text-center">Ничего не найдено.</p>
+    {% endif %}
 {% else %}
     {% if c_user.profile.friends %}
         {% for friend in c_user.profile.friends %}

@@ -522,7 +522,9 @@ def global_search(request):
 
 
 def get_render(request, context):
+    context['matching'] = True
     if not request.POST.get('query'):
+        context['matching'] = False
         return render(request, 'friends/list.html', context)
 
     query = request.POST.get('query')
