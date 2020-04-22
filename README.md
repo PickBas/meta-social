@@ -56,3 +56,30 @@
     # 2
     login: vzsdnhqifk_1582663185@tfbnw.net
     password: verystrongpa55word
+
+# Для работы чата
+
+## Запуск приложения через Docker
+    docker-compose up --build
+
+## Запуск на локальной машине
+    CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)], Заменить на "hosts": [('127.0.0.1', 6379)],
+            },
+        },
+    }
+
+## Установка redis
+    Arch: sudo pacman -S redis
+    Fedora: sudo dnf install redis
+    Debian: sudo apt install redis
+
+## Запуск redis
+    Linux: redis-server
+    Docker: docker run -p 6379:6379 -d redis:5
+
+## Проверка redis
+    redis-cli ping

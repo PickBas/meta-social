@@ -86,8 +86,8 @@
         <p class="text-center">Ничего не найдено.</p>
     {% endif %}
 {% else %}
-    {% if c_user.profile.friends %}
-        {% for friend in c_user.profile.friends %}
+    {% if c_user.profile.friends.all %}
+        {% for friend in c_user.profile.friends.all %}
             <li class="list-group-item">
                 <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
                 <a href="/accounts/profile/{{ friend.id }}/">{{ friend.username }}</a>

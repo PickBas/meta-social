@@ -1,0 +1,129 @@
+{% extends 'chat/base.html' %}
+{% block center %}
+
+    <div class="card" style="height: 750px">
+        <div class="card-header bg-white">
+            <div class="row">
+                <div class="col-5 text-right pr-0">
+                    <img src="{{ first_user.profile.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
+                </div>
+                <div class="col-7 text-left pl-2">
+                    <a href="/accounts/profile/{{ first_user.id }}/" id="chat_name">{{ first_user.profile.get_name }}</a>
+                    <br>
+                    <small class="text-muted" id="chat_status">{{ first_user.profile.get_status }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body text-center">
+            <div style="display: flex; flex-direction: column; flex-wrap: nowrap; overflow-y: scroll; overflow-x: hidden;" id="messages_list" class="h-100">
+                {% if messages_list %}
+                    {% for message in messages_list %}
+                        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
+                            <div class="col-lg-1 col-sm-1">
+                                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+                            </div>
+                            <div class="col-lg-11 col-sm-11 text-left">
+                                <a href="#">{{ message.author.username }}</a>
+                                <small class="text-muted ml-1">{{ message.date }}</small>
+                                <p>{{ message.message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center" style="margin-top: auto;">Список сообщений пуст</p>
+                {% endif %}
+
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="input-group">
+                <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id='chat-message-submit'>
+                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+
+    <script>
+
+        autosize(document.getElementById('message-input'));
+        const roomName = {{ room_name }};
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            let text_area = document.getElementById('chat-message-input');
+            $.ajax({
+                    type: "POST",
+                    url: '/chat/go_to_chat/' + roomName + '/get_messages/',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        text: text_area.value,
+                    },
+                    success: function (result) {
+                        document.getElementById('messages_list').innerHTML = result;
+                    }
+                })
+        }
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            console.log("HERE");
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if (message.length) {
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'author': {{ user.id }},
+                    'chat_id': {{ room_name }},
+                }));
+                messageInputDom.value = '';
+            }
+        };
+    </script>
+
+{% endblock %}
+
+{% block right %}
+    <div class="card" style="max-height: 325px;">
+        <div class="card-body text-left">
+            <p>Чаты:</p>
+            {% if user.profile.friends %}
+                {% for friend in user.profile.friends.all %}
+                    <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST" style="display: inline-block;">
+                        {% csrf_token %}
+                        <a href="/chat/go_to_chat/{{ chat.id }}/" onclick="this.closest('form').submit();return false;">
+                                {{ friend.profile.get_name }}
+                        </a>
+                    </form>
+                    {% if not forloop.last %}<hr>{% endif %}
+                {% endfor %}
+            {% else %}
+                Нет друзей для чата
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

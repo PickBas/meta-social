@@ -30,9 +30,9 @@ admin.site.register(Post, PostAdmin)
 
 
 class MessageInline(admin.StackedInline):
-    model = Messages
+    model = Message
     verbose_name_plural = 'Сообщения'
-    fk_name = 'from_user'
+    fk_name = 'author'
 
 
 class CommentInline(admin.StackedInline):

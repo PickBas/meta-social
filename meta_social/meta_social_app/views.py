@@ -11,16 +11,18 @@ from django.http import Http404, HttpResponse, JsonResponse
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment, Messages, Community, Like
+from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Friend, Post, FriendshipRequest, PostImages, Music
-from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, UpdateAvatarForm, CommunityCreateForm
+from .models import Post, FriendshipRequest, PostImages, Music
+from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
+    UpdateAvatarForm, CommunityCreateForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -126,13 +128,13 @@ def profile(request, user_id) -> render:
     is_in_blacklist = False
 
     if user_item != request.user:
-        if request.user not in user_item.profile.friends():
+        if request.user not in user_item.profile.friends.all():
             pass_add_to_friends = True
         if request.user in user_item.profile.blacklist.all():
             is_in_blacklist = True
 
     context['is_in_blacklist'] = is_in_blacklist
-    context['is_friend'] = True if request.user in user_item.profile.friends() and request.user != user_item else False
+    context['is_friend'] = True if request.user in user_item.profile.friends.all() and request.user != user_item else False
     context['pass_add_to_friends'] = pass_add_to_friends
 
     context['postform'] = PostForm()
@@ -336,7 +338,8 @@ def change_avatar(request):
 
             resized_image.save(io, 'JPEG', quality=60)
 
-            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()), save=False)
+            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                                            save=False)
             request.user.profile.save()
     else:
         avatar_form = UpdateAvatarForm()
@@ -389,6 +392,55 @@ def music_upload(request):
     context['form'] = UploadMusicForm()
 
     return render(request, 'music/music_upload.html', context)
+
+
+@login_required
+def chat(request, user_id):
+    context = {}
+
+    c_user = User.objects.get(id=user_id)
+    context['c_user'] = c_user
+
+    return render(request, 'chat/chat.html', context)
+
+
+@login_required
+def chat_move(request, user_id, friend_id):
+    c_user = User.objects.get(id=user_id)
+    c_friend = User.objects.get(id=friend_id)
+    if request.method == "POST":
+        for c_user_chat in c_user.profile.chats.all():
+            if c_user_chat in c_friend.profile.chats.all():
+                ex_chat = Chat.objects.get(id=c_user_chat.id)
+                return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
+
+        new_chat = Chat.objects.create(
+            first_user=c_user,
+            second_user=c_friend
+        )
+
+        new_chat.save()
+        c_user.profile.chats.add(new_chat)
+        c_friend.profile.chats.add(new_chat)
+        return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
+
+
+@login_required
+def room(request, room_id):
+    context = {'room_name': mark_safe(json.dumps(room_id))}
+    c_room = Chat.objects.get(id=room_id)
+    context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+    context['messages_list'] = c_room.messages.all()
+    return render(request, 'chat/message.html', context)
+
+
+@login_required
+def get_messages(request, room_id):
+    if request.method == 'POST':
+        messages = Chat.objects.get(id=room_id).messages.all()
+
+        return render(request, 'chat/messages_list.html', {'messages_list': messages})
+    raise Http404()
 
 
 @login_required
@@ -611,11 +663,11 @@ def accept_request(request, user_id) -> redirect:
         else:
             raise Http404()
 
-        friends_item = Friend(
-            from_user=request_item.from_user,
-            to_user=request_item.to_user,
-        )
-        friends_item.save()
+        first_user = User.objects.get(id=request_item.from_user.id)
+        second_user = User.objects.get(id=request_item.to_user.id)
+        first_user.profile.friends.add(second_user)
+        second_user.profile.friends.add(first_user)
+
         request_item.delete()
 
         return get_render(request, {'c_user': request.user})
@@ -655,12 +707,9 @@ def remove_friend(request, user_id) -> redirect:
     if request.method == 'POST':
         user_item = get_object_or_404(User, id=user_id)
 
-        if Friend.objects.filter(from_user=user_item, to_user=request.user).exists():
-            Friend.objects.get(from_user=user_item,
-                               to_user=request.user).delete()
-        elif Friend.objects.filter(from_user=request.user, to_user=user_item).exists():
-            Friend.objects.get(from_user=request.user,
-                               to_user=user_item).delete()
+        if user_item in request.user.profile.friends.all():
+            request.user.profile.friends.remove(user_item)
+            user_item.profile.friends.remove(request.user)
         else:
             raise Http404()
 
@@ -680,7 +729,7 @@ def blacklist_add(request, user_id):
     if request.method == 'POST':
         user_for_blacklist = get_object_or_404(User, id=user_id)
 
-        if user_for_blacklist in request.user.profile.friends():
+        if user_for_blacklist in request.user.profile.friends.all():
             remove_friend(request, user_id)
 
         request.user.profile.blacklist.add(user_for_blacklist)
@@ -689,40 +738,6 @@ def blacklist_add(request, user_id):
         return get_render(request, {'c_user': request.user})
     raise Http404()
 
-
-def get_messages_list(from_user, to_user):
-    mes1 = Messages.objects.filter(to_user=from_user, from_user=to_user)
-    mes2 = Messages.objects.filter(from_user=from_user, to_user=to_user)
-    merged_lists = chain(mes1, mes2)
-    sorted_lists = sorted(merged_lists, key=lambda item: item.date)
-
-    return sorted_lists
-
-
-@login_required
-def show_chat(request):
-    context = get_menu_context('messages', 'Сообщения')
-
-    context['first_user'] = request.user.profile.friends()[0] if request.user.profile.friends() else None
-    
-    if context['first_user']:
-        context['messages_list'] = get_messages_list(context['first_user'], request.user)
-    
-    return render(request, 'messages/chat.html', context)
-
-
-@login_required
-def send_message(request, user_id):
-    to_user = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST' and request.POST.get('text'):
-        mes = Messages(from_user=request.user, to_user=to_user, message=request.POST.get('text'))
-        mes.save()
-
-        messages = get_messages_list(to_user, request.user)
-
-        return render(request, 'messages/messages_list.html', {'messages_list': messages})
-    raise Http404()
 
 
 @login_required

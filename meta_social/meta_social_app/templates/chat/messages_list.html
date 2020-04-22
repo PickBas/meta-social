@@ -1,11 +1,11 @@
 {% if messages_list %}
     {% for message in messages_list %}
-        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %} >
+        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
             <div class="col-lg-1 col-sm-1">
-                <img src="{{ message.from_user.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
             </div>
             <div class="col-lg-11 col-sm-11 text-left">
-                <a href="#">{{ message.from_user.username }}</a>
+                <a href="#">{{ message.author.username }}</a>
                 <small class="text-muted ml-1">{{ message.date }}</small>
                 <p>{{ message.message }}</p>
             </div>

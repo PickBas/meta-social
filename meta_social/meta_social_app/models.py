@@ -96,6 +96,24 @@ class Post(models.Model):
     def amount_of_comments(self):
         return len(self.comments())
 
+        
+class Message(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
+    message = models.TextField(null=True)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.author.username
+
+
+class Chat(models.Model):
+    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_part', blank=True, null=True)
+    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_part', blank=True, null=True)
+    messages = models.ManyToManyField(Message, blank=True)
+
+    def __str__(self):
+        return "{}".format(self.pk)
+
 
 class Profile(models.Model):
     """
@@ -129,6 +147,8 @@ class Profile(models.Model):
     blacklist = models.ManyToManyField(User, 'blacklist')
     communities = models.ManyToManyField(Community)
     liked_posts = models.ManyToManyField(Post, 'liked_posts')
+    friends = models.ManyToManyField(User, related_name='friendlist')
+    chats = models.ManyToManyField(Chat)
 
     def get_name(self):
         if self.user.first_name:
@@ -204,14 +224,6 @@ class Profile(models.Model):
         """
         return len(self.posts())
 
-    def friends(self):
-        friends = [i.to_user for i in list(
-            Friend.objects.filter(from_user=self.user))]
-        friends += [i.from_user for i in list(
-            Friend.objects.filter(to_user=self.user))]
-
-        return friends
-
     def friendship_inbox_requests(self):
         return FriendshipRequest.objects.filter(to_user=self.user)
 
@@ -240,7 +252,7 @@ class Profile(models.Model):
         :return: list
         """
         posts = []
-        for friend in self.friends():
+        for friend in self.friends.all():
             posts += list(friend.profile.posts())
         for community in self.communities.all():
             posts += community.posts()
@@ -315,19 +327,10 @@ class PostImages(models.Model):
         img.save(output, format='JPEG', quality=100)
         output.seek(0)
 
-        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
+        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
+                                          'image/jpeg', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
-
-
-class Friend(models.Model):
-    """
-    Friend class
-    """
-    from_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='1+')
-    to_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='2+')
 
 
 class FriendshipRequest(models.Model):
@@ -363,14 +366,3 @@ class Music(models.Model):
     class Meta:
         verbose_name = 'Музыка'
         verbose_name_plural = 'Музыка'
-
-
-class Messages(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="5+", null=True)
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="6+", null=True)
-    message = models.CharField(max_length=250, null=True)
-    date = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = 'Сообщения'
-        verbose_name_plural = 'Сообщения'
