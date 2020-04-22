@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
+import json
 
 # class AdminTest(TestCase):
 #     pass
@@ -18,7 +19,6 @@ class MetaSetUp(TestCase):
 
 
 class IndexViewTest(MetaSetUp):
-
     def setUp(self):
         super().setUp()
         self.response = self.client.get(reverse("home"))
@@ -44,6 +44,20 @@ class ProfileViewTest(MetaSetUp):
         self.assertEqual(self.response.status_code, 200)
 
     # здесь тест содержимого
+
+
+class FriendsSearchView(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+        self.response = self.client.get('/friends/search/')
+
+    def test_friend_post(self):
+        response = self.client.post('/friends/search/', {'name': 'test_user2'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTrue(
+            User.objects.get(
+                username="test_user2") in response.context['matches'])
 
 
 class FriendsListView(MetaSetUp):
@@ -72,6 +86,15 @@ class ChatMeesages(MetaSetUp):
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
 
+    def test_send_post(self):
+        response = self.client.get('/chat/go_to_chat/3/send_mes/')
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post('/chat/go_to_chat/3/send_mes/',
+                                    {'text': 'Wake up!'})
+        self.assertEqual(response.status_code, 200)
+        result = json.loads(response.content)
+        self.assertEqual(result['sender'], 'test_user')
+
 
 class CommunityView(MetaSetUp):
     def setUp(self):
@@ -98,7 +121,6 @@ class PostView(MetaSetUp):
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
-
 
 
 # Админка не обладает данными об аккаунтах в
