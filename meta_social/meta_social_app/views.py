@@ -708,7 +708,7 @@ def show_chat(request):
     if context['first_user']:
         context['messages_list'] = get_messages_list(context['first_user'], request.user)
     
-    return render(request, 'messages/test.html', context)
+    return render(request, 'messages/chat.html', context)
 
 
 @login_required

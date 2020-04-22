@@ -68,7 +68,7 @@
             {% if user.profile.friends %}
                 {% for friend in user.profile.friends %}
                     <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
-                    <a onclick="changeUser(event, '/messages/{{ friend.id }}/', '{{ friend.profile.image.url }}', '{{ friend.profile.get_status }}')"
+                    <a onclick="changeUser(event, '/messages/{{ friend.id }}/', '{{ friend.profile.image.url }}', '{{ friend.profile.get_status }}', '{{ friend.id }}')"
                        href="javascript:void(0)">
                         {{ friend.profile.get_name }}
                     </a>
@@ -81,7 +81,7 @@
     </div>
 
     <script>
-        function changeUser(e, link, img, status) {
+        function changeUser(e, link, img, status, id) {
             $.ajax({
                 type: "POST",
                 url: link + 'get_mes/',
@@ -93,6 +93,7 @@
 
                     document.getElementById('chat_avatar').src = img
                     document.getElementById('chat_name').innerHTML = e.target.innerHTML
+                    document.getElementById('chat_name').href = '/accounts/profile/' + id + '/'
                     document.getElementById('chat_status').innerHTML = status
                     document.getElementById('send_btn').onclick = function (event) {
                         sendMessage(event, link + 'send_mes/')
