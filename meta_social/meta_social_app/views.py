@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404, JsonResponse
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
 from django.template.loader import render_to_string
 from django.views import View
 from simple_search import search_filter
@@ -235,18 +235,7 @@ class EditProfile(View):
 def post_view(request, post_id):
     context = {}
     context = get_menu_context('post', 'Пост')
-    context['pagename'] = 'Пост'
     context['post'] = Post.objects.get(id=post_id)
-
-    try:
-        userlike = Like.objects.get(user=request.user, post_id=context['post'])
-    except:
-        userlike = None
-
-    if userlike:
-        context['liked_by_user'] = True
-    else:
-        context['liked_by_user'] = False
 
     return render(request, 'full_post.html', context)
 
@@ -464,24 +453,18 @@ def crop_image(request, user_id):
 
 @login_required
 def like_post(request, post_id):
-    is_liked = False
     if request.method == 'POST':
-        post_item = Post.objects.get(id=post_id)
-        if request.user not in [i.user for i in post_item.likes()]:
-            like_item = Like(
-                post=post_item,
-                user=request.user
-            )
-            is_liked = True
-            like_item.save()
+        post_item = get_object_or_404(Post, id=post_id)
+
+        if post_item in request.user.profile.liked_posts.all():
+            request.user.profile.liked_posts.remove(post_item)
+            post_item.likes.all().get(user=request.user).delete()
+
+            return HttpResponse('unliked')
         else:
-            like_item = Like.objects.get(
-                post=post_item,
-                user=request.user
-            )
-            is_liked = False
-            like_item.delete()
-        data = {
-            'is_liked': is_liked,
-        }
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            post_item.likes.create(user=request.user)
+            request.user.profile.liked_posts.add(post_item)
+
+            return HttpResponse('liked')
+
+    raise Http404()

@@ -13,6 +13,27 @@ from django.template.defaultfilters import slugify
 from image_cropping import ImageRatioField, ImageCropField
 
 
+class Like(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+
+class Post(models.Model):
+    """
+    Post class
+    """
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    text = models.TextField()
+    date = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(Like, blank=True, related_name='likes')
+
+    def __str__(self):
+        return self.text
+
+    def get_images(self):
+        return PostImages.objects.filter(post=self)
+
+
 class Profile(models.Model):
     """
     User profile class
@@ -40,6 +61,8 @@ class Profile(models.Model):
     last_act = models.DateTimeField(default=timezone.now, auto_now=False, auto_now_add=False)
 
     blacklist = models.ManyToManyField(User, 'blacklist')
+
+    liked_posts = models.ManyToManyField(Post, 'liked_posts')
 
     def check_online_with_last_log(self) -> bool:
         """
@@ -148,33 +171,6 @@ class Profile(models.Model):
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
-    def likes(self):
-        return Like.objects.filter(user=self.user)
-
-
-class Post(models.Model):
-    """
-    Post class
-    """
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    text = models.TextField()
-    date = models.DateTimeField(auto_now=True)
-    likes = models.ManyToManyField(User, blank=True, related_name='likes')
-
-    def __str__(self):
-        return self.text
-
-    def get_images(self):
-        return PostImages.objects.filter(post=self)
-
-    def like(self):
-        return "/like/" + str(self.id) + '/'
-
-    def likes(self):
-        return Like.objects.filter(post=self)
-
-    def likes_count(self):
-        return len(self.likes())
 
 class PostImages(models.Model):
     """
@@ -275,8 +271,3 @@ class FriendshipRequest(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='3+')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='4+')
     already_sent = models.BooleanField(default=False)
-
-class Like(models.Model):
-    date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    post = models.ForeignKey(to=Post, on_delete=models.CASCADE)

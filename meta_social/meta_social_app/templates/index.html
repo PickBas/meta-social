@@ -1,5 +1,6 @@
 {% extends 'base_menu.html' %}
 {% load cropping %}
+{% load static %}
 
 {% block center %}
     <div class="card">
@@ -113,6 +114,12 @@
 
                     <hr class="mt-1 mb-1">
                     <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+                    
+                    {% if post in user.profile.liked_posts.all %}
+                        <button class="btn btn-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+                    {% else %}
+                        <button class="btn btn-outline-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
@@ -124,3 +131,7 @@
 {% block right %}
     Не знаю что сюда впихнуть
 {% endblock %}
+
+{% block extra__js %}
+  <script src="{% static 'js/like_post.js' %}"></script>
+{% endblock extra__js %}
