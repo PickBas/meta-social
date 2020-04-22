@@ -93,12 +93,14 @@
             console.log("HERE");
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'author': {{ user.id }},
-                'chat_id': {{ room_name }},
-            }));
-            messageInputDom.value = '';
+            if (message.length) {
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'author': {{ user.id }},
+                    'chat_id': {{ room_name }},
+                }));
+                messageInputDom.value = '';
+            }
         };
     </script>
 
@@ -111,8 +113,7 @@
             {% if user.profile.friends %}
                 {% for friend in user.profile.friends.all %}
                     <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
-                    <small class="float-right text-muted">{% if friend.profile.check_online_with_afk %}Онлайн{% else %}Оффлайн{% endif %}</small>
-                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
+                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST" style="display: inline-block;">
                         {% csrf_token %}
                         <a href="/chat/go_to_chat/{{ chat.id }}/" onclick="this.closest('form').submit();return false;">
                                 {{ friend.profile.get_name }}
