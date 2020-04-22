@@ -775,14 +775,3 @@ def like_post(request, post_id):
             
     raise Http404()
 
-
-@login_required
-def get_messages(request, user_id):
-    to_user = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST':
-        messages = get_messages_list(to_user, request.user)
-
-        return render(request, 'messages/messages_list.html', {'messages_list': messages})
-
-    raise Http404()
