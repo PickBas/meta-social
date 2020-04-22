@@ -48,6 +48,55 @@ class Community(models.Model):
         return len(self.posts())
 
 
+class Like(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+
+class Post(models.Model):
+    """
+    Post class
+    """
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
+    community = models.ForeignKey(to=Community, on_delete=models.CASCADE, null=True)
+    text = models.TextField()
+    date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
+
+    likes = models.ManyToManyField(Like, blank=True, related_name='likes')
+
+    class Meta:
+        verbose_name = 'Посты'
+        verbose_name_plural = 'Посты'
+
+    def __str__(self):
+        return self.text
+
+    def get_owner(self):
+        return self.community if self.community else self.user.profile
+
+    def get_owner_name(self):
+        if self.community:
+            return self.community.name
+        return self.user.username
+
+    def get_link(self):
+        if self.community:
+            return '/community/' + str(self.community.id) + '/'
+        return '/accounts/profile/' + str(self.user.id) + '/'
+
+    def get_images(self):
+        return PostImages.objects.filter(post=self)
+
+    def get_images_count(self):
+        return PostImages.objects.filter(post=self).count()
+
+    def comments(self):
+        return Comment.objects.filter(post=self)
+
+    def amount_of_comments(self):
+        return len(self.comments())
+
+
 class Profile(models.Model):
     """
     User profile class
@@ -78,8 +127,8 @@ class Profile(models.Model):
         default=timezone.now, auto_now=False, auto_now_add=False)
 
     blacklist = models.ManyToManyField(User, 'blacklist')
-
     communities = models.ManyToManyField(Community)
+    liked_posts = models.ManyToManyField(Post, 'liked_posts')
 
     def check_online_with_last_log(self) -> bool:
         """
@@ -234,48 +283,6 @@ def create_user_profile(sender, **kwargs) -> None:
             save_image_from_url(profile, picture)
 
     profile.save()
-
-
-class Post(models.Model):
-    """
-    Post class
-    """
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
-    community = models.ForeignKey(to=Community, on_delete=models.CASCADE, null=True)
-    text = models.TextField()
-    date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
-
-    class Meta:
-        verbose_name = 'Посты'
-        verbose_name_plural = 'Посты'
-
-    def __str__(self):
-        return self.text
-
-    def get_owner(self):
-        return self.community if self.community else self.user.profile
-
-    def get_owner_name(self):
-        if self.community:
-            return self.community.name
-        return self.user.username
-
-    def get_link(self):
-        if self.community:
-            return '/community/' + str(self.community.id) + '/'
-        return '/accounts/profile/' + str(self.user.id) + '/'
-
-    def get_images(self):
-        return PostImages.objects.filter(post=self)
-
-    def get_images_count(self):
-        return PostImages.objects.filter(post=self).count()
-
-    def comments(self):
-        return Comment.objects.filter(post=self)
-
-    def amount_of_comments(self):
-        return len(self.comments())
 
 
 class PostImages(models.Model):

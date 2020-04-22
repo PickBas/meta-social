@@ -46,6 +46,7 @@ urlpatterns = [
     path('chat/go_to_chat/<int:user_id>/send_mes/', send_message),
 
     path('ajax/search/', global_search),
+    path('like/<int:post_id>/', like_post)
 ]
 
 if settings.DEBUG:

@@ -9,12 +9,13 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404, HttpResponse, JsonResponse
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
+from django.template.loader import render_to_string
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
 from django.urls import reverse
-from .models import Profile, Comment, Messages, Community
+from .models import Profile, Comment, Messages, Community, Like
 from PIL import Image
 from django.forms import modelformset_factory
 
@@ -211,6 +212,14 @@ class EditProfile(View):
         get_last_act(request, context['uedit'])
 
         return render(request, self.template_name, context)
+
+@login_required
+def post_view(request, post_id):
+    context = {}
+    context = get_menu_context('post', 'Пост')
+    context['post'] = Post.objects.get(id=post_id)
+
+    return render(request, 'full_post.html', context)
 
 
 @login_required
@@ -726,4 +735,23 @@ def blacklist_remove(request, user_id):
 
         return get_render(request, {'c_user': request.user})
 
+    raise Http404()
+
+
+@login_required
+def like_post(request, post_id):
+    if request.method == 'POST':
+        post_item = get_object_or_404(Post, id=post_id)
+
+        if post_item in request.user.profile.liked_posts.all():
+            request.user.profile.liked_posts.remove(post_item)
+            post_item.likes.all().get(user=request.user).delete()
+
+            return HttpResponse('unliked')
+        else:
+            post_item.likes.create(user=request.user)
+            request.user.profile.liked_posts.add(post_item)
+
+            return HttpResponse('liked')
+            
     raise Http404()
