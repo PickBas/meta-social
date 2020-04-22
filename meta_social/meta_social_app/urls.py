@@ -41,12 +41,12 @@ urlpatterns = [
     path('music/<int:user_id>/', music_list),
     path('music/upload/', music_upload),
 
-    path('chat/', chat),
-    path('chat/go_to_chat/<int:user_id>/', show_messages),
-    path('chat/go_to_chat/<int:user_id>/send_mes/', send_message),
-
     path('ajax/search/', global_search),
-    path('like/<int:post_id>/', like_post)
+    path('like/<int:post_id>/', like_post),
+    
+    path('messages/', show_chat),
+    path('messages/<int:user_id>/get_mes/', get_messages),
+    path('messages/<int:user_id>/send_mes/', send_message),
 ]
 
 if settings.DEBUG:
