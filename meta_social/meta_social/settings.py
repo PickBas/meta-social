@@ -186,3 +186,7 @@ AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
 AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
 AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
 AWS_S3_BUCKET_NAME = "social-bucket"
+
+FIXTURE_DIRS = [
+    'meta_social_app/fixtures',
+]
