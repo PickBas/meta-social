@@ -81,7 +81,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title float-left">{% if c_user.first_name or c_user.last_name %}{{ c_user.first_name }} {{ c_user.last_name }}{% else %}{{ c_user.username }}{% endif %}</h5>
-          <small class="float-right text-muted">{% if is_online %}Онлайн{% else %}Оффлайн{% endif %}</small>
+          <small class="float-right text-muted">{% if user == c_user %}Онлайн{% else %}{{ c_user.profile.get_status }}{% endif %}</small>
           <br><hr>
           <p class="card-text">
             {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
