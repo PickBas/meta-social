@@ -47,11 +47,12 @@
         </div>
     </div>
 
-    <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+    {% load static %}
+    <script src="{% static 'js/autosize.min.js' %}"></script>
 
     <script>
 
-        autosize(document.getElementById('message-input'));
+        autosize(document.getElementById('chat-message-input'));
         const roomName = {{ room_name }};
 
         const chatSocket = new WebSocket(

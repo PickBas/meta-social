@@ -64,7 +64,8 @@
     </div>
 </div>
 
-<script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+{% load static %}
+<script src="{% static 'js/autosize.min.js' %}"></script>
 
 <script>
     autosize(document.getElementById("id_text"));
