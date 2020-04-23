@@ -633,8 +633,6 @@ class FriendsViews:
         search_fields = ['username', 'first_name', 'last_name']
 
         context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
-        asd = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
-        print(asd[0].profile.blacklist.all())
 
         return render(request, 'friends/list.html', context)
 
