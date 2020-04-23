@@ -232,10 +232,9 @@ class ProfileViews:
 
             return render(request, self.template_name, context)
 
-    @login_required
     class AvatarManaging(View):
         def __init__(self, **kwargs):
-            self.context = {}
+            self.context = get_menu_context('profile', 'Смена аватарки')
             self.template_name = 'profile/change_avatar.html'
             super().__init__(**kwargs)
 
@@ -265,11 +264,9 @@ class ProfileViews:
                                                 save=False)
                 request.user.profile.save()
 
-            self.context['avatar_form'] = avatar_form
-            self.context['crop_form'] = crop_form
+                return redirect('/accounts/profile/' + str(request.user.id))
 
         def get(self, request):
-            self.context = get_menu_context('profile', 'Смена аватарки')
             avatar_form = UpdateAvatarForm()
             crop_form = CropAvatarForm()
 
@@ -375,21 +372,23 @@ class PostViews:
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+    @staticmethod
+    def like_post(request, post_id):
+        if request.method == 'POST':
+            post_item = get_object_or_404(Post, id=post_id)
 
-@login_required
-def community(request, community_id):
-    context = get_menu_context('community', 'Сообщество')
+            if post_item in request.user.profile.liked_posts.all():
+                request.user.profile.liked_posts.remove(post_item)
+                post_item.likes.all().get(user=request.user).delete()
 
-    context['community'] = get_object_or_404(Community, id=community_id)
+                return HttpResponse('unliked')
+            else:
+                post_item.likes.create(user=request.user)
+                request.user.profile.liked_posts.add(post_item)
 
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+                return HttpResponse('liked')
 
-    context['postform'] = PostForm()
-    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
-
-    context['action_type'] = '/post/create/{}/'.format(community_id)
-
-    return render(request, 'community/community_page.html', context)
+        raise Http404()
 
 
 class MusicViews:
@@ -431,7 +430,7 @@ class Conversations:
     class ChatList(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.template_name = 'chat/message.html'
+            self.template_name = 'chat/chat.html'
 
         def get(self, request, **kwargs):
             context = {}
@@ -482,333 +481,338 @@ class Conversations:
         raise Http404()
 
 
-@login_required
-def community_create(request):
-    context = get_menu_context('community', 'Создание сообщества')
+class Communities:
+    class CommunityView(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'community/community_page.html'
 
-    if request.method == 'POST':
-        form = CommunityCreateForm(request.POST)
-        if form.is_valid():
-            community = Community(
-                name=request.POST.get('name'),
-                info=request.POST.get('info'),
-                country=request.POST.get('country'),
-                owner=request.user
-            )
-            community.save()
+        def get(self, request, community_id):
+            context = get_menu_context('community', 'Сообщество')
+
+            context['community'] = get_object_or_404(Community, id=community_id)
+
+            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+            context['postform'] = PostForm()
+            context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+            context['action_type'] = '/post/create/{}/'.format(community_id)
+
+            return render(request, self.template_name, context)
+
+    class CommunityCreate(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'community/community_create.html'
+
+        @staticmethod
+        def post(request):
+            form = CommunityCreateForm(request.POST)
+            if form.is_valid():
+                community = Community(
+                    name=request.POST.get('name'),
+                    info=request.POST.get('info'),
+                    country=request.POST.get('country'),
+                    owner=request.user
+                )
+                community.save()
+                community.users.add(request.user)
+                request.user.profile.communities.add(community)
+                return redirect('/community/{}/'.format(community.id))
+
+        def get(self, request):
+            context = get_menu_context('community', 'Создание сообщества')
+            context['form'] = CommunityCreateForm()
+            return render(request, self.template_name, context)
+
+    class CommunityList(View):
+        def __init__(self, **kwargs):
+            self.context = {}
+            self.template_name_get = 'community/community_list.html'
+            self.template_name_post = 'community/search.html'
+            super().__init__(**kwargs)
+
+        def get(self, request, **kwargs):
+            self.context = get_menu_context('community', 'Список сообществ')
+            self.context['c_user'] = get_object_or_404(User, id=kwargs['user_id'])
+            return render(request, 'community/community_list.html', self.context)
+
+        def post(self, request, **kwargs):
+            self.context['matching'] = True
+            if not request.POST.get('query'):
+                self.context['matching'] = False
+                return render(request, 'community/search.html', self.context)
+            query = request.POST.get('query')
+            search_fields = ['name']
+            self.context['c_matches'] = Community.objects.filter(search_filter(search_fields, query))
+
+            return render(request, 'community/search.html', self.context)
+
+    @staticmethod
+    def community_join(request, community_id):
+        community = get_object_or_404(Community, id=community_id)
+        if request.user not in community.users.all():
             community.users.add(request.user)
             request.user.profile.communities.add(community)
-            return redirect('/community/{}/'.format(community.id))
-    context['form'] = CommunityCreateForm()
-    return render(request, 'community/community_create.html', context)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def community_leave(request, community_id):
+        community = get_object_or_404(Community, id=community_id)
+        if request.user in community.users.all():
+            community.users.remove(request.user)
+            request.user.profile.communities.remove(community)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def post_community_new(request, community_id):
+        """
+        Function for creating post
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+
+        community = get_object_or_404(Community, id=community_id)
+
+        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+
+        if request.method == "POST":
+            postForm = PostForm(request.POST)
+            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+            if postForm.is_valid() and formset.is_valid():
+                post_form = postForm.save(commit=False)
+                post_form.community = community
+                post_form.save()
+
+                for form in formset.cleaned_data:
+                    if form:
+                        image = form['image']
+                        photo = PostImages(post=post_form, image=image)
+                        photo.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required
-def community_list(request, user_id):
-    context = get_menu_context('community', 'Список сообществ')
+class GlobalSearch(View):
+    def __init__(self, **kwargs):
+        self.template_name = 'search_list.html'
+        super().__init__(**kwargs)
 
-    context['c_user'] = get_object_or_404(User, id=user_id)
+    def post(self, request):
+        if request.POST.get('query'):
+            context = {}
+            query = request.POST.get('query')
 
-    if request.method == 'POST':
+            search_fields = ['username', 'first_name', 'last_name']
+            context['users'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+
+            search_fields = ['artist', 'title']
+            context['music'] = Music.objects.filter(search_filter(search_fields, query))
+
+            search_fields = ['name']
+            context['communities'] = Community.objects.filter(search_filter(search_fields, query))
+
+            return render(request, self.template_name, context)
+
+    def get(self, request):
+        raise Http404()
+
+
+class FriendsViews:
+    @staticmethod
+    def get_render(request, context):
         context['matching'] = True
         if not request.POST.get('query'):
             context['matching'] = False
-            return render(request, 'community/search.html', context)
+            return render(request, 'friends/list.html', context)
+
         query = request.POST.get('query')
-        search_fields = ['name']
-        context['c_matches'] = Community.objects.filter(search_filter(search_fields, query))
-
-        return render(request, 'community/search.html', context)
-
-    return render(request, 'community/community_list.html', context)
-
-
-@login_required
-def community_join(request, community_id):
-    community = get_object_or_404(Community, id=community_id)
-    if request.user not in community.users.all():
-        community.users.add(request.user)
-        request.user.profile.communities.add(community)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def community_leave(request, community_id):
-    community = get_object_or_404(Community, id=community_id)
-    if request.user in community.users.all():
-        community.users.remove(request.user)
-        request.user.profile.communities.remove(community)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def post_community_new(request, community_id):
-    """
-    Function for creating post
-    :param request: request
-    :return: HttpResponseRedirect
-    """
-
-    community = get_object_or_404(Community, id=community_id)
-
-    PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
-
-    if request.method == "POST":
-        postForm = PostForm(request.POST)
-        formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
-
-        if postForm.is_valid() and formset.is_valid():
-            post_form = postForm.save(commit=False)
-            post_form.community = community
-            post_form.save()
-
-            for form in formset.cleaned_data:
-                if form:
-                    image = form['image']
-                    photo = PostImages(post=post_form, image=image)
-                    photo.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def global_search(request):
-    if request.method == 'POST' and request.POST.get('query'):
-        context = {}
-        query = request.POST.get('query')
-
         search_fields = ['username', 'first_name', 'last_name']
-        context['users'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
 
-        search_fields = ['artist', 'title']
-        context['music'] = Music.objects.filter(search_filter(search_fields, query))
+        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
 
-        search_fields = ['name']
-        context['communities'] = Community.objects.filter(search_filter(search_fields, query))
-
-        return render(request, 'search_list.html', context)
-    raise Http404()
-
-
-def get_render(request, context):
-    context['matching'] = True
-    if not request.POST.get('query'):
-        context['matching'] = False
         return render(request, 'friends/list.html', context)
 
-    query = request.POST.get('query')
-    search_fields = ['username', 'first_name', 'last_name']
+    class FriendsList(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'friends/friends_list.html'
+            self.context = {}
+            super().__init__(**kwargs)
 
-    context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+        def get(self, request, **kwargs):
+            self.context = get_menu_context('friends', 'Список друзей')
+            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            return render(request, self.template_name, self.context)
 
-    return render(request, 'friends/list.html', context)
+        def post(self, request):
+            return FriendsViews.get_render(request, self.context)
 
+    class FriendsRequests(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'friends/requests.html'
+            super().__init__(**kwargs)
 
-@login_required
-def friends_list(request, user_id) -> render:
-    """
-    Friend_list view
-    :param request: request
-    :param user_id: id
-    :return: render
-    """
-    context = get_menu_context('friends', 'Список друзей')
+        def get(self, request):
+            context = get_menu_context('friends', 'Заявки в друзья')
 
-    context['c_user'] = User.objects.get(id=user_id)
+            context['c_user'] = request.user
+            context['friendship'] = {
+                'incoming': request.user.profile.friendship_inbox_requests(),
+                'outcoming': request.user.profile.friendship_outbox_requests(),
+            }
 
-    if request.method == 'POST':
-        return get_render(request, context)
+            return render(request, self.template_name, context)
 
-    return render(request, 'friends/friends_list.html', context)
+    class FriendsBlacklist(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'friends/blacklist.html'
+            super().__init__(**kwargs)
 
+        def get(self, request, user_id) -> render:
+            """
+            Friends_blacklist view
+            :param user_id: user in blacklist od
+            :param request: request
+            :return: render
+            """
+            context = get_menu_context('friends', 'Черный список')
 
-@login_required
-def friends_requests(request) -> render:
-    """
-    Friends_requests view
-    :param request: request
-    :return: render
-    """
-    context = get_menu_context('friends', 'Заявки в друзья')
+            c_user = get_object_or_404(User, id=user_id)
+            context['c_user'] = c_user
 
-    context['c_user'] = request.user
-    context['friendship'] = {
-        'incoming': request.user.profile.friendship_inbox_requests(),
-        'outcoming': request.user.profile.friendship_outbox_requests(),
-    }
+            return render(request, self.template_name, context)
 
-    return render(request, 'friends/requests.html', context)
+    @staticmethod
+    def send_friendship_request(request, user_id) -> redirect:
+        """
+        Sending friendship request view
+        :param request: request
+        :param user_id: id
+        :return: redirect
+        """
 
-
-@login_required
-def friends_blacklist(request, user_id) -> render:
-    """
-    Friends_blacklist view
-    :param user_id: user in blacklist od
-    :param request: request
-    :return: render
-    """
-    context = get_menu_context('friends', 'Черный список')
-
-    c_user = get_object_or_404(User, id=user_id)
-    context['c_user'] = c_user
-
-    return render(request, 'friends/blacklist.html', context)
-
-
-@login_required
-def send_friendship_request(request, user_id) -> redirect:
-    """
-    Sending friendship request view
-    :param request: request
-    :param user_id: id
-    :return: redirect
-    """
-
-    user_item = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST':
-        if not FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-            if not FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-                item = FriendshipRequest(
-                    from_user=request.user,
-                    to_user=user_item,
-                )
-
-                item.save()
-
-                return get_render(request, {'c_user': request.user})
-
-    raise Http404()
-
-
-@login_required
-def accept_request(request, user_id) -> redirect:
-    """
-    Accept_request view
-    :param request: request
-    :param request_id: id
-    :return: redirect
-    """
-    if request.method == 'POST':
         user_item = get_object_or_404(User, id=user_id)
 
-        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=user_item, to_user=request.user)
-        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=request.user, to_user=user_item)
-        else:
-            raise Http404()
+        if request.method == 'POST':
+            if not FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+                if not FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+                    item = FriendshipRequest(
+                        from_user=request.user,
+                        to_user=user_item,
+                    )
 
-        first_user = User.objects.get(id=request_item.from_user.id)
-        second_user = User.objects.get(id=request_item.to_user.id)
-        first_user.profile.friends.add(second_user)
-        second_user.profile.friends.add(first_user)
+                    item.save()
 
-        request_item.delete()
+                    return FriendsViews.get_render(request, {'c_user': request.user})
 
-        return get_render(request, {'c_user': request.user})
+        raise Http404()
 
-    raise Http404()
+    @staticmethod
+    def accept_request(request, user_id) -> redirect:
+        """
+        Accept_request view
+        :param request: request
+        :param request_id: id
+        :return: redirect
+        """
+        if request.method == 'POST':
+            user_item = get_object_or_404(User, id=user_id)
 
+            if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+                request_item = FriendshipRequest.objects.get(
+                    from_user=user_item, to_user=request.user)
+            elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+                request_item = FriendshipRequest.objects.get(
+                    from_user=request.user, to_user=user_item)
+            else:
+                raise Http404()
 
-@login_required
-def cancel_request(request, user_id):
-    if request.method == 'POST':
-        user_item = get_object_or_404(User, id=user_id)
+            first_user = User.objects.get(id=request_item.from_user.id)
+            second_user = User.objects.get(id=request_item.to_user.id)
+            first_user.profile.friends.add(second_user)
+            second_user.profile.friends.add(first_user)
 
-        if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=user_item, to_user=request.user)
-        elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-            request_item = FriendshipRequest.objects.get(
-                from_user=request.user, to_user=user_item)
-        else:
-            raise Http404()
+            request_item.delete()
 
-        request_item.delete()
+            return FriendsViews.get_render(request, {'c_user': request.user})
 
-        return get_render(request, {'c_user': request.user})
+        raise Http404()
 
-    raise Http404()
+    @staticmethod
+    def cancel_request(request, user_id):
+        if request.method == 'POST':
+            user_item = get_object_or_404(User, id=user_id)
 
+            if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+                request_item = FriendshipRequest.objects.get(
+                    from_user=user_item, to_user=request.user)
+            elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+                request_item = FriendshipRequest.objects.get(
+                    from_user=request.user, to_user=user_item)
+            else:
+                raise Http404()
 
-@login_required
-def remove_friend(request, user_id) -> redirect:
-    """
-    Remove_friend view
-    :param request: request
-    :param user_id: id
-    :return: redirect
-    """
-    if request.method == 'POST':
-        user_item = get_object_or_404(User, id=user_id)
+            request_item.delete()
 
-        if user_item in request.user.profile.friends.all():
-            request.user.profile.friends.remove(user_item)
-            user_item.profile.friends.remove(request.user)
-        else:
-            raise Http404()
+            return FriendsViews.get_render(request, {'c_user': request.user})
 
-        return get_render(request, {'c_user': request.user})
+        raise Http404()
 
-    raise Http404()
+    @staticmethod
+    def remove_friend(request, user_id) -> redirect:
+        """
+        Remove_friend view
+        :param request: request
+        :param user_id: id
+        :return: redirect
+        """
+        if request.method == 'POST':
+            user_item = get_object_or_404(User, id=user_id)
 
+            if user_item in request.user.profile.friends.all():
+                request.user.profile.friends.remove(user_item)
+                user_item.profile.friends.remove(request.user)
+            else:
+                raise Http404()
 
-@login_required
-def blacklist_add(request, user_id):
-    """
-    Blacklist_add view
-    :param request: request
-    :param user_id: id
-    """
+            return FriendsViews.get_render(request, {'c_user': request.user})
 
-    if request.method == 'POST':
-        user_for_blacklist = get_object_or_404(User, id=user_id)
+        raise Http404()
 
-        if user_for_blacklist in request.user.profile.friends.all():
-            remove_friend(request, user_id)
+    @staticmethod
+    def blacklist_add(request, user_id):
+        """
+        Blacklist_add view
+        :param request: request
+        :param user_id: id
+        """
 
-        request.user.profile.blacklist.add(user_for_blacklist)
-        request.user.save()
+        if request.method == 'POST':
+            user_for_blacklist = get_object_or_404(User, id=user_id)
 
-        return get_render(request, {'c_user': request.user})
-    raise Http404()
+            if user_for_blacklist in request.user.profile.friends.all():
+                FriendsViews.remove_friend(request, user_id)
 
+            request.user.profile.blacklist.add(user_for_blacklist)
+            request.user.save()
 
-@login_required
-def blacklist_remove(request, user_id):
-    """
-    Blacklist_remove view
-    :param request: request
-    :param user_id: id
-    """
-    if request.method == 'POST':
-        user_to_remove = get_object_or_404(User, id=user_id)
+            return FriendsViews.get_render(request, {'c_user': request.user})
+        raise Http404()
 
-        request.user.profile.blacklist.remove(user_to_remove)
+    @staticmethod
+    def blacklist_remove(request, user_id):
+        """
+        Blacklist_remove view
+        :param request: request
+        :param user_id: id
+        """
+        if request.method == 'POST':
+            user_to_remove = get_object_or_404(User, id=user_id)
 
-        return get_render(request, {'c_user': request.user})
+            request.user.profile.blacklist.remove(user_to_remove)
 
-    raise Http404()
+            return FriendsViews.get_render(request, {'c_user': request.user})
 
-
-@login_required
-def like_post(request, post_id):
-    if request.method == 'POST':
-        post_item = get_object_or_404(Post, id=post_id)
-
-        if post_item in request.user.profile.liked_posts.all():
-            request.user.profile.liked_posts.remove(post_item)
-            post_item.likes.all().get(user=request.user).delete()
-
-            return HttpResponse('unliked')
-        else:
-            post_item.likes.create(user=request.user)
-            request.user.profile.liked_posts.add(post_item)
-
-            return HttpResponse('liked')
-
-    raise Http404()
+        raise Http404()
