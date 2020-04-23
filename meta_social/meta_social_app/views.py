@@ -68,24 +68,32 @@ def get_last_act(request, user_item) -> None:
         user_item.profile.save()
 
 
-@login_required
-def index(request) -> render:
+class Index(View):
     """
-    Index page view
-    :param request: request
-    :return: render
+    Index Class
     """
-    context = get_menu_context('newsfeed', 'Главная')
-    context['pagename'] = "Главная"
 
-    PostImageFormSet = modelformset_factory(
-        PostImages, form=PostImageForm, extra=10)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template_name = 'index.html'
 
-    context['postform'] = PostForm()
-    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
-    context['action_type'] = '/post/create/'
+    def get(self, request) -> render:
+        """
+        Index page view
+        :param request: request
+        :return: render
+        """
+        context = get_menu_context('newsfeed', 'Главная')
+        context['pagename'] = "Главная"
 
-    return render(request, 'index.html', context)
+        PostImageFormSet = modelformset_factory(
+            PostImages, form=PostImageForm, extra=10)
+
+        context['postform'] = PostForm()
+        context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+        context['action_type'] = '/post/create/'
+
+        return render(request, self.template_name, context)
 
 
 @login_required
@@ -102,253 +110,270 @@ def logout_track(request, user_id) -> redirect:
     return redirect('/accounts/logout/')
 
 
-@login_required
-def profile(request, user_id) -> render:
+class ProfileViews:
     """
-    User profile view.
-    :param request: request
-    :param user_id: id
-    :return: context
-    """
-    if not User.objects.filter(id=user_id).exists():
-        raise Http404()
-
-    context = get_menu_context('profile', 'Профиль')
-    context['profile'] = Profile.objects.get(user=user_id)
-    user_item = User.objects.get(id=user_id)
-    context['c_user'] = user_item
-    context['is_online'] = context['profile'].check_online_with_afk()
-    get_last_act(request, user_item)
-
-    PostImageFormSet = modelformset_factory(
-        PostImages, form=PostImageForm, extra=10)
-
-    pass_add_to_friends = False
-
-    is_in_blacklist = False
-
-    if user_item != request.user:
-        if request.user not in user_item.profile.friends.all():
-            pass_add_to_friends = True
-        if request.user in user_item.profile.blacklist.all():
-            is_in_blacklist = True
-
-    context['is_in_blacklist'] = is_in_blacklist
-    context['is_friend'] = True if request.user in user_item.profile.friends.all() and request.user != user_item else False
-    context['pass_add_to_friends'] = pass_add_to_friends
-
-    context['postform'] = PostForm()
-    context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
-
-    context['action_type'] = '/post/create/'
-
-    return render(request, 'profile/profile_page.html', context)
-
-
-class EditProfile(View):
-    """
-    EditProfile class
+    ProfileViews
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.template_name = 'profile/edit_profile.html'
-        self.profile = None
-        self.previous_birth = None
+    class ProfilePage(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'profile/profile_page.html'
+            super().__init__(**kwargs)
 
-    def post(self, request, **kwargs) -> redirect:
+        def get(self, request, **kwargs) -> render:
+            """
+            User profile view.
+            :param request: request
+            :param user_id: id
+            :return: context
+            """
+            if not User.objects.filter(id=kwargs['user_id']).exists():
+                raise Http404()
+
+            context = get_menu_context('profile', 'Профиль')
+            context['profile'] = Profile.objects.get(user=kwargs['user_id'])
+            user_item = User.objects.get(id=kwargs['user_id'])
+            context['c_user'] = user_item
+            context['is_online'] = context['profile'].check_online_with_afk()
+            get_last_act(request, user_item)
+
+            PostImageFormSet = modelformset_factory(
+                PostImages, form=PostImageForm, extra=10)
+
+            pass_add_to_friends = False
+
+            is_in_blacklist = False
+
+            if user_item != request.user:
+                if request.user not in user_item.profile.friends.all():
+                    pass_add_to_friends = True
+                if request.user in user_item.profile.blacklist.all():
+                    is_in_blacklist = True
+
+            context['is_in_blacklist'] = is_in_blacklist
+            context['is_friend'] = True if request.user in user_item.profile.friends.all() \
+                                           and request.user != user_item else False
+            context['pass_add_to_friends'] = pass_add_to_friends
+
+            context['postform'] = PostForm()
+            context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+            context['action_type'] = '/post/create/'
+
+            return render(request, self.template_name, context)
+
+    class EditProfile(View):
         """
-        Processing post request
-        :param request: request
-        :param kwargs: attrs
-        :return:
+        EditProfile class
         """
 
-        self.previous_birth = User.objects.get(
-            id=kwargs['user_id']).profile.birth
-        user_form = UserUpdateForm(
-            request.POST, instance=User.objects.get(id=kwargs['user_id']))
-        self.profile = Profile.objects.get(user=kwargs['user_id'])
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'profile/edit_profile.html'
+            self.profile = None
+            self.previous_birth = None
 
-        self.profile.show_email = False if request.POST.get(
-            'show_email') is None else True
+        def post(self, request, **kwargs) -> redirect:
+            """
+            Processing post request
+            :param request: request
+            :param kwargs: attrs
+            :return:
+            """
 
-        try:
-            img_manage = ImageManage(
-                kwargs['user_id'], self.profile, request.FILES['avatar'])
-            img_manage.process_img()
-        except Exception:
-            pass
+            self.previous_birth = User.objects.get(
+                id=kwargs['user_id']).profile.birth
+            user_form = UserUpdateForm(
+                request.POST, instance=User.objects.get(id=kwargs['user_id']))
+            self.profile = Profile.objects.get(user=kwargs['user_id'])
 
-        profile_form = ProfileUpdateForm(request.POST,
-                                         instance=self.profile)
+            self.profile.show_email = False if request.POST.get(
+                'show_email') is None else True
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            tmp_user = User.objects.get(id=kwargs['user_id'])
+            try:
+                img_manage = ImageManage(
+                    kwargs['user_id'], self.profile, request.FILES['avatar'])
+                img_manage.process_img()
+            except Exception:
+                pass
 
-            if self.profile.birth is None:
-                self.profile.birth = self.previous_birth
-                self.profile.save()
+            profile_form = ProfileUpdateForm(request.POST,
+                                             instance=self.profile)
 
-            return redirect('/accounts/profile/' + str(kwargs['user_id']))
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                tmp_user = User.objects.get(id=kwargs['user_id'])
 
-    def get(self, request, **kwargs) -> render:
-        """
-        Processing get request
-        :param request: request
-        :param kwargs: attrs
-        :return: render
-        """
-        context = get_menu_context('profile', 'Редактирование профиля')
-        context['profile'] = Profile.objects.get(user=kwargs['user_id'])
-        context['uedit'] = User.objects.get(id=kwargs['user_id'])
-        context['user_form'] = UserUpdateForm(
-            instance=User.objects.get(id=kwargs['user_id'])
-        )
-        context['profile_form'] = ProfileUpdateForm(
-            instance=Profile.objects.get(user=kwargs['user_id']))
-        self.previous_birth = User.objects.get(
-            id=kwargs['user_id']).profile.birth
-        get_last_act(request, context['uedit'])
+                if self.profile.birth is None:
+                    self.profile.birth = self.previous_birth
+                    self.profile.save()
 
-        return render(request, self.template_name, context)
+                return redirect('/accounts/profile/' + str(kwargs['user_id']))
 
-@login_required
-def post_view(request, post_id):
-    context = {}
-    context = get_menu_context('post', 'Пост')
-    context['post'] = Post.objects.get(id=post_id)
-
-    return render(request, 'full_post.html', context)
-
-
-@login_required
-def post_view(request, post_id):
-    context = get_menu_context('post', 'Пост')
-    context['pagename'] = 'Пост'
-    context['post'] = Post.objects.get(id=post_id)
-
-    return render(request, 'full_post.html', context)
-
-
-@login_required
-def post_ajax(request, post_id):
-    if request.method == "POST":
-        if len(request.POST.get('text')) > 0:
-            comment_item = Comment(
-                text=request.POST.get('text'),
-                post=Post.objects.get(id=post_id),
-                user=request.user
+        def get(self, request, **kwargs) -> render:
+            """
+            Processing get request
+            :param request: request
+            :param kwargs: attrs
+            :return: render
+            """
+            context = get_menu_context('profile', 'Редактирование профиля')
+            context['profile'] = Profile.objects.get(user=kwargs['user_id'])
+            context['uedit'] = User.objects.get(id=kwargs['user_id'])
+            context['user_form'] = UserUpdateForm(
+                instance=User.objects.get(id=kwargs['user_id'])
             )
-            comment_item.save()
+            context['profile_form'] = ProfileUpdateForm(
+                instance=Profile.objects.get(user=kwargs['user_id']))
+            self.previous_birth = User.objects.get(
+                id=kwargs['user_id']).profile.birth
+            get_last_act(request, context['uedit'])
 
-            json_response = json.dumps({'id': comment_item.user.id,
-                                        'username': comment_item.user.username,
-                                        'text': comment_item.text,
-                                        'date': str(comment_item.date)})
+            return render(request, self.template_name, context)
 
-            return HttpResponse(json_response, content_type="application/json")
-        raise Http404()
+    @login_required
+    class AvatarManaging(View):
+        def __init__(self, **kwargs):
+            self.context = {}
+            self.template_name = 'profile/change_avatar.html'
+            super().__init__(**kwargs)
+
+        def post(self, request):
+            avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=request.user.profile)
+            crop_form = CropAvatarForm(request.POST)
+            if crop_form.is_valid() and avatar_form.is_valid():
+                avatar_form.save()
+
+                x = float(request.POST.get('x'))
+                y = float(request.POST.get('y'))
+                w = float(request.POST.get('width'))
+                h = float(request.POST.get('height'))
+
+                if request.FILES.get('base_image'):
+                    image = Image.open(request.FILES.get('base_image'))
+                else:
+                    image = Image.open(request.user.profile.base_image)
+                cropped_image = image.crop((x, y, w + x, h + y))
+                resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+
+                io = BytesIO()
+
+                resized_image.save(io, 'JPEG', quality=60)
+
+                request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                                                save=False)
+                request.user.profile.save()
+
+            self.context['avatar_form'] = avatar_form
+            self.context['crop_form'] = crop_form
+
+        def get(self, request):
+            self.context = get_menu_context('profile', 'Смена аватарки')
+            avatar_form = UpdateAvatarForm()
+            crop_form = CropAvatarForm()
+
+            self.context['avatar_form'] = avatar_form
+            self.context['crop_form'] = crop_form
+
+            return render(request, self.template_name, self.context)
 
 
-@login_required
-def post_new(request):
+class PostViews:
     """
-    Function for creating post
-    :param request: request
-    :return: HttpResponseRedirect
-    """
-    PostImageFormSet = modelformset_factory(
-        PostImages, form=PostImageForm, extra=10)
-
-    if request.method == "POST":
-        postForm = PostForm(request.POST)
-        formset = PostImageFormSet(
-            request.POST, request.FILES, queryset=PostImages.objects.none())
-
-        if postForm.is_valid() and formset.is_valid():
-            post_form = postForm.save(commit=False)
-            post_form.user = request.user
-            post_form.save()
-
-            for form in formset.cleaned_data:
-                if form:
-                    image = form['image']
-                    photo = PostImages(post=post_form, image=image)
-                    photo.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def post_remove(request, post_id) -> HttpResponseRedirect:
-    """
-    Removing a post using Ajax
-    :param request: request
-    :param post_id: id of a post want to be deleted
-    :return: HttpResponseRedirect
-    """
-    if request.method == "POST":
-        Post.objects.get(id=post_id).delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required
-def post_edit(request, post_id) -> HttpResponseRedirect:
-    """
-    Editing text of a post
-    :param request: request
-    :param post_id: id of a post want to be edited
-    :return: HttpResponseRedirect
+    PostViews
     """
 
-    if request.method == 'POST':
-        post_to_edit = Post.objects.get(id=post_id)
-        post_to_edit.text = request.POST.get('text')
-        post_to_edit.save()
+    class PostView(View):
+        """
+        PostView
+        """
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'full_post.html'
 
+        def get(self, request, **kwargs) -> render:
+            context = get_menu_context('post', 'Пост')
+            context['post'] = Post.objects.get(id=kwargs['post_id'])
 
-@login_required
-def change_avatar(request):
-    context = get_menu_context('profile', 'Смена аватарки')
+            return render(request, self.template_name, context)
 
-    if request.method == 'POST':
-        avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=request.user.profile)
-        crop_form = CropAvatarForm(request.POST)
-        if crop_form.is_valid() and avatar_form.is_valid():
-            avatar_form.save()
+    class PostAjax(View):
+        @staticmethod
+        def post(request, **kwargs):
+            if request.method == "POST":
+                if len(request.POST.get('text')) > 0:
+                    comment_item = Comment(
+                        text=request.POST.get('text'),
+                        post=Post.objects.get(id=kwargs['post_id']),
+                        user=request.user
+                    )
+                    comment_item.save()
 
-            x = float(request.POST.get('x'))
-            y = float(request.POST.get('y'))
-            w = float(request.POST.get('width'))
-            h = float(request.POST.get('height'))
+                    json_response = json.dumps({'id': comment_item.user.id,
+                                                'username': comment_item.user.username,
+                                                'text': comment_item.text,
+                                                'date': str(comment_item.date)})
 
-            if request.FILES.get('base_image'):
-                image = Image.open(request.FILES.get('base_image'))
-            else:
-                image = Image.open(request.user.profile.base_image)
-            cropped_image = image.crop((x, y, w + x, h + y))
-            resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+                    return HttpResponse(json_response, content_type="application/json")
+                raise Http404()
 
-            io = BytesIO()
+    @staticmethod
+    def post_new(request):
+        """
+        Function for creating post
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+        PostImageFormSet = modelformset_factory(
+            PostImages, form=PostImageForm, extra=10)
 
-            resized_image.save(io, 'JPEG', quality=60)
+        if request.method == "POST":
+            postForm = PostForm(request.POST)
+            formset = PostImageFormSet(
+                request.POST, request.FILES, queryset=PostImages.objects.none())
 
-            request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
-                                            save=False)
-            request.user.profile.save()
-    else:
-        avatar_form = UpdateAvatarForm()
-        crop_form = CropAvatarForm()
+            if postForm.is_valid() and formset.is_valid():
+                post_form = postForm.save(commit=False)
+                post_form.user = request.user
+                post_form.save()
 
-    context['avatar_form'] = avatar_form
-    context['crop_form'] = crop_form
+                for form in formset.cleaned_data:
+                    if form:
+                        image = form['image']
+                        photo = PostImages(post=post_form, image=image)
+                        photo.save()
 
-    return render(request, 'profile/change_avatar.html', context)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def post_remove(request, post_id) -> HttpResponseRedirect:
+        """
+        Removing a post using Ajax
+        :param request: request
+        :param post_id: id of a post want to be deleted
+        :return: HttpResponseRedirect
+        """
+        if request.method == "POST":
+            Post.objects.get(id=post_id).delete()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def post_edit(request, post_id) -> HttpResponseRedirect:
+        """
+        Editing text of a post
+        :param request: request
+        :param post_id: id of a post want to be edited
+        :return: HttpResponseRedirect
+        """
+
+        if request.method == 'POST':
+            post_to_edit = Post.objects.get(id=post_id)
+            post_to_edit.text = request.POST.get('text')
+            post_to_edit.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -367,80 +392,94 @@ def community(request, community_id):
     return render(request, 'community/community_page.html', context)
 
 
-@login_required
-def music_list(request, user_id):
-    context = get_menu_context('music', 'Музыка')
+class MusicViews:
+    class MusicList(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'music/music_list.html'
 
-    context['c_user'] = User.objects.get(id=user_id)
-    context['music_list'] = User.objects.get(id=user_id).profile.get_music_list()
+        def get(self, request, **kwargs):
+            context = get_menu_context('music', 'Музыка')
 
-    return render(request, 'music/music_list.html', context)
+            context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            context['music_list'] = User.objects.get(id=kwargs['user_id']).profile.get_music_list()
 
+            return render(request, self.template_name, context)
 
-@login_required
-def music_upload(request):
-    context = get_menu_context('music', 'Загрузка музыки')
+    class MusicUpload(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'music/music_upload.html'
 
-    if request.method == 'POST':
-        form = UploadMusicForm(request.POST, request.FILES)
-        if form.is_valid():
-            music = form.save(commit=False)
+        @login_required
+        def post(self, request):
+            form = UploadMusicForm(request.POST, request.FILES)
+            if form.is_valid():
+                music = form.save(commit=False)
+                music.user = request.user
+                music.save()
 
-            music.user = request.user
-            music.save()
+        def get(self, request):
+            context = get_menu_context('music', 'Загрузка музыки')
 
-    context['form'] = UploadMusicForm()
+            context['form'] = UploadMusicForm()
 
-    return render(request, 'music/music_upload.html', context)
-
-
-@login_required
-def chat(request, user_id):
-    context = {}
-
-    c_user = User.objects.get(id=user_id)
-    context['c_user'] = c_user
-
-    return render(request, 'chat/chat.html', context)
+            return render(request, self.template_name, context)
 
 
-@login_required
-def chat_move(request, user_id, friend_id):
-    c_user = User.objects.get(id=user_id)
-    c_friend = User.objects.get(id=friend_id)
-    if request.method == "POST":
-        for c_user_chat in c_user.profile.chats.all():
-            if c_user_chat in c_friend.profile.chats.all():
-                ex_chat = Chat.objects.get(id=c_user_chat.id)
-                return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
+class Conversations:
+    class ChatList(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'chat/message.html'
 
-        new_chat = Chat.objects.create(
-            first_user=c_user,
-            second_user=c_friend
-        )
+        def get(self, request, **kwargs):
+            context = {}
 
-        new_chat.save()
-        c_user.profile.chats.add(new_chat)
-        c_friend.profile.chats.add(new_chat)
-        return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
+            c_user = User.objects.get(id=kwargs['user_id'])
+            context['c_user'] = c_user
 
+            return render(request, self.template_name, context)
 
-@login_required
-def room(request, room_id):
-    context = {'room_name': mark_safe(json.dumps(room_id))}
-    c_room = Chat.objects.get(id=room_id)
-    context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
-    context['messages_list'] = c_room.messages.all()
-    return render(request, 'chat/message.html', context)
+    @staticmethod
+    def chat_move(request, user_id, friend_id):
+        c_user = User.objects.get(id=user_id)
+        c_friend = User.objects.get(id=friend_id)
+        if request.method == "POST":
+            for c_user_chat in c_user.profile.chats.all():
+                if c_user_chat in c_friend.profile.chats.all():
+                    ex_chat = Chat.objects.get(id=c_user_chat.id)
+                    return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
 
+            new_chat = Chat.objects.create(
+                first_user=c_user,
+                second_user=c_friend
+            )
 
-@login_required
-def get_messages(request, room_id):
-    if request.method == 'POST':
-        messages = Chat.objects.get(id=room_id).messages.all()
+            new_chat.save()
+            c_user.profile.chats.add(new_chat)
+            c_friend.profile.chats.add(new_chat)
+            return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
-        return render(request, 'chat/messages_list.html', {'messages_list': messages})
-    raise Http404()
+    class Room(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'chat/message.html'
+
+        def get(self, request, room_id):
+            context = {'room_name': mark_safe(json.dumps(room_id))}
+            c_room = Chat.objects.get(id=room_id)
+            context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+            context['messages_list'] = c_room.messages.all()
+            return render(request, self.template_name, context)
+
+    @staticmethod
+    def get_messages(request, room_id):
+        if request.method == 'POST':
+            messages = Chat.objects.get(id=room_id).messages.all()
+
+            return render(request, 'chat/messages_list.html', {'messages_list': messages})
+        raise Http404()
 
 
 @login_required
@@ -563,7 +602,7 @@ def get_render(request, context):
     context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
 
     return render(request, 'friends/list.html', context)
-    
+
 
 @login_required
 def friends_list(request, user_id) -> render:
@@ -739,7 +778,6 @@ def blacklist_add(request, user_id):
     raise Http404()
 
 
-
 @login_required
 def blacklist_remove(request, user_id):
     """
@@ -772,6 +810,5 @@ def like_post(request, post_id):
             request.user.profile.liked_posts.add(post_item)
 
             return HttpResponse('liked')
-            
-    raise Http404()
 
+    raise Http404()
