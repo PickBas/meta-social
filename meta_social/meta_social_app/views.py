@@ -135,6 +135,7 @@ class ProfileViews:
             user_item = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = user_item
             context['is_online'] = context['profile'].check_online_with_afk()
+            print(context['is_online'])
             get_last_act(request, user_item)
 
             PostImageFormSet = modelformset_factory(
@@ -632,21 +633,23 @@ class FriendsViews:
         search_fields = ['username', 'first_name', 'last_name']
 
         context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+        asd = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+        print(asd[0].profile.blacklist.all())
 
         return render(request, 'friends/list.html', context)
 
     class FriendsList(View):
         def __init__(self, **kwargs):
             self.template_name = 'friends/friends_list.html'
-            self.context = {}
+            self.context = get_menu_context('friends', 'Список друзей')
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
-            self.context = get_menu_context('friends', 'Список друзей')
             self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
             return render(request, self.template_name, self.context)
 
-        def post(self, request):
+        def post(self, request, **kwargs):
+            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
             return FriendsViews.get_render(request, self.context)
 
     class FriendsRequests(View):
@@ -670,7 +673,7 @@ class FriendsViews:
             self.template_name = 'friends/blacklist.html'
             super().__init__(**kwargs)
 
-        def get(self, request, user_id) -> render:
+        def get(self, request, **kwargs) -> render:
             """
             Friends_blacklist view
             :param user_id: user in blacklist od
@@ -679,66 +682,75 @@ class FriendsViews:
             """
             context = get_menu_context('friends', 'Черный список')
 
-            c_user = get_object_or_404(User, id=user_id)
+            c_user = get_object_or_404(User, id=kwargs['user_id'])
             context['c_user'] = c_user
 
             return render(request, self.template_name, context)
 
-    @staticmethod
-    def send_friendship_request(request, user_id) -> redirect:
-        """
-        Sending friendship request view
-        :param request: request
-        :param user_id: id
-        :return: redirect
-        """
+    class SendFriendshipRequest(View):
+        def __init__(self, **kwargs):
+            self.user_item = None
+            super().__init__(**kwargs)
 
-        user_item = get_object_or_404(User, id=user_id)
+        def post(self, request, **kwargs) -> redirect:
+            """
+            Sending friendship request view
+            :param request: request
+            :param user_id: id
+            :return: redirect
+            """
 
-        if request.method == 'POST':
-            if not FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-                if not FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+            self.user_item = get_object_or_404(User, id=kwargs['user_id'])
+
+            if not FriendshipRequest.objects.filter(from_user=self.user_item, to_user=request.user).exists():
+                if not FriendshipRequest.objects.filter(from_user=request.user, to_user=self.user_item).exists():
                     item = FriendshipRequest(
                         from_user=request.user,
-                        to_user=user_item,
+                        to_user=self.user_item,
                     )
 
                     item.save()
 
                     return FriendsViews.get_render(request, {'c_user': request.user})
 
-        raise Http404()
+        def get(self, request, **kwargs):
+            raise Http404()
 
-    @staticmethod
-    def accept_request(request, user_id) -> redirect:
-        """
-        Accept_request view
-        :param request: request
-        :param request_id: id
-        :return: redirect
-        """
-        if request.method == 'POST':
-            user_item = get_object_or_404(User, id=user_id)
+    class AcceptRequest(View):
+        def __init__(self, **kwargs):
+            self.user_item = None
+            super().__init__(**kwargs)
 
-            if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
-                request_item = FriendshipRequest.objects.get(
-                    from_user=user_item, to_user=request.user)
-            elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
-                request_item = FriendshipRequest.objects.get(
-                    from_user=request.user, to_user=user_item)
-            else:
-                raise Http404()
+        def post(self, request, **kwargs) -> redirect:
+            """
+            Accept_request view
+            :param request: request
+            :param request_id: id
+            :return: redirect
+            """
+            if request.method == 'POST':
+                user_item = get_object_or_404(User, id=kwargs['user_id'])
 
-            first_user = User.objects.get(id=request_item.from_user.id)
-            second_user = User.objects.get(id=request_item.to_user.id)
-            first_user.profile.friends.add(second_user)
-            second_user.profile.friends.add(first_user)
+                if FriendshipRequest.objects.filter(from_user=user_item, to_user=request.user).exists():
+                    request_item = FriendshipRequest.objects.get(
+                        from_user=user_item, to_user=request.user)
+                elif FriendshipRequest.objects.filter(from_user=request.user, to_user=user_item).exists():
+                    request_item = FriendshipRequest.objects.get(
+                        from_user=request.user, to_user=user_item)
+                else:
+                    raise Http404()
 
-            request_item.delete()
+                first_user = User.objects.get(id=request_item.from_user.id)
+                second_user = User.objects.get(id=request_item.to_user.id)
+                first_user.profile.friends.add(second_user)
+                second_user.profile.friends.add(first_user)
 
-            return FriendsViews.get_render(request, {'c_user': request.user})
+                request_item.delete()
 
-        raise Http404()
+                return FriendsViews.get_render(request, {'c_user': request.user})
+
+        def get(self, request, **kwargs):
+            raise Http404()
 
     @staticmethod
     def cancel_request(request, user_id):
