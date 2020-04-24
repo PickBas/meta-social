@@ -438,9 +438,8 @@ class Conversations:
             c_user = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = c_user
 
-            for i in c_user.profile.chats.all():
-                print(i)
-
+            chats = c_user.profile.chats.all().order_by('messages__date')
+            context['chats'] = reversed(list(dict.fromkeys(chats)))
             return render(request, self.template_name, context)
 
     @staticmethod
