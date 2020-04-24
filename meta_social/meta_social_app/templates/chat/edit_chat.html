@@ -1,12 +1,12 @@
 {% load static %}
 <button type="button"
-            class="btn btn-outline-dark float-right mr-3"
-            data-placement="top"
-            title="Редактировать"
-            style="display: inline-block;"
-            data-toggle="modal"
-            data-target="#EditConvModal"
-            onclick="">
+        class="btn btn-outline-dark float-right mr-3"
+        data-placement="top"
+        title="Редактировать"
+        style="display: inline-block;"
+        data-toggle="modal"
+        data-target="#EditConvModal"
+        onclick="" xmlns="http://www.w3.org/1999/html">
         <img src="{% static 'img/edit_icon.svg' %}" width="20" height="20">
 </button>
 
@@ -34,11 +34,14 @@
                 <h5 class="text-center">Участники</h5>
                 <ul class="list-group list-group-flush" id="friend-list-modal">
                     {% for participant in c_room.participants.all %}
-                        {% if participant != user %}
+                        {% if participant != c_room.owner %}
                             <div>
                                 <li class="list-group-item">
                                     <img src="{{ participant.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
                                     <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.id }}/">{{ participant.profile.get_name }}</a>
+                                    {% if participant in c_room.administrators %}
+                                        <small class="text-muted">(admin)</small>
+                                    {% endif %}
                                     <script src="{% static 'js/remove_from_chat.js' %}"></script>
                                     <script>
                                         csr_token = '{{ csrf_token }}';
@@ -51,6 +54,31 @@
                                                 onclick="removeFromChat(event, '/chat/{{ c_room.id }}/remove/{{ participant.id }}/')">
                                             <img src="{% static 'img/cross_icon.svg' %}" width="20" height="20">
                                     </button>
+                                    {% if user == c_room.owner and participant not in c_room.administrators.all %}
+                                        <form method="POST" action="/chat/{{ c_room.id }}/makeadmin/{{ participant.id }}/" id="id-form-makeadmin">
+                                            {% csrf_token %}
+                                            <button type="button"
+                                                        class="btn btn-outline-dark float-right mr-2"
+                                                        data-placement="top"
+                                                        title="Сделать администратором"
+                                                        style="display: inline-block;"
+                                                        onclick="document.getElementById('id-form-makeadmin').submit();">
+                                                    <img src="{% static 'img/admin_icon.svg' %}" width="20" height="20">
+                                            </button>
+                                        </form>
+                                    {% elif user == c_room.owner and participant in c_room.administrators.all %}
+                                        <form method="POST" action="/chat/{{ c_room.id }}/rmadmin/{{ participant.id }}/" id="id-form-makeadmin">
+                                            {% csrf_token %}
+                                            <button type="button"
+                                                        class="btn btn-outline-dark float-right mr-2"
+                                                        data-placement="top"
+                                                        title="Сделать администратором"
+                                                        style="display: inline-block;"
+                                                        onclick="document.getElementById('id-form-makeadmin').submit();">
+                                                    <img src="{% static 'img/admin_icon.svg' %}" width="20" height="20">
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </li>
                             </div>
                         {% endif %}

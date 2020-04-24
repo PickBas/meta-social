@@ -13,7 +13,6 @@ function removeFromChat(e, link) {
                 to_remove = e.target.parentNode.parentNode;
                 to_remove.remove();
             }
-            console.log(to_remove);
         }
     })
 }

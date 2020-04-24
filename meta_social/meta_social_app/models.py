@@ -112,6 +112,9 @@ class Chat(models.Model):
     messages = models.ManyToManyField(Message, blank=True)
     is_dialog = models.BooleanField(default=False)
 
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_owner', null=True)
+    administrators = models.ManyToManyField(User, related_name='chat_administrators')
+
     base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
 

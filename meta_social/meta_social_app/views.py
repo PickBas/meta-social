@@ -449,6 +449,7 @@ class Conversations:
             new_chat = Chat.objects.create()
             new_chat.participants.add(request.user)
             new_chat.chat_name = request.POST.get('text')
+            new_chat.owner = request.user
             new_chat.save()
             c_user = User.objects.get(id=request.user.id)
             c_user.profile.chats.add(new_chat)
@@ -457,6 +458,26 @@ class Conversations:
             chats = c_user.profile.chats.all().order_by('-messages__date')
             context['chats'] = list(dict.fromkeys(chats))
             return render(request, 'chat/chatlist.html', context)
+        raise Http404()
+
+    @staticmethod
+    def make_admin(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            participant = User.objects.get(id=participant_id)
+            c_room.administrators.add(participant)
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
+    def rm_admin(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            participant = User.objects.get(id=participant_id)
+            c_room.administrators.remove(participant)
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         raise Http404()
 
     @staticmethod

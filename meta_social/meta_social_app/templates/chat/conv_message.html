@@ -10,7 +10,9 @@
                 <div class="col-7 text-left pl-2">
                     <p id="chat_name" style="display: inline-block; margin-top: 7px;">{{ c_room.chat_name }}</p>
                     {% include 'chat/add_to_conv_modal.html' %}
-                    {% include 'chat/edit_chat.html' %}
+                    {% if c_room.owner == user or user in c_room.administrators.all %}
+                        {% include 'chat/edit_chat.html' %}
+                    {% endif %}
                 </div>
             </div>
         </div>

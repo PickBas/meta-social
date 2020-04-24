@@ -48,6 +48,8 @@ urlpatterns = [
     path('chat/create/', login_required(Conversations.create_chat)),
     path('chat/<int:room_id>/add/<int:friend_id>/', login_required(Conversations.add_to_chat)),
     path('chat/<int:room_id>/remove/<int:participant_id>/', login_required(Conversations.remove_from_chat)),
+    path('chat/<int:room_id>/makeadmin/<int:participant_id>/', login_required(Conversations.make_admin)),
+    path('chat/<int:room_id>/rmadmin/<int:participant_id>/', login_required(Conversations.rm_admin)),
     path('chat/change_avatar/<int:room_id>/', login_required(Conversations.AvatarManaging.as_view())),
     path('chat/edit_chat_name/<int:room_id>/', login_required(Conversations.edit_chat_name)),
     path('chats/<int:user_id>/<int:friend_id>/', login_required(Conversations.chat_move)),
