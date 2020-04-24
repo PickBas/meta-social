@@ -513,8 +513,9 @@ class Conversations:
 
             context['messages_list'] = c_room.messages.all()
             context['c_room'] = c_room
-            other_chats = request.user.profile.chats.all().order_by('-messages__date')[:4]
-            context['other_chats'] = list(dict.fromkeys(other_chats))
+            other_chats = request.user.profile.chats.all().order_by('-messages__date')
+            context['other_chats'] = list(dict.fromkeys(other_chats))[:4]
+            print(other_chats)
 
             if c_room.is_dialog:
                 return render(request, self.template_name_dialog, context)
