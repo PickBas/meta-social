@@ -107,17 +107,15 @@ class Message(models.Model):
 
 
 class Chat(models.Model):
+    chat_name = models.CharField(max_length=50, null=True)
     participants = models.ManyToManyField(User, related_name="chat_participants")
     messages = models.ManyToManyField(Message, blank=True)
 
+    def is_dialog(self):
+        return len(self.participants.all()) == 2
+
     def __str__(self):
         return "{}".format(self.pk)
-
-
-class ConversationM(Chat):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    conversation_name = models.CharField(max_length=50, null=True)
 
 
 class Profile(models.Model):

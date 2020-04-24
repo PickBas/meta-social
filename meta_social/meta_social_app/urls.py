@@ -45,6 +45,7 @@ urlpatterns = [
     path('like/<int:post_id>/', login_required(PostViews.like_post)),
     
     path('chats/<int:user_id>/', login_required(Conversations.ChatList.as_view())),
+    path('chat/create/', login_required(Conversations.create_chat)),
     path('chats/<int:user_id>/<int:friend_id>/', login_required(Conversations.chat_move)),
     path('chat/go_to_chat/<int:room_id>/', login_required(Conversations.Room.as_view())),
     path('chat/go_to_chat/<int:room_id>/get_messages/', login_required(Conversations.get_messages)),

@@ -1,0 +1,29 @@
+{% load static %}
+<button class="btn btn-success w-30" id="friends-search-input" data-toggle="modal" data-target="#creatingChatModal">Создать чат</button>
+<div class="modal fade" id="creatingChatModal" tabindex="-1" role="dialog" aria-labelledby="creatingChatModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="creatingChatModalLabel">Имя чата</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" style="min-width: 100%" id="id-chat-name-input"></textarea>
+          </div>
+          <div class="modal-footer">
+              <script src="{% static 'js/create_conv.js' %}"></script>
+              <button class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+              <button class="btn btn-primary" data-dismiss="modal" onclick="createConversation(event, '/chat/create/')">Созать</button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/autosize.min.js' %}"></script>
+<script>
+    autosize(document.getElementById('id-chat-name-input'));
+    const csr_token = '{{ csrf_token }}';
+    const name = document.getElementById('id-chat-name-input');
+</script>

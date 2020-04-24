@@ -135,7 +135,6 @@ class ProfileViews:
             user_item = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = user_item
             context['is_online'] = context['profile'].check_online_with_afk()
-            print(context['is_online'])
             get_last_act(request, user_item)
 
             PostImageFormSet = modelformset_factory(
@@ -442,6 +441,21 @@ class Conversations:
             return render(request, self.template_name, context)
 
     @staticmethod
+    def create_chat(request):
+        if request.method == 'POST':
+            context = {}
+            new_chat = Chat.objects.create()
+            new_chat.participants.add(request.user)
+            new_chat.chat_name = request.POST.get('text')
+            new_chat.save()
+            c_user = User.objects.get(id=request.user.id)
+            c_user.profile.chats.add(new_chat)
+            c_user.save()
+            context['c_user'] = c_user
+            return render(request, 'chat/chatlist.html', context)
+        raise Http404()
+
+    @staticmethod
     def chat_move(request, user_id, friend_id):
         c_user = User.objects.get(id=user_id)
         c_friend = User.objects.get(id=friend_id)
@@ -455,6 +469,7 @@ class Conversations:
 
             new_chat.participants.add(c_user)
             new_chat.participants.add(c_friend)
+            new_chat.chat_name = c_user.username + ' ' + c_friend.username
 
             new_chat.save()
 
