@@ -454,6 +454,8 @@ class Conversations:
             c_user.profile.chats.add(new_chat)
             c_user.save()
             context['c_user'] = c_user
+            chats = c_user.profile.chats.all().order_by('-messages__date')
+            context['chats'] = list(dict.fromkeys(chats))
             return render(request, 'chat/chatlist.html', context)
         raise Http404()
 
