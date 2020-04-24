@@ -496,6 +496,22 @@ class Conversations:
         else:
             raise Http404()
 
+    @staticmethod
+    def remove_from_chat(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_participant = User.objects.get(id=participant_id)
+
+            c_room.participants.remove(c_participant)
+            c_participant.profile.chats.remove(c_room)
+
+            c_room.save()
+            c_participant.save()
+
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            raise Http404()
+
     class Room(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
@@ -518,7 +534,6 @@ class Conversations:
             other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
             other_chats.remove(c_room)
             context['other_chats'] = other_chats[:3]
-            print(other_chats)
 
             if c_room.is_dialog:
                 return render(request, self.template_name_dialog, context)
