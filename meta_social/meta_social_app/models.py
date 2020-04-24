@@ -110,9 +110,7 @@ class Chat(models.Model):
     chat_name = models.CharField(max_length=50, null=True)
     participants = models.ManyToManyField(User, related_name="chat_participants")
     messages = models.ManyToManyField(Message, blank=True)
-
-    def is_dialog(self):
-        return len(self.participants.all()) == 2
+    is_dialog = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}".format(self.pk)

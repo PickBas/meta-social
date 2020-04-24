@@ -438,6 +438,9 @@ class Conversations:
             c_user = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = c_user
 
+            for i in c_user.profile.chats.all():
+                print(i)
+
             return render(request, self.template_name, context)
 
     @staticmethod
@@ -461,7 +464,7 @@ class Conversations:
         c_friend = User.objects.get(id=friend_id)
         if request.method == "POST":
             for c_user_chat in c_user.profile.chats.all():
-                if c_user_chat in c_friend.profile.chats.all():
+                if c_user_chat in c_friend.profile.chats.all() and c_user_chat.is_dialog:
                     ex_chat = Chat.objects.get(id=c_user_chat.id)
                     return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
 
@@ -471,16 +474,32 @@ class Conversations:
             new_chat.participants.add(c_friend)
             new_chat.chat_name = c_user.username + ' ' + c_friend.username
 
+            new_chat.is_dialog = True
+
             new_chat.save()
 
             c_user.profile.chats.add(new_chat)
             c_friend.profile.chats.add(new_chat)
             return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
+    @staticmethod
+    def add_to_chat(request, room_id, friend_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_friend = User.objects.get(id=friend_id)
+            c_room.participants.add(c_friend)
+            c_room.save()
+            c_friend.profile.chats.add(c_room)
+            c_friend.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            raise Http404()
+
     class Room(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.template_name = 'chat/message.html'
+            self.template_name_dialog = 'chat/message.html'
+            self.template_name_conv = 'chat/conv_message.html'
 
         def get(self, request, room_id):
             context = {'room_name': mark_safe(json.dumps(room_id))}
@@ -494,7 +513,12 @@ class Conversations:
                     context['first_user'] = participant
 
             context['messages_list'] = c_room.messages.all()
-            return render(request, self.template_name, context)
+            context['c_room'] = c_room
+
+            if c_room.is_dialog:
+                return render(request, self.template_name_dialog, context)
+            else:
+                return render(request, self.template_name_conv, context)
 
     @staticmethod
     def get_messages(request, room_id):
