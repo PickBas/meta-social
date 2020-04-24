@@ -15,7 +15,7 @@ echo "Таки дождались..........."
 echo "======Накатываем миграции======"
 python manage.py migrate
 echo "======Разворачиваем фикстуры======"
-python manage.py loaddata db.json
+python manage.py loaddata meta_social_app/fixtures/db.json
 
 echo "======Стартуем сервер======"
 python manage.py runserver 0.0.0.0:80

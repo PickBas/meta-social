@@ -43,6 +43,11 @@
             {% csrf_token %}
 
             <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
+                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
+                    </button>
+                </div>
                 {{ postform }}
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">
@@ -69,6 +74,10 @@
 
 <script>
     autosize(document.getElementById("id_text"));
+
+    function triggerInput() {
+        $('#fileElem')[0].click()
+    }
 
     let dropArea = document.getElementById('drop-area')
 

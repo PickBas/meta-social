@@ -2,20 +2,16 @@
 View module
 """
 import json
-from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
-from django.template.loader import render_to_string
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.utils.safestring import mark_safe
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
-from django.urls import reverse
 from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
@@ -191,20 +187,12 @@ class ProfileViews:
             self.profile.show_email = False if request.POST.get(
                 'show_email') is None else True
 
-            try:
-                img_manage = ImageManage(
-                    kwargs['user_id'], self.profile, request.FILES['avatar'])
-                img_manage.process_img()
-            except Exception:
-                pass
-
             profile_form = ProfileUpdateForm(request.POST,
                                              instance=self.profile)
 
             if user_form.is_valid() and profile_form.is_valid():
                 user_form.save()
                 profile_form.save()
-                tmp_user = User.objects.get(id=kwargs['user_id'])
 
                 if self.profile.birth is None:
                     self.profile.birth = self.previous_birth
