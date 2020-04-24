@@ -8,8 +8,9 @@
                 <h5>Ваши чаты</h5>
                 {% include 'chat/create_chat_modal.html' %}
                 <hr>
-                {% include 'chat/chatlist.html' %}
-                <div id="chat-list"></div>
+                <div id="chat-list">
+                    {% include 'chat/chatlist.html' %}
+                </div>
             {% endif %}
         </div>
     </div>
