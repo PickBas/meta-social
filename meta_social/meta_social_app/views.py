@@ -451,12 +451,13 @@ class Conversations:
                     ex_chat = Chat.objects.get(id=c_user_chat.id)
                     return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
 
-            new_chat = Chat.objects.create(
-                first_user=c_user,
-                second_user=c_friend
-            )
+            new_chat = Chat.objects.create()
+
+            new_chat.participants.add(c_user)
+            new_chat.participants.add(c_friend)
 
             new_chat.save()
+
             c_user.profile.chats.add(new_chat)
             c_friend.profile.chats.add(new_chat)
             return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
@@ -469,7 +470,14 @@ class Conversations:
         def get(self, request, room_id):
             context = {'room_name': mark_safe(json.dumps(room_id))}
             c_room = Chat.objects.get(id=room_id)
-            context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+
+            if request.user not in c_room.participants.all():
+                return HttpResponse('Access denied')
+
+            for participant in c_room.participants.all():
+                if participant != request.user:
+                    context['first_user'] = participant
+
             context['messages_list'] = c_room.messages.all()
             return render(request, self.template_name, context)
 

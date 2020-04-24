@@ -96,7 +96,7 @@ class Post(models.Model):
     def amount_of_comments(self):
         return len(self.comments())
 
-        
+
 class Message(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
     message = models.TextField(null=True)
@@ -107,12 +107,17 @@ class Message(models.Model):
 
 
 class Chat(models.Model):
-    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_part', blank=True, null=True)
-    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_part', blank=True, null=True)
+    participants = models.ManyToManyField(User, related_name="chat_participants")
     messages = models.ManyToManyField(Message, blank=True)
 
     def __str__(self):
         return "{}".format(self.pk)
+
+
+class ConversationM(Chat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    conversation_name = models.CharField(max_length=50, null=True)
 
 
 class Profile(models.Model):
