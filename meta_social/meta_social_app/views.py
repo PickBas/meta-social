@@ -460,6 +460,15 @@ class Conversations:
         raise Http404()
 
     @staticmethod
+    def edit_chat_name(request, room_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_room.chat_name = request.POST.get('text')
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
     def chat_move(request, user_id, friend_id):
         c_user = User.objects.get(id=user_id)
         c_friend = User.objects.get(id=friend_id)
