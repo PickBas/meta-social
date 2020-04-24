@@ -481,6 +481,16 @@ class Conversations:
         raise Http404()
 
     @staticmethod
+    def quit_room(request, room_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_room.participants.remove(request.user)
+            c_room.save()
+            request.user.profile.chats.remove(c_room)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
     def edit_chat_name(request, room_id):
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)

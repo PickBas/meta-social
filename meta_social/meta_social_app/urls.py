@@ -46,6 +46,7 @@ urlpatterns = [
     
     path('chats/<int:user_id>/', login_required(Conversations.ChatList.as_view())),
     path('chat/create/', login_required(Conversations.create_chat)),
+    path('chat/quit/<int:room_id>/', login_required(Conversations.quit_room)),
     path('chat/<int:room_id>/add/<int:friend_id>/', login_required(Conversations.add_to_chat)),
     path('chat/<int:room_id>/remove/<int:participant_id>/', login_required(Conversations.remove_from_chat)),
     path('chat/<int:room_id>/makeadmin/<int:participant_id>/', login_required(Conversations.make_admin)),
