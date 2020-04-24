@@ -10,7 +10,6 @@ function editChatName(e, link) {
         },
         success: function() {
           old_text.innerText = edited_text.value;
-          console.log(old_text)
         }
     })
 }
