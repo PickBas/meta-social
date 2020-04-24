@@ -515,8 +515,9 @@ class Conversations:
 
             context['messages_list'] = c_room.messages.all()
             context['c_room'] = c_room
-            other_chats = request.user.profile.chats.all().order_by('-messages__date')
-            context['other_chats'] = list(dict.fromkeys(other_chats))[:4]
+            other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
+            other_chats.remove(c_room)
+            context['other_chats'] = other_chats[:3]
             print(other_chats)
 
             if c_room.is_dialog:
