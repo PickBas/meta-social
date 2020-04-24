@@ -438,8 +438,8 @@ class Conversations:
             c_user = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = c_user
 
-            chats = c_user.profile.chats.all().order_by('messages__date')
-            context['chats'] = reversed(list(dict.fromkeys(chats)))
+            chats = c_user.profile.chats.all().order_by('-messages__date')
+            context['chats'] = list(dict.fromkeys(chats))
             return render(request, self.template_name, context)
 
     @staticmethod
@@ -513,6 +513,8 @@ class Conversations:
 
             context['messages_list'] = c_room.messages.all()
             context['c_room'] = c_room
+            other_chats = request.user.profile.chats.all().order_by('-messages__date')[:4]
+            context['other_chats'] = list(dict.fromkeys(other_chats))
 
             if c_room.is_dialog:
                 return render(request, self.template_name_dialog, context)
