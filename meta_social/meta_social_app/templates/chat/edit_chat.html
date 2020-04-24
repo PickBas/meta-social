@@ -20,6 +20,13 @@
             </button>
           </div>
           <div class="modal-body">
+            <div class="text-center">
+                <h5 class="text-center">Аватар</h5>
+                <a href="/chat/change_avatar/{{ c_room.id }}/">
+                    <button class="btn btn-primary text-center">Сменить</button>
+                </a>
+            </div>
+            <hr>
             <h5 class="text-center">Имя чата</h5>
             <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input">{{ c_room.chat_name }}</textarea>
             <hr>

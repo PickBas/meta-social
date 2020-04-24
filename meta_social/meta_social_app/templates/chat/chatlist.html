@@ -2,7 +2,7 @@
     <ul class="list-group list-group-flush" id="friend-list">
         {% for chat in chats %}
             <li class="list-group-item">
-                <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != c_user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ user.profile.image.url }}{% endif %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != c_user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                 {% if chat.is_dialog %}
                     {% if chat.participants.all.1 != c_user %}
                         <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>

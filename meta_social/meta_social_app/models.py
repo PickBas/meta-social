@@ -112,6 +112,9 @@ class Chat(models.Model):
     messages = models.ManyToManyField(Message, blank=True)
     is_dialog = models.BooleanField(default=False)
 
+    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+    image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+
     def __str__(self):
         return "{}".format(self.pk)
 

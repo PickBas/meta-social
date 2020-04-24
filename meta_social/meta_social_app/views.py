@@ -548,6 +548,47 @@ class Conversations:
             return render(request, 'chat/messages_list.html', {'messages_list': messages})
         raise Http404()
 
+    class AvatarManaging(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'profile/change_avatar.html'
+            super().__init__(**kwargs)
+
+        def post(self, request, **kwargs):
+            c_room = Chat.objects.get(id=kwargs['room_id'])
+            avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=c_room)
+            crop_form = CropAvatarForm(request.POST)
+            if crop_form.is_valid() and avatar_form.is_valid():
+                avatar_form.save()
+
+                x = float(request.POST.get('x'))
+                y = float(request.POST.get('y'))
+                w = float(request.POST.get('width'))
+                h = float(request.POST.get('height'))
+
+                if request.FILES.get('base_image'):
+                    image = Image.open(request.FILES.get('base_image'))
+                else:
+                    image = Image.open(request.user.profile.base_image)
+                cropped_image = image.crop((x, y, w + x, h + y))
+                resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+
+                io = BytesIO()
+
+                resized_image.save(io, 'JPEG', quality=60)
+
+                c_room.image.save('image_{}.jpg'.format(c_room.id), ContentFile(io.getvalue()),
+                                  save=False)
+                c_room.save()
+
+                return redirect('/chat/go_to_chat/' + str(c_room.id))
+
+        def get(self, request, **kwargs):
+            avatar_form = UpdateAvatarForm()
+            crop_form = CropAvatarForm()
+            context = {'avatar_form': avatar_form, 'crop_form': crop_form}
+
+            return render(request, self.template_name, context)
+
 
 class Communities:
     class CommunityView(View):
