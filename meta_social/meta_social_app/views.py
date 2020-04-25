@@ -576,6 +576,7 @@ class Conversations:
             other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
             other_chats.remove(c_room)
             context['other_chats'] = other_chats[:3]
+            context['len_other_chats'] = len(other_chats[:3])
 
             if c_room.is_dialog:
                 return render(request, self.template_name_dialog, context)
