@@ -35,7 +35,7 @@
                     {% load static %}
                     <script src="{% static 'js/quitChat.js' %}"></script>
                     <script>
-                        csr_token = '{{ csrf_token }}';
+                        const csr_token = '{{ csrf_token }}';
                     </script>
                     {% if not chat.is_dialog and user != chat.owner %}
                         <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
