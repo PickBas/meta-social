@@ -247,11 +247,16 @@ class ProfileViews:
 
                 io = BytesIO()
 
-                resized_image.save(io, 'JPEG', quality=60)
-
-                request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
-                                                save=False)
-                request.user.profile.save()
+                try:
+                    resized_image.save(io, 'JPEG', quality=100)
+                    request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                                                    save=False)
+                    request.user.profile.save()
+                except:
+                    resized_image.save(io, 'PNG', quality=100)
+                    request.user.profile.image.save('image_{}.png'.format(request.user.id), ContentFile(io.getvalue()),
+                                                    save=False)
+                    request.user.profile.save()
 
                 return redirect('/accounts/profile/' + str(request.user.id))
 
@@ -292,33 +297,10 @@ class PostViews:
             self.context = get_menu_context('post', 'Редактирование поста')
 
         def post(self, request, **kwargs):
-            post_item = get_object_or_404(Post, id=kwargs['post_id'])
-            
-            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
-            post_form = PostForm(request.POST, instance=post_item)
-            formset = PostImageFormSet(request.POST, request.FILES, queryset=post_item.get_images())
-
-            if post_form.is_valid() and formset.is_valid():
-                post_form.save()
-                for form in formset:
-                    form.save()
-            
-            self.context['post_form'] = post_form
-            self.context['formset'] = formset
-            
-            return render(request, self.template_name, self.context)
+            pass
         
         def get(self, request, **kwargs):
-            post_item = get_object_or_404(Post, id=kwargs['post_id'])
-
-            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
-            post_form = PostForm(instance=post_item)
-            formset = PostImageFormSet(queryset=post_item.get_images())
-
-            self.context['post_form'] = post_form
-            self.context['formset'] = formset
-
-            return render(request, self.template_name, self.context)
+            pass
 
 
     class PostAjax(View):

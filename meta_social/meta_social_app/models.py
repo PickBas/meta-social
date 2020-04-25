@@ -308,22 +308,24 @@ class PostImages(models.Model):
     Posts Images class
     """
     post = models.ForeignKey(Post, models.CASCADE)
-    image = models.ImageField(upload_to='post/images/', blank=True, null=True)
+    image = models.ImageField(upload_to='post/images/')
 
     def save(self):
-        if self.image:
-            img = Image.open(self.image)
-            output = BytesIO()
+        img = Image.open(self.image)
+        output = BytesIO()
 
-            new_size = (1280, (img.size[1] * 1280) // img.size[0])
+        new_size = (1280, (img.size[1] * 1280) // img.size[0])
 
-            img = img.resize(new_size, Image.ANTIALIAS)
+        img = img.resize(new_size, Image.ANTIALIAS)
 
+        try:
             img.save(output, format='JPEG', quality=100)
             output.seek(0)
-
-            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
-                                            'image/jpeg', sys.getsizeof(output), None)
+            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
+        except OSError:
+            img.save(output, format='PNG', quality=100)
+            output.seek(0)
+            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.png".format(self.image.name.split('.')[0]), 'image/png', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
 
