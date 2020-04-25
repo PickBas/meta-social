@@ -485,6 +485,8 @@ class Conversations:
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             c_room.participants.remove(request.user)
+            if request.user in c_room.administrators.all():
+                c_room.administrators.remove(request.user)
             c_room.save()
             request.user.profile.chats.remove(c_room)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

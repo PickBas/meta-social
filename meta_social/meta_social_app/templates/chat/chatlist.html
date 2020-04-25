@@ -18,7 +18,9 @@
                     <script>
                         csr_token = '{{ csrf_token }}';
                     </script>
-                    <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
+                    {% if not chat.is_dialog and user != chat.owner %}
+                        <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
+                    {% endif %}
                     <a class="float-right btn btn-outline-secondary mr-2" href="/chat/go_to_chat/{{ chat.id }}/">Text</a>
                 </li>
             </div>
