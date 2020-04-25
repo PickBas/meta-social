@@ -63,7 +63,7 @@
                                                         title="Сделать администратором"
                                                         style="display: inline-block;"
                                                         onclick="document.getElementById('id-form-makeadmin').submit();">
-                                                    <img src="{% static 'img/admin_icon.svg' %}" width="20" height="20">
+                                                    <img src="{% static 'img/add_admin.svg' %}" width="20" height="20">
                                             </button>
                                         </form>
                                     {% elif user == c_room.owner and participant in c_room.administrators.all %}
@@ -75,7 +75,7 @@
                                                         title="Отобрать права администратора"
                                                         style="display: inline-block;"
                                                         onclick="document.getElementById('id-form-makeadmin').submit();">
-                                                    <img src="{% static 'img/admin_icon.svg' %}" width="20" height="20">
+                                                    <img src="{% static 'img/remove_admin.svg' %}" width="20" height="20">
                                             </button>
                                         </form>
                                     {% endif %}
