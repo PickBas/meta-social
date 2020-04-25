@@ -119,7 +119,10 @@ class Chat(models.Model):
     image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
 
     def last_message(self):
-        return list(self.messages.all().order_by('-date'))[0]
+        try:
+            return list(self.messages.all().order_by('-date'))[0]
+        except:
+            return False
 
     def __str__(self):
         return "{}".format(self.pk)

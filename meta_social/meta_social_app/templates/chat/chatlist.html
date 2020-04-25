@@ -1,7 +1,6 @@
 <style>
     #id-last-msg {
         display: inline-block;
-        margin-right: 200px;
 
         width: 200px;
         white-space: nowrap;
@@ -31,7 +30,7 @@
                         <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/">{{ chat.chat_name }}</a>
                     {% endif %}
                     {% if chat.last_message %}
-                        <p id="id-last-msg" class="float-center text-muted">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
+                        <p id="id-last-msg" class="float-left text-muted ml-3">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
                     {% endif %}
                     {% load static %}
                     <script src="{% static 'js/quitChat.js' %}"></script>
