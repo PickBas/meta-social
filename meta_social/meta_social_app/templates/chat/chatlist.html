@@ -23,7 +23,7 @@
                             <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
                         {% endif %}
                     {% else %}
-                        <p class="float-left ml-2">{{ chat.chat_name }}</p>
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/">{{ chat.chat_name }}</a>
                     {% endif %}
                     {% if chat.last_message %}
                         <p id="id-last-msg" class="float-center text-muted">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
