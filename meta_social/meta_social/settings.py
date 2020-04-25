@@ -94,7 +94,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],# [('redis', 6379)], #
+            "hosts": [('redis', 6379)],
         },
     },
 }
@@ -104,14 +104,14 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-    #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #    'NAME': 'DB',
-    #    'USER': 'postgres',
-    #    'PASSWORD': 'postgres',
-    #    'HOST': 'db',
-    #    'PORT': '5432',
-    # },
-    # 'old_sqlite3': {
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+       'NAME': 'DB',
+       'USER': 'postgres',
+       'PASSWORD': 'postgres',
+       'HOST': 'db',
+       'PORT': '5432',
+    },
+    'old_sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
