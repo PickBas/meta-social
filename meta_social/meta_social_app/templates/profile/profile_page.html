@@ -132,7 +132,7 @@
 
       {% if c_user == user %}
         <div class="mt-3">
-            {% include 'post_menu.html' %}
+            {% include 'post/post_menu.html' %}
         </div>
       {% endif %}
       {% if is_in_blacklist %}
@@ -145,8 +145,17 @@
                   <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
                   <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
                     {% if c_user == user %}
-                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#removingPostModal" class="float-right"><i class="fas fa-ban"></i></button>
-                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#editPostModal" class="float-right"><i class="far fa-edit"></i></button>
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  
+                                data-toggle="modal" 
+                                data-target="#removingPostModal" 
+                                class="float-right">
+                          <i class="fas fa-ban"></i>
+                        </button>
+                        <a style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  
+                                class="float-right"
+                                href="/post/{{ post.id }}/edit/">
+                                  <i class="far fa-edit"></i>
+                        </a>
                     {% endif %}
                   <p class="card-text mt-2" id="id-post-text">{{ post.text }}</p>
                   <div class="kollaz">
@@ -167,13 +176,13 @@
                   {% else %}
                     <button class="btn btn-outline-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
                   {% endif %}
-                  <a href="/post/{{ post.id }}" class="text-muted mb-0">{{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i></a>
+                  <a href="/post/{{ post.id }}/" class="text-muted mb-0">{{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i></a>
                     {% if c_user == user %}
                         <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="editPostModalLabel">Modal title</h5>
+                                <h5 class="modal-title" id="editPostModalLabel">Редактирование поста</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                   <span aria-hidden="true">&times;</span>
                                 </button>

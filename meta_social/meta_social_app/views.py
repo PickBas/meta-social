@@ -277,13 +277,49 @@ class PostViews:
 
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.template_name = 'full_post.html'
+            self.template_name = 'post/full_post.html'
 
         def get(self, request, **kwargs) -> render:
             context = get_menu_context('post', 'Пост')
             context['post'] = Post.objects.get(id=kwargs['post_id'])
 
             return render(request, self.template_name, context)
+
+    class PostEdit(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'post/post_edit.html'
+            self.context = get_menu_context('post', 'Редактирование поста')
+
+        def post(self, request, **kwargs):
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+            
+            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+            post_form = PostForm(request.POST, instance=post_item)
+            formset = PostImageFormSet(request.POST, request.FILES, queryset=post_item.get_images())
+
+            if post_form.is_valid() and formset.is_valid():
+                post_form.save()
+                for form in formset:
+                    form.save()
+            
+            self.context['post_form'] = post_form
+            self.context['formset'] = formset
+            
+            return render(request, self.template_name, self.context)
+        
+        def get(self, request, **kwargs):
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+
+            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+            post_form = PostForm(instance=post_item)
+            formset = PostImageFormSet(queryset=post_item.get_images())
+
+            self.context['post_form'] = post_form
+            self.context['formset'] = formset
+
+            return render(request, self.template_name, self.context)
+
 
     class PostAjax(View):
         @staticmethod
@@ -345,21 +381,6 @@ class PostViews:
             Post.objects.get(id=post_id).delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-    @staticmethod
-    def post_edit(request, post_id) -> HttpResponseRedirect:
-        """
-        Editing text of a post
-        :param request: request
-        :param post_id: id of a post want to be edited
-        :return: HttpResponseRedirect
-        """
-
-        if request.method == 'POST':
-            post_to_edit = Post.objects.get(id=post_id)
-            post_to_edit.text = request.POST.get('text')
-            post_to_edit.save()
-
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
     def like_post(request, post_id):

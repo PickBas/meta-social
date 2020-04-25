@@ -36,10 +36,10 @@ urlpatterns = [
     path('post/<int:post_id>/', login_required(PostViews.PostView.as_view())),
     path('post/<int:post_id>/ajax/', login_required(PostViews.PostAjax.as_view())),
     path('post/<int:post_id>/remove/', login_required(PostViews.post_remove)),
-    path('post/<int:post_id>/edit/', login_required(PostViews.post_edit)),
+    path('post/<int:post_id>/edit/', login_required(PostViews.PostEdit.as_view())),
 
     path('music/<int:user_id>/', login_required(MusicViews.MusicList.as_view())),
-    path('music/upload/',  login_required(MusicViews.MusicUpload.as_view())),
+    path('music/upload/', login_required(MusicViews.MusicUpload.as_view())),
 
     path('ajax/search/', login_required(GlobalSearch.as_view())),
     path('like/<int:post_id>/', login_required(PostViews.like_post)),

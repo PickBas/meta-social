@@ -269,12 +269,6 @@ class Profile(models.Model):
     def get_music_list(self):
         return Music.objects.filter(user=self.user)
 
-    def get_incoming_messages(self):
-        return Messages.objects.filter(to_user=self.user)
-
-    def get_outcoming_messages(self):
-        return Messages.objects.filter(from_user=self.user)
-
 
 def save_image_from_url(profile, image_url):
     """
@@ -314,21 +308,22 @@ class PostImages(models.Model):
     Posts Images class
     """
     post = models.ForeignKey(Post, models.CASCADE)
-    image = models.ImageField(upload_to='post/images/')
+    image = models.ImageField(upload_to='post/images/', blank=True, null=True)
 
     def save(self):
-        img = Image.open(self.image)
-        output = BytesIO()
+        if self.image:
+            img = Image.open(self.image)
+            output = BytesIO()
 
-        new_size = (1280, (img.size[1] * 1280) // img.size[0])
+            new_size = (1280, (img.size[1] * 1280) // img.size[0])
 
-        img = img.resize(new_size, Image.ANTIALIAS)
+            img = img.resize(new_size, Image.ANTIALIAS)
 
-        img.save(output, format='JPEG', quality=100)
-        output.seek(0)
+            img.save(output, format='JPEG', quality=100)
+            output.seek(0)
 
-        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
-                                          'image/jpeg', sys.getsizeof(output), None)
+            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
+                                            'image/jpeg', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
 
