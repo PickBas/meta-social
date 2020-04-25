@@ -96,7 +96,7 @@ class Post(models.Model):
     def amount_of_comments(self):
         return len(self.comments())
 
-        
+
 class Message(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
     message = models.TextField(null=True)
@@ -107,9 +107,22 @@ class Message(models.Model):
 
 
 class Chat(models.Model):
-    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_part', blank=True, null=True)
-    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_part', blank=True, null=True)
+    chat_name = models.CharField(max_length=50, null=True)
+    participants = models.ManyToManyField(User, related_name="chat_participants")
     messages = models.ManyToManyField(Message, blank=True)
+    is_dialog = models.BooleanField(default=False)
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_owner', null=True)
+    administrators = models.ManyToManyField(User, related_name='chat_administrators')
+
+    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+    image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+
+    def last_message(self):
+        try:
+            return list(self.messages.all().order_by('-date'))[0]
+        except:
+            return False
 
     def __str__(self):
         return "{}".format(self.pk)

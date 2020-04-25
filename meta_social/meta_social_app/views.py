@@ -135,7 +135,6 @@ class ProfileViews:
             user_item = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = user_item
             context['is_online'] = context['profile'].check_online_with_afk()
-            print(context['is_online'])
             get_last_act(request, user_item)
 
             PostImageFormSet = modelformset_factory(
@@ -439,7 +438,68 @@ class Conversations:
             c_user = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = c_user
 
+            chats = c_user.profile.chats.all().order_by('-messages__date')
+            context['chats'] = list(dict.fromkeys(chats))
             return render(request, self.template_name, context)
+
+    @staticmethod
+    def create_chat(request):
+        if request.method == 'POST':
+            context = {}
+            new_chat = Chat.objects.create()
+            new_chat.participants.add(request.user)
+            new_chat.chat_name = request.POST.get('text')
+            new_chat.owner = request.user
+            new_chat.save()
+            c_user = User.objects.get(id=request.user.id)
+            c_user.profile.chats.add(new_chat)
+            c_user.save()
+            context['c_user'] = c_user
+            chats = c_user.profile.chats.all().order_by('-messages__date')
+            context['chats'] = list(dict.fromkeys(chats))
+            return render(request, 'chat/chatlist.html', context)
+        raise Http404()
+
+    @staticmethod
+    def make_admin(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            participant = User.objects.get(id=participant_id)
+            c_room.administrators.add(participant)
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
+    def rm_admin(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            participant = User.objects.get(id=participant_id)
+            c_room.administrators.remove(participant)
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
+    def quit_room(request, room_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_room.participants.remove(request.user)
+            if request.user in c_room.administrators.all():
+                c_room.administrators.remove(request.user)
+            c_room.save()
+            request.user.profile.chats.remove(c_room)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
+
+    @staticmethod
+    def edit_chat_name(request, room_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_room.chat_name = request.POST.get('text')
+            c_room.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        raise Http404()
 
     @staticmethod
     def chat_move(request, user_id, friend_id):
@@ -447,31 +507,81 @@ class Conversations:
         c_friend = User.objects.get(id=friend_id)
         if request.method == "POST":
             for c_user_chat in c_user.profile.chats.all():
-                if c_user_chat in c_friend.profile.chats.all():
+                if c_user_chat in c_friend.profile.chats.all() and c_user_chat.is_dialog:
                     ex_chat = Chat.objects.get(id=c_user_chat.id)
                     return redirect('/chat/go_to_chat/' + str(ex_chat.id) + '/')
 
-            new_chat = Chat.objects.create(
-                first_user=c_user,
-                second_user=c_friend
-            )
+            new_chat = Chat.objects.create()
+
+            new_chat.participants.add(c_user)
+            new_chat.participants.add(c_friend)
+            new_chat.chat_name = c_user.username + ' ' + c_friend.username
+
+            new_chat.is_dialog = True
 
             new_chat.save()
+
             c_user.profile.chats.add(new_chat)
             c_friend.profile.chats.add(new_chat)
             return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
+    @staticmethod
+    def add_to_chat(request, room_id, friend_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_friend = User.objects.get(id=friend_id)
+            c_room.participants.add(c_friend)
+            c_room.save()
+            c_friend.profile.chats.add(c_room)
+            c_friend.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            raise Http404()
+
+    @staticmethod
+    def remove_from_chat(request, room_id, participant_id):
+        if request.method == 'POST':
+            c_room = Chat.objects.get(id=room_id)
+            c_participant = User.objects.get(id=participant_id)
+
+            c_room.participants.remove(c_participant)
+            c_participant.profile.chats.remove(c_room)
+
+            c_room.save()
+            c_participant.save()
+
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            raise Http404()
+
     class Room(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.template_name = 'chat/message.html'
+            self.template_name_dialog = 'chat/message.html'
+            self.template_name_conv = 'chat/conv_message.html'
 
         def get(self, request, room_id):
             context = {'room_name': mark_safe(json.dumps(room_id))}
             c_room = Chat.objects.get(id=room_id)
-            context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+
+            if request.user not in c_room.participants.all():
+                return HttpResponse('Access denied')
+
+            for participant in c_room.participants.all():
+                if participant != request.user:
+                    context['first_user'] = participant
+
             context['messages_list'] = c_room.messages.all()
-            return render(request, self.template_name, context)
+            context['c_room'] = c_room
+            other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
+            other_chats.remove(c_room)
+            context['other_chats'] = other_chats[:3]
+            context['len_other_chats'] = len(other_chats[:3])
+
+            if c_room.is_dialog:
+                return render(request, self.template_name_dialog, context)
+            else:
+                return render(request, self.template_name_conv, context)
 
     @staticmethod
     def get_messages(request, room_id):
@@ -480,6 +590,47 @@ class Conversations:
 
             return render(request, 'chat/messages_list.html', {'messages_list': messages})
         raise Http404()
+
+    class AvatarManaging(View):
+        def __init__(self, **kwargs):
+            self.template_name = 'profile/change_avatar.html'
+            super().__init__(**kwargs)
+
+        def post(self, request, **kwargs):
+            c_room = Chat.objects.get(id=kwargs['room_id'])
+            avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=c_room)
+            crop_form = CropAvatarForm(request.POST)
+            if crop_form.is_valid() and avatar_form.is_valid():
+                avatar_form.save()
+
+                x = float(request.POST.get('x'))
+                y = float(request.POST.get('y'))
+                w = float(request.POST.get('width'))
+                h = float(request.POST.get('height'))
+
+                if request.FILES.get('base_image'):
+                    image = Image.open(request.FILES.get('base_image'))
+                else:
+                    image = Image.open(request.user.profile.base_image)
+                cropped_image = image.crop((x, y, w + x, h + y))
+                resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+
+                io = BytesIO()
+
+                resized_image.save(io, 'JPEG', quality=60)
+
+                c_room.image.save('image_{}.jpg'.format(c_room.id), ContentFile(io.getvalue()),
+                                  save=False)
+                c_room.save()
+
+                return redirect('/chat/go_to_chat/' + str(c_room.id))
+
+        def get(self, request, **kwargs):
+            avatar_form = UpdateAvatarForm()
+            crop_form = CropAvatarForm()
+            context = {'avatar_form': avatar_form, 'crop_form': crop_form}
+
+            return render(request, self.template_name, context)
 
 
 class Communities:
