@@ -1,6 +1,7 @@
 <style>
     #id-last-msg {
         display: inline-block;
+        text-align: left;
 
         width: 200px;
         white-space: nowrap;
@@ -11,6 +12,15 @@
         #id-last-msg {
             display: none;
         }
+    }
+    #chat-name-link {
+        text-decoration: none;
+        text-align: left;
+
+        width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 
@@ -27,7 +37,7 @@
                             <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
                         {% endif %}
                     {% else %}
-                        <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/">{{ chat.chat_name }}</a>
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/" id="chat-name-link">{{ chat.chat_name }}</a>
                     {% endif %}
                     {% if chat.last_message %}
                         <p id="id-last-msg" class="float-left text-muted ml-3">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
@@ -35,7 +45,7 @@
                     {% load static %}
                     <script src="{% static 'js/quitChat.js' %}"></script>
                     <script>
-                        const csr_token = '{{ csrf_token }}';
+                        csr_token = '{{ csrf_token }}';
                     </script>
                     {% if not chat.is_dialog and user != chat.owner %}
                         <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>

@@ -1,5 +1,16 @@
 {% extends 'chat/base.html' %}
 {% block center %}
+    <style>
+        #chat_name {
+            display: inline-block;
+            margin-top: 7px;
+
+            width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 
     <div class="card" style="height: 750px">
         <div class="card-header bg-white">
@@ -8,7 +19,7 @@
                     <img src="{{ c_room.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
                 </div>
                 <div class="col-7 text-left pl-2">
-                    <p id="chat_name" style="display: inline-block; margin-top: 7px;">{{ c_room.chat_name }}</p>
+                    <p id="chat_name">{{ c_room.chat_name }}</p>
                     {% include 'chat/add_to_conv_modal.html' %}
                     {% if c_room.owner == user or user in c_room.administrators.all %}
                         {% include 'chat/edit_chat.html' %}

@@ -24,6 +24,6 @@
 <script src="{% static 'js/autosize.min.js' %}"></script>
 <script>
     autosize(document.getElementById('id-chat-name-input'));
-    const csr_token = '{{ csrf_token }}';
+    let csr_token = '{{ csrf_token }}';
     const name = document.getElementById('id-chat-name-input');
 </script>
