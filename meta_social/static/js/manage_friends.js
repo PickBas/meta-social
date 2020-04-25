@@ -59,7 +59,7 @@ function removeFriend (e, user_id) {
 } 
 
 $(function () {
-    $("#friends-search-input").on('input paste change', function (e) {
+    $("#friends-search-input").on('input paste', function (e) {
         $.ajax({
             type: "POST",
             url: '',
