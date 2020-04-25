@@ -110,6 +110,13 @@
                         onclick="removeFriend(event, {{ friend.id }})">
                     <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
                 </button>
+
+                <div class="float-right mr-2">
+                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
+                        {% csrf_token %}
+                        <input class="float-right btn btn-outline-secondary" type="submit" value="text">
+                     </form>
+                </div>
             </li>
         {% endfor %}
     {% else %}

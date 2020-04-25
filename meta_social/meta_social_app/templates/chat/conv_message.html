@@ -1,16 +1,29 @@
 {% extends 'chat/base.html' %}
 {% block center %}
+    <style>
+        #chat_name {
+            display: inline-block;
+            margin-top: 7px;
+
+            width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 
     <div class="card" style="height: 750px">
         <div class="card-header bg-white">
             <div class="row">
                 <div class="col-5 text-right pr-0">
-                    <img src="{{ first_user.profile.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
+                    <img src="{{ c_room.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
                 </div>
                 <div class="col-7 text-left pl-2">
-                    <a href="/accounts/profile/{{ first_user.id }}/" id="chat_name">{{ first_user.profile.get_name }}</a>
-                    <br>
-                    <small class="text-muted" id="chat_status">{{ first_user.profile.get_status }}</small>
+                    <p id="chat_name">{{ c_room.chat_name }}</p>
+                    {% include 'chat/add_to_conv_modal.html' %}
+                    {% if c_room.owner == user or user in c_room.administrators.all %}
+                        {% include 'chat/edit_chat.html' %}
+                    {% endif %}
                 </div>
             </div>
         </div>

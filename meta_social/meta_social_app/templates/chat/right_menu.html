@@ -1,0 +1,37 @@
+<style>
+    .names-chats {
+        text-decoration: none;
+        text-align: left;
+        display: inline-block;
+
+        width: 126px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="card" style="max-height: 325px;">
+    <div class="card-body text-left">
+        <p>Чаты:</p>
+        {% if user.profile.chats.all and len_other_chats > 0 %}
+            {% for chat in other_chats %}
+                <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border border-dark" width=35 height=35>
+                <a href="/chat/go_to_chat/{{ chat.id }}/" class="names-chats">
+                    {% if chat.is_dialog %}
+                        {% if chat.participants.all.1 != user %}
+                            {{ chat.participants.all.1.profile.get_name }}
+                        {% else %}
+                            {{ chat.participants.all.0.profile.get_name }}
+                        {% endif %}
+                    {% else %}
+                        {{ chat.chat_name }}
+                    {% endif %}
+                </a>
+                {% if not forloop.last %}<hr>{% endif %}
+            {% endfor %}
+        {% else %}
+            Нет других чатов
+        {% endif %}
+    </div>
+</div>
