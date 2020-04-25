@@ -1,3 +1,15 @@
+<style>
+    #id-last-msg {
+        display: inline-block;
+        margin-right: 200px;
+    }
+    @media only screen and (max-width: 1026px) {
+        #id-last-msg {
+            display: none;
+        }
+    }
+</style>
+
 {% if chats %}
     <ul class="list-group list-group-flush" id="chat-list">
         {% for chat in chats %}
@@ -13,6 +25,9 @@
                     {% else %}
                         <p class="float-left ml-2">{{ chat.chat_name }}</p>
                     {% endif %}
+                    {% if chat.last_message %}
+                        <p id="id-last-msg" class="float-center text-muted">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
+                    {% endif %}
                     {% load static %}
                     <script src="{% static 'js/quitChat.js' %}"></script>
                     <script>
@@ -22,6 +37,8 @@
                         <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
                     {% endif %}
                     <a class="float-right btn btn-outline-secondary mr-2" href="/chat/go_to_chat/{{ chat.id }}/">Text</a>
+                    <script>
+                    </script>
                 </li>
             </div>
         {% endfor %}
