@@ -1,0 +1,10 @@
+{% extends 'base_menu.html' %}
+{% block center%}
+<h5>Здесь находятся все ваши файлы, которые вы загружали раннее</h5>
+    <h7>Картинки: </h7>
+    <p></p>
+        {% for i in images %}
+            <img src="{{ i.image.url }}" width="50%" class="mb-1">
+        {% endfor %}
+
+{% endblock %}

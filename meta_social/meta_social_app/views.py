@@ -42,6 +42,7 @@ def get_menu_context(page: str, pagename: str) -> dict:
         'music',
         'messages',
         'post',
+        'files'
     ]
 
     if page not in available_pages:
@@ -339,7 +340,7 @@ class PostViews:
                 for form in formset.cleaned_data:
                     if form:
                         image = form['image']
-                        photo = PostImages(post=post_form, image=image)
+                        photo = PostImages(post=post_form, image=image, from_user_id=request.user.id)
                         photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -741,7 +742,7 @@ class Communities:
                 for form in formset.cleaned_data:
                     if form:
                         image = form['image']
-                        photo = PostImages(post=post_form, image=image)
+                        photo = PostImages(post=post_form, image=image, from_user_id=request.user.id)
                         photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -977,3 +978,12 @@ class FriendsViews:
             return FriendsViews.get_render(request, {'c_user': request.user})
 
         raise Http404()
+
+
+class Files:
+    @staticmethod
+    def all_files(request, user_id):
+        context ={}
+        all_images_from_posts = PostImages.objects.filter(from_user_id=user_id)
+        context['images'] = all_images_from_posts
+        return render(request, 'files/files.html', context)
