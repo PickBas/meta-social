@@ -25,6 +25,9 @@ from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, U
     UpdateAvatarForm, CommunityCreateForm
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+PAGE_SIZE = 10
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -78,15 +81,24 @@ def index(request) -> render:
     context = get_menu_context('newsfeed', 'Главная')
     context['pagename'] = "Главная"
 
-    PostImageFormSet = modelformset_factory(
-        PostImages, form=PostImageForm, extra=10)
+    PostImageFormSet = modelformset_factory(PostImages,
+                                            form=PostImageForm,
+                                            extra=10)
 
     context['postform'] = PostForm()
     context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
     context['action_type'] = '/post/create/'
 
-    return render(request, 'index.html', context)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(request.user.profile.get_newsfeed(), PAGE_SIZE)
+    try:
+        context['newsfeed'] = paginator.page(page)
+    except PageNotAnInteger:
+        context['newsfeed'] = paginator.page(1)
+    except EmptyPage:
+        context['newsfeed'] = []
 
+    return render(request, 'index.html', context)
 
 @login_required
 def logout_track(request, user_id) -> redirect:
@@ -429,7 +441,8 @@ def chat_move(request, user_id, friend_id):
 def room(request, room_id):
     context = {'room_name': mark_safe(json.dumps(room_id))}
     c_room = Chat.objects.get(id=room_id)
-    context['first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
+    context[
+        'first_user'] = c_room.first_user if c_room.first_user != request.user else c_room.second_user
     context['messages_list'] = c_room.messages.all()
     return render(request, 'chat/message.html', context)
 

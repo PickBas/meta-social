@@ -100,8 +100,8 @@
             </div>
         </div>
     </div>
-    {% if user.profile.get_newsfeed %}
-        {% for post in user.profile.get_newsfeed %}
+    {% if newsfeed %}
+        {% for post in newsfeed %}
             <div class="card mt-3">
                 <div class="card-body text-left">
                     <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark"
