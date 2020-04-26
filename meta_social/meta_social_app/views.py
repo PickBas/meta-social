@@ -431,16 +431,17 @@ class Conversations:
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'chat/chat.html'
+            self.context = get_menu_context('messages', 'Чаты')
 
         def get(self, request, **kwargs):
-            context = {}
+            self.context['pagename'] = 'Чаты'
 
             c_user = User.objects.get(id=kwargs['user_id'])
-            context['c_user'] = c_user
+            self.context['c_user'] = c_user
 
             chats = c_user.profile.chats.all().order_by('-messages__date')
-            context['chats'] = list(dict.fromkeys(chats))
-            return render(request, self.template_name, context)
+            self.context['chats'] = list(dict.fromkeys(chats))
+            return render(request, self.template_name, self.context)
 
     @staticmethod
     def create_chat(request):
