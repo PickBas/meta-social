@@ -57,9 +57,9 @@
                 <ul class="list-group list-group-flush">
                     {% for friend in c_user.profile.friends.all|slice:":6"%}
                   <div style="display: flex; flex-wrap: wrap;">
-                        <li class="list-group-item" style="padding-left: 10px; padding-right: 10px;">
-                           <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.username }}" class="ml-2">
-                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark " style="margin-left: 20px" width=35 height=35>
+                        <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
+                           <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.username }}" class="ml-2" style="margin-left: 0;">
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark " style="margin-left: -5px;" width=35 height=35>
                            </a>
                           <br>
                         </li>
