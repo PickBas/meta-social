@@ -170,6 +170,16 @@ class ProfileViews:
 
             context['postform'] = PostForm()
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+            
+            if not is_in_blacklist:
+                page = request.GET.get('page', 1)
+                paginator = Paginator(list(user_item.profile.posts()), PAGE_SIZE)
+                try:
+                    context['c_user_posts'] = paginator.page(page)
+                except PageNotAnInteger:
+                    context['c_user_posts'] = paginator.page(1)
+                except EmptyPage:
+                    context['c_user_posts'] = []
 
             context['action_type'] = '/post/create/'
 

@@ -136,18 +136,31 @@
         </div>
       {% endif %}
       {% if is_in_blacklist %}
-            <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
+          <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
       {% else %}
-          {% if c_user.profile.posts and not is_in_blacklist %}
-        {% for post in c_user.profile.posts %}
-        {% include 'post.html' %}
-         {% endfor %}
-
-          {% endif %}
-          {% endif %}
+	  {% if c_user_posts %}
+              <div class="infinite-container">
+		  {% for post in c_user_posts %}
+		      <div class="infinite-item">
+			  {% include 'post.html' %}
+		      </div>
+		  {% endfor %}
+              </div>
+	      {% if c_user_posts.has_next %}
+		  <a class="infinite-more-link" href="?page={{ c_user_posts.next_page_number }}">More</a>
+	      {% endif %}
+	  {% endif %}
+      {% endif %}
     </div>
   </div>
 {% endblock %}
 {% block extra__js %}
-              <script src="{% static 'js/like_post.js' %}"></script>
+    <script src="{% static 'js/like_post.js' %}"></script>
+    <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+     var infinite = new Waypoint.Infinite({
+	 element: $('.infinite-container')[0]
+     });
+    </script>
 {% endblock extra__js %}
