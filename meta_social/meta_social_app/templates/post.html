@@ -1,0 +1,127 @@
+                <div class="card mt-3">
+                <div class="card-body">
+                  <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+                  <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
+                    {% if c_user == user %}
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#removingPostModal" class="float-right"><i class="fas fa-ban"></i></button>
+                        <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#editPostModal" class="float-right"><i class="far fa-edit"></i></button>
+                    {% endif %}
+                  <p class="card-text mt-2" id="id-post-text">{{ post.text }}</p>
+                  <div class="kollaz">
+                  {% if post.get_images %}
+                    {% for post_img in post.get_images %}
+                    {% if post.get_images.count > 1 %}
+                      <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                    {%else%}
+                       <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                    {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  </div>
+
+                  <hr class="mt-1 mb-1">
+                  {% if post in user.profile.liked_posts.all %}
+                    <button class="btn btn-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+                  {% else %}
+                    <button class="btn btn-outline-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+                  {% endif %}
+                  <a href="/post/{{ post.id }}" class="text-muted mb-0">{{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i></a>
+                    {% if c_user == user %}
+                        <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="editPostModalLabel">Modal title</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <textarea class="form-control" style="min-width: 100%" id="updated-post-text">{{ post.text }}</textarea>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="edit_post(event, '/post/{{ post.id }}/edit/')">Сохранить</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal fade" id="removingPostModal" tabindex="-1" role="dialog" aria-labelledby="removingPostModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="removingPostModalLabel">Удалить пост?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                                <button type="button" class="btn btn-primary" onclick="remove_post(event, '/post/{{ post.id }}/remove/')" data-dismiss="modal">Да</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    {% endif %}
+                  <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+
+                </div>
+                  <ul id="all_comments" style="padding-left: 0;">
+        {% if post.comments %}
+                {% for comment in post.comments|slice:":1" %}
+
+                       <div class="card" style="font-size: 15px; width: 100%; height: 130px; ">
+                       <div class="card-body" style="">
+
+                        <img src="{{ comment.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 600px">
+                           <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
+                            <div class="media-body">
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">{{ comment.text }}</h5>
+                                </div>
+                            <hr class="mt-1 mb-1">
+                            <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
+
+                        </div>
+                           </div>
+
+
+                {% endfor %}
+        {% endif %}
+    </ul>
+              </div>
+
+
+<script>
+      autosize(document.getElementById("updated-post-text"));
+
+      function remove_post(e, link) {
+          $.ajax({
+              type: "POST",
+              url: link,
+              data: {
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              success: function () {
+                  e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
+              }
+          })
+
+      }
+
+      function edit_post(e, link) {
+          let edited_text = document.getElementById("updated-post-text");
+          let old_text = document.getElementById("id-post-text");
+          $.ajax({
+              type: "POST",
+              url: link,
+              data: {
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                  text: edited_text.value
+              },
+              success: function() {
+                  old_text.innerText = edited_text.value;
+              }
+          })
+      }
+
+  </script>

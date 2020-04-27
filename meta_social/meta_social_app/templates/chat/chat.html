@@ -6,30 +6,14 @@
         <div class="card-body">
             {% if user == c_user %}
                 <h5>Ваши чаты</h5>
+                {% include 'chat/create_chat_modal.html' %}
                 <hr>
-                {% if c_user.profile.friends.all %}
-                    <ul class="list-group list-group-flush" id="friend-list">
-                        {% for friend in c_user.profile.friends.all %}
-                            <li class="list-group-item">
-                                <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                                <a href="/accounts/profile/{{ friend.id }}/" class="float-left ml-2">{{ friend.username }}</a>
-                                <div>
-                                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
-                                        {% csrf_token %}
-                                        <input class="float-right btn btn-outline-secondary" type="submit" value="text">
-                                     </form>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    Список друзей пуст.
-                {% endif %}
+                <div id="chat-list">
+                    {% include 'chat/chatlist.html' %}
+                </div>
             {% endif %}
         </div>
     </div>
-
-
-
+</div>
 
 {% endblock %}
