@@ -87,38 +87,45 @@
         <p class="text-center">Ничего не найдено.</p>
     {% endif %}
 {% else %}
-    {% if c_user.profile.friends.all %}
-        {% for friend in c_user.profile.friends.all %}
-            <li class="list-group-item">
-                <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-                <a href="/accounts/profile/{{ friend.id }}/">{{ friend.username }}</a>
+    {% if friendlist %}
+	<div class="infinite-container">
+            {% for friend in friendlist %}
+		<div class="infinite-container">
+		    <li class="list-group-item">
+			<img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+			<a href="/accounts/profile/{{ friend.id }}/">{{ friend.username }}</a>
 
-                <button type="button" 
-                        class="btn btn-outline-dark float-right" 
-                        data-toggle="tooltip" 
-                        data-placement="top" 
-                        title="Добавить в черный список"
-                        onclick="addBlacklist(event, {{ friend.id }})">
-                    <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
-                </button>
+			<button type="button" 
+				class="btn btn-outline-dark float-right" 
+				data-toggle="tooltip" 
+				data-placement="top" 
+				title="Добавить в черный список"
+				onclick="addBlacklist(event, {{ friend.id }})">
+			    <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+			</button>
 
-                <button type="button" 
-                        class="btn btn-outline-dark float-right mr-2" 
-                        data-toggle="tooltip" 
-                        data-placement="top" 
-                        title="Удалить из друзей"
-                        onclick="removeFriend(event, {{ friend.id }})">
-                    <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
-                </button>
+			<button type="button" 
+				class="btn btn-outline-dark float-right mr-2" 
+				data-toggle="tooltip" 
+				data-placement="top" 
+				title="Удалить из друзей"
+				onclick="removeFriend(event, {{ friend.id }})">
+			    <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+			</button>
 
-                <div class="float-right mr-2">
-                    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
-                        {% csrf_token %}
-                        <input class="float-right btn btn-outline-secondary" type="submit" value="text">
-                     </form>
-                </div>
-            </li>
-        {% endfor %}
+			<div class="float-right mr-2">
+			    <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST">
+				{% csrf_token %}
+				<input class="float-right btn btn-outline-secondary" type="submit" value="text">
+			    </form>
+			</div>
+		    </li>
+		</div>
+            {% endfor %}
+	</div>
+	{% if friendlist.has_next %}
+	    <a class="infinite-more-link" href="?page={{ friendlist.next_page_number }}">More</a>
+	{% endif %}
     {% else %}
         <p class="mb-0 text-center">Список друзей пуст.</p>
     {% endif %}

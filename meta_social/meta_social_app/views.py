@@ -807,7 +807,7 @@ class FriendsViews:
         query = request.POST.get('query')
         search_fields = ['username', 'first_name', 'last_name']
 
-        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)        
 
         return render(request, 'friends/list.html', context)
 
@@ -818,7 +818,17 @@ class FriendsViews:
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
-            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            c_user = User.objects.get(id=kwargs['user_id'])
+            self.context['c_user'] = c_user
+            page = request.GET.get('page', 1)
+            paginator = Paginator(c_user.profile.friends.all(), PAGE_SIZE)
+            try:
+                self.context['friendlist'] = paginator.page(page)
+            except PageNotAnInteger:
+                self.context['friendlist'] = paginator.page(1)
+            except EmptyPage:
+                self.context['friendlist'] = []
+
             return render(request, self.template_name, self.context)
 
         def post(self, request, **kwargs):
