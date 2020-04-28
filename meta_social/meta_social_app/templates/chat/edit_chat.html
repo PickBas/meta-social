@@ -32,6 +32,7 @@
             <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="id-chat-name-change" maxlength="25">{{ c_room.chat_name }}</textarea>
             <script>autosize(document.getElementById('id-chat-name-change'))</script>
             <hr>
+            <div>
             {% if c_room.participants.all %}
                 <h5 class="text-center">Участники</h5>
                 <ul class="list-group list-group-flush" id="friend-list-modal">
@@ -88,6 +89,21 @@
                 </ul>
             {% else %}
                 Список участников пуст
+            {% endif %}
+            </div>
+            {% if user == c_room.owner %}
+                <hr>
+                 <form method="POST" action="/chat/{{ c_room.id }}/remove/" id="id-form-removechat" class="text-center">
+                    {% csrf_token %}
+                    <button type="button"
+                                class="btn btn-danger text-center mr-2"
+                                data-placement="top"
+                                title="Удалить чат"
+                                style="display: inline-block;"
+                                onclick="document.getElementById('id-form-removechat').submit();">
+                            Удалить чат
+                    </button>
+                </form>
             {% endif %}
           </div>
           <div class="modal-footer">

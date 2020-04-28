@@ -462,6 +462,16 @@ class Conversations:
         raise Http404()
 
     @staticmethod
+    def remove_chat(request, room_id):
+        c_room = Chat.objects.get(id=room_id)
+        if request.method == 'POST' and request.user == c_room.owner:
+            c_room.delete()
+            return redirect('/chats/' + str(request.user.id))
+        raise Http404()
+
+
+
+    @staticmethod
     def make_admin(request, room_id, participant_id):
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
