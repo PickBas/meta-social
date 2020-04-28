@@ -731,7 +731,13 @@ class Communities:
 
         def get(self, request, **kwargs):
             self.context = get_menu_context('community', 'Список сообществ')
-            self.context['c_user'] = get_object_or_404(User, id=kwargs['user_id'])
+
+            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            self.context['c_user'] = c_user
+            pagination_elemetns(request,
+                                list(c_user.profile.communities.all()),
+                                self.context, 'c_user_communities')
+
             return render(request, 'community/community_list.html', self.context)
 
         def post(self, request, **kwargs):
