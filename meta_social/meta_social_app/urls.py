@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('community/<int:community_id>/', login_required(Communities.CommunityView.as_view())),
     path('community/list/<int:user_id>/', login_required(Communities.CommunityList.as_view())),
+    path('community/mylist/', login_required(Communities.my_communities)),
     path('community/create/', login_required(Communities.CommunityCreate.as_view())),
     path('community/<int:community_id>/join/', login_required(Communities.community_join)),
     path('community/<int:community_id>/leave/', login_required(Communities.community_leave)),
@@ -46,6 +47,7 @@ urlpatterns = [
     
     path('chats/<int:user_id>/', login_required(Conversations.ChatList.as_view())),
     path('chat/create/', login_required(Conversations.create_chat)),
+    path('chat/<int:room_id>/remove/', login_required(Conversations.remove_chat)),
     path('chat/quit/<int:room_id>/', login_required(Conversations.quit_room)),
     path('chat/<int:room_id>/add/<int:friend_id>/', login_required(Conversations.add_to_chat)),
     path('chat/<int:room_id>/remove/<int:participant_id>/', login_required(Conversations.remove_from_chat)),

@@ -88,22 +88,23 @@ class ChatConsumer(WebsocketConsumer):
         """
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        author_user = User.objects.get(id=int(text_data_json['author']))
-        new_message = Message.objects.create(
-            author=author_user,
-            message=text_data_json['message'])
+        if not message.isspace():
+            author_user = User.objects.get(id=int(text_data_json['author']))
+            new_message = Message.objects.create(
+                author=author_user,
+                message=text_data_json['message'])
 
-        chat = Chat.objects.get(id=int(text_data_json['chat_id']))
-        chat.messages.add(new_message)
-        chat.save()
+            chat = Chat.objects.get(id=int(text_data_json['chat_id']))
+            chat.messages.add(new_message)
+            chat.save()
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': self.message_to_json(new_message)
-            }
-        )
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': self.message_to_json(new_message)
+                }
+            )
 
     def chat_message(self, event: dict) -> None:
         """

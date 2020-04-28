@@ -18,6 +18,9 @@
                     {% if participant in c_room.administrators.all %}
                         <small class="text-muted float-left">(admin)</small>
                     {% endif %}
+                    {% if participant == c_room.owner %}
+                        <small class="text-muted float-left">(owner)</small>
+                    {% endif %}
                 </li>
             {% endfor %}
             </ul>
