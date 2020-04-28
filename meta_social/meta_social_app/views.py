@@ -689,6 +689,12 @@ class Communities:
             context['form'] = CommunityCreateForm()
             return render(request, self.template_name, context)
 
+    @staticmethod
+    def my_communities(request):
+        return render(request, 'community/own_community_list.html', {
+
+        })
+
     class CommunityList(View):
         def __init__(self, **kwargs):
             self.context = {}
