@@ -29,6 +29,22 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 PAGE_SIZE = 10
 
+def pagination_elemetns(request, elements, context, context_key: str, page_size=PAGE_SIZE):
+    """
+    elements - query elem for paginate: list
+    request
+    page => context[context_key]
+    """
+    page = request.GET.get('page', 1)
+    paginator = Paginator(elements, page_size)
+    try:
+        context[context_key] = paginator.page(page)
+    except PageNotAnInteger:
+        context[context_key] = paginator.page(1)
+    except EmptyPage:
+        context[context_key] = []
+
+
 
 def get_menu_context(page: str, pagename: str) -> dict:
     """
@@ -96,15 +112,8 @@ class Index(View):
         context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
         context['action_type'] = '/post/create/'
 
-        page = request.GET.get('page', 1)
-        paginator = Paginator(request.user.profile.get_newsfeed(), PAGE_SIZE)
-        try:
-            context['newsfeed'] = paginator.page(page)
-        except PageNotAnInteger:
-            context['newsfeed'] = paginator.page(1)
-        except EmptyPage:
-            context['newsfeed'] = []
-
+        pagination_elemetns(request, request.user.profile.get_newsfeed(),
+                            context, 'newsfeed')
 
         return render(request, self.template_name, context)
 
@@ -170,16 +179,10 @@ class ProfileViews:
 
             context['postform'] = PostForm()
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
-            
+
             if not is_in_blacklist:
-                page = request.GET.get('page', 1)
-                paginator = Paginator(list(user_item.profile.posts()), PAGE_SIZE)
-                try:
-                    context['c_user_posts'] = paginator.page(page)
-                except PageNotAnInteger:
-                    context['c_user_posts'] = paginator.page(1)
-                except EmptyPage:
-                    context['c_user_posts'] = []
+                pagination_elemetns(request, list(user_item.profile.posts()),
+                                    context, 'c_user_posts')
 
             context['action_type'] = '/post/create/'
 
@@ -605,7 +608,8 @@ class Conversations:
                 if participant != request.user:
                     context['first_user'] = participant
 
-            context['messages_list'] = c_room.messages.all()
+            pagination_elemetns(request, c_room.messages.all(),
+                                context, 'messages_list', 20)
             context['c_room'] = c_room
             other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
             other_chats.remove(c_room)
