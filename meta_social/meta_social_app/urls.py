@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/profile/<int:user_id>/', login_required(ProfileViews.ProfilePage.as_view())),
     path('accounts/profile/<int:user_id>/edit_profile/', login_required(ProfileViews.EditProfile.as_view())),
     path('accounts/profile/change_avatar/', login_required(ProfileViews.AvatarManaging.as_view())),
+    path('accounts/profile/like_marks/', login_required(PostViews.PostUrLikes.as_view())),
 
     path('friends/<int:user_id>/', login_required(FriendsViews.FriendsList.as_view())),
     path('friends/requests/', login_required(FriendsViews.FriendsRequests.as_view())),
