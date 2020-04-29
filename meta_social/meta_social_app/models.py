@@ -25,6 +25,7 @@ class Community(models.Model):
     Community class
     """
     users = models.ManyToManyField(to=User, related_name='users')
+    admins = models.ManyToManyField(to=User, related_name='admins')
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=True)
     info = models.CharField(max_length=1000, null=True)

@@ -22,7 +22,7 @@ from django.forms import modelformset_factory
 
 from .models import Post, FriendshipRequest, PostImages, Music
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
-    UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm
+    UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -675,6 +675,26 @@ class Communities:
             context['action_type'] = '/post/create/{}/'.format(community_id)
 
             return render(request, self.template_name, context)
+
+    class EditCommunity(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'community/edit_community.html'
+            self.context = get_menu_context('community', 'Редактирование сообщества')
+
+        def post(self, request, **kwargs):
+            community = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['community'] = community
+            form = EditCommunityForm(request.POST, instance=self.context['community'])
+            if form.is_valid():
+                form.save()
+            return redirect('/community/{}/'.format(community.id))
+
+        def get(self, request, **kwargs):
+            self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['form'] = EditCommunityForm(instance=self.context['community'])
+
+            return render(request, self.template_name, self.context)
 
     class CommunityCreate(View):
         def __init__(self, **kwargs):

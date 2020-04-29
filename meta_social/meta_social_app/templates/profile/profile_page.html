@@ -31,7 +31,7 @@
         <div class="card-body">
           {% if c_user == user %}
             <hr class="mt-0">
-            <a href="/accounts/profile/{{ c_user.id }}/edit_profile/" class="btn btn-block btn-primary">Редактировать</a>
+            <a href="/accounts/profile/{{ c_user.id }}/edit/" class="btn btn-block btn-primary">Редактировать</a>
           {% else %}
               <hr class="mt-0">
               {% if not is_in_blacklist and not is_friend %}

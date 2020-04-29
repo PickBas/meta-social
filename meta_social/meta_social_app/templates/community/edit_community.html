@@ -1,0 +1,30 @@
+{% extends 'base_menu.html' %}
+{% load crispy_forms_tags %}
+
+{% block center %}
+    <div class="card">
+        <div class="card-header text-center">
+            Редактирование сообщества {{ community.name }}
+        </div>
+        <div class="card-body mb">
+            {% if user == community.owner %}
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    <style>
+                        .asteriskField {
+                            display: none;
+                        }
+                    </style>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            {{ form|crispy }}
+                            <input class="btn btn-primary btn-block" type="submit" value="Сохранить">
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <p>Вы не можете редактировать это сообщество. <a href="/community/{{ community.id }}/">Вернуться назад.</a></p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
