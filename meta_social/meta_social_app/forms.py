@@ -40,6 +40,23 @@ class ProfileUpdateForm(forms.ModelForm):
         }
 
 
+class EditCommunityForm(forms.ModelForm):
+    """
+        EditCommunityForm class
+    """
+    class Meta:
+        model = Community
+        fields = ('name', 'info', 'country',)
+        widgets = {
+            'info': forms.Textarea()
+        }
+        labels = {
+            'name': 'Название',
+            'info': 'Информация',
+            'country': 'Страна',
+        }
+
+
 class UserUpdateForm(forms.ModelForm):
     """
         UserUpdateForm class
@@ -50,6 +67,9 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class UpdateAvatarForm(forms.ModelForm):
+    """
+        UpdateAvatarForm class
+    """
     base_image = forms.ImageField(required=True)
 
     class Meta:
@@ -57,7 +77,21 @@ class UpdateAvatarForm(forms.ModelForm):
         fields = ('base_image', )
 
 
+class UpdateCommunityAvatarForm(forms.ModelForm):
+    """
+        UpdateCommunityAvatarForm class
+    """
+    base_image = forms.ImageField(required=True)
+
+    class Meta:
+        model = Community
+        fields = ('base_image', )
+
+
 class CropAvatarForm(forms.Form):
+    """
+        CropAvatarForm class
+    """
     x = forms.FloatField(widget=forms.HiddenInput())
     y = forms.FloatField(widget=forms.HiddenInput())
     width = forms.FloatField(widget=forms.HiddenInput())
@@ -100,12 +134,18 @@ class PostImageForm(forms.ModelForm):
 
 
 class UploadMusicForm(forms.ModelForm):
+    """
+        UploadMusicForm class
+    """
     class Meta:
         model = Music
         fields = ('audio_file', 'artist', 'title', )
 
 
 class CommunityCreateForm(forms.Form):
+    """
+        CommunityCreateForm class
+    """
     name = forms.CharField(max_length=100)
     info = forms.CharField(max_length=1000)
     country = CountryField().formfield()

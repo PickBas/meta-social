@@ -22,7 +22,7 @@ from django.forms import modelformset_factory
 
 from .models import Post, FriendshipRequest, PostImages, Music
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
-    UpdateAvatarForm, CommunityCreateForm
+    UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -676,6 +676,26 @@ class Communities:
 
             return render(request, self.template_name, context)
 
+    class EditCommunity(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'community/edit_community.html'
+            self.context = get_menu_context('community', 'Редактирование сообщества')
+
+        def post(self, request, **kwargs):
+            community = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['community'] = community
+            form = EditCommunityForm(request.POST, instance=self.context['community'])
+            if form.is_valid():
+                form.save()
+            return redirect('/community/{}/'.format(community.id))
+
+        def get(self, request, **kwargs):
+            self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['form'] = EditCommunityForm(instance=self.context['community'])
+
+            return render(request, self.template_name, self.context)
+
     class CommunityCreate(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
@@ -700,6 +720,51 @@ class Communities:
             context = get_menu_context('community', 'Создание сообщества')
             context['form'] = CommunityCreateForm()
             return render(request, self.template_name, context)
+
+    class AvatarManaging(View):
+        def __init__(self, **kwargs):
+            self.context = get_menu_context('community', 'Смена аватарки сообщества')
+            self.template_name = 'community/change_avatar.html'
+            super().__init__(**kwargs)
+
+        def post(self, request, **kwargs):
+            community = get_object_or_404(Community, id=kwargs['community_id'])
+            avatar_form = UpdateCommunityAvatarForm(request.POST, request.FILES, instance=community)
+            crop_form = CropAvatarForm(request.POST)
+            if crop_form.is_valid() and avatar_form.is_valid():
+                avatar_form.save()
+
+                x = float(request.POST.get('x'))
+                y = float(request.POST.get('y'))
+                w = float(request.POST.get('width'))
+                h = float(request.POST.get('height'))
+
+                if request.FILES.get('base_image'):
+                    image = Image.open(request.FILES.get('base_image'))
+                else:
+                    image = Image.open(community.base_image)
+                cropped_image = image.crop((x, y, w + x, h + y))
+                resized_image = cropped_image.resize((256, 256), Image.ANTIALIAS)
+
+                io = BytesIO()
+
+                resized_image.save(io, 'JPEG', quality=60)
+
+                community.image.save('image_{}.jpg'.format(community.id), ContentFile(io.getvalue()),
+                                                save=False)
+                community.save()
+
+                return redirect('/community/' + str(community.id))
+
+        def get(self, request, **kwargs):
+            avatar_form = UpdateCommunityAvatarForm()
+            crop_form = CropAvatarForm()
+
+            self.context['avatar_form'] = avatar_form
+            self.context['crop_form'] = crop_form
+            self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
+
+            return render(request, self.template_name, self.context)
 
     @staticmethod
     def my_communities(request):

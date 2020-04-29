@@ -10,7 +10,7 @@ urlpatterns = [
     path('', login_required(Index.as_view()), name='home'),
     path('track/logout/<int:user_id>/', logout_track),
     path('accounts/profile/<int:user_id>/', login_required(ProfileViews.ProfilePage.as_view())),
-    path('accounts/profile/<int:user_id>/edit_profile/', login_required(ProfileViews.EditProfile.as_view())),
+    path('accounts/profile/<int:user_id>/edit/', login_required(ProfileViews.EditProfile.as_view())),
     path('accounts/profile/change_avatar/', login_required(ProfileViews.AvatarManaging.as_view())),
     path('accounts/profile/like_marks/', login_required(PostViews.PostUrLikes.as_view())),
 
@@ -31,6 +31,8 @@ urlpatterns = [
     path('community/create/', login_required(Communities.CommunityCreate.as_view())),
     path('community/<int:community_id>/join/', login_required(Communities.community_join)),
     path('community/<int:community_id>/leave/', login_required(Communities.community_leave)),
+    path('community/<int:community_id>/change_avatar/', login_required(Communities.AvatarManaging.as_view())),
+    path('community/<int:community_id>/edit/', login_required(Communities.EditCommunity.as_view())),
 
     path('post/create/', login_required(PostViews.post_new)),
     path('post/create/<int:community_id>/', login_required(Communities.post_community_new)),
