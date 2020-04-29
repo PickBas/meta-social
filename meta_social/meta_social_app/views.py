@@ -330,7 +330,7 @@ class PostViews:
             PostImageFormSet = modelformset_factory(
                 PostImages, form=PostImageForm, extra=10
             )
-
+            
             self.context['postform'] = PostForm(instance=post_item)
             self.context['formset'] = PostImageFormSet(queryset=post_item.get_images())
             

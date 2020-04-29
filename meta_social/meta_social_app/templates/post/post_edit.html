@@ -8,13 +8,35 @@
                 {{ postform }}
                 
                 {{ formset.management_form }}
-                {% for form in formset %}
-                    {{ form }}
-                    <hr>
-                {% endfor %}
+                <ul id="simple-list" class="list-group list-group-flush">
+                    {% for form in formset %}
+                        <li class="list-group-item">{{ form }}</li>
+                    {% endfor %}
+                </ul>
 
                 <input type="submit" value="Save">
             </form>
         </div>
     </div>
 {% endblock center %}
+
+{% block extra__js %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+    <script defer>
+        var sortable = new Sortable(
+            $('#simple-list')[0],
+            {
+                onEnd: function (evt) {
+                    console.clear()
+                    for (var i=0; i < $('#simple-list').children().length; i++) {
+                        let nm = $('#simple-list').children().eq(i).children('input[type=file]')[0]
+                        nm.setAttribute('name', 'form-' + i + '-image')
+                        nm.setAttribute('id', 'id_form-' + i + '-image')
+                        console.log(nm)
+                    }
+                },
+            }
+        )
+    </script>
+{% endblock extra__js %}
