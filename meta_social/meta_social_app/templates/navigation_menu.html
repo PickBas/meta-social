@@ -21,17 +21,21 @@
             {% endif %}
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link {% if page == 'friends' %}active{% endif %}" href="/friends/{{ user.id }}/">
+    <li class="nav-item w-100" style="display: table">
+        <a href="/friends/{{ user.id }}/" 
+           {% if user.profile.friendship_requests_count %}
+            class="nav-link {% if page == 'friends' %}active{% endif %} float-left w-75"
+            style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;"
+           {% else %}
+            class="nav-link {% if page == 'friends' %}active{% endif %} float-left w-100"
+           {% endif %}>
             Друзья
-            {% if user.profile.friendship_requests_count %}
-                {% if page == 'friends' %}
-                    <span class="badge badge-light float-right mt-1" id="friendshipsCount">{{ user.profile.friendship_requests_count }}</span>
-                {% else %}
-                    <span class="badge badge-primary float-right mt-1" id="friendshipsCount">{{ user.profile.friendship_requests_count }}</span>
-                {% endif %}
-            {% endif %}
         </a>
+        {% if user.profile.friendship_requests_count %}
+            <a href="/friends/requests/" class="btn btn-outline-primary float-right w-25 pl-2" style="border-top-left-radius: 0px; border-bottom-left-radius: 0px; height: 40px;">
+                {{ user.profile.friendship_requests_count }}
+            </a>
+        {% endif %}
     </li>
     <li class="nav-item">
         <a class="nav-link {% if page == 'community' %}active{% endif %}" href="/community/list/{{ user.id }}/">
