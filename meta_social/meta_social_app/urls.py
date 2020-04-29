@@ -31,6 +31,7 @@ urlpatterns = [
     path('community/create/', login_required(Communities.CommunityCreate.as_view())),
     path('community/<int:community_id>/join/', login_required(Communities.community_join)),
     path('community/<int:community_id>/leave/', login_required(Communities.community_leave)),
+    path('community/<int:community_id>/change_avatar/', login_required(Communities.AvatarManaging.as_view())),
 
     path('post/create/', login_required(PostViews.post_new)),
     path('post/create/<int:community_id>/', login_required(Communities.post_community_new)),

@@ -57,6 +57,14 @@ class UpdateAvatarForm(forms.ModelForm):
         fields = ('base_image', )
 
 
+class UpdateCommunityAvatarForm(forms.ModelForm):
+    base_image = forms.ImageField(required=True)
+
+    class Meta:
+        model = Community
+        fields = ('base_image', )
+
+
 class CropAvatarForm(forms.Form):
     x = forms.FloatField(widget=forms.HiddenInput())
     y = forms.FloatField(widget=forms.HiddenInput())

@@ -61,7 +61,13 @@
           opacity: 0.7;
         }
       </style>
-      <img src="{{ community.image.url }}" class="card-img-top rollover" />
+        {% if user == community.owner %}
+          <a href="/community/{{ community.id }}/change_avatar/">
+            <img src="{{ community.image.url }}" class="card-img-top rollover" />
+          </a>
+        {% else %}
+          <img src="{{ community.image.url }}" class="card-img-top" />
+        {% endif %}
       <div class="card-body">
           <hr class="mt-0">
           {% if user == community.owner %}
