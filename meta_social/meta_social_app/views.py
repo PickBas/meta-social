@@ -301,9 +301,10 @@ class PostViews:
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'profile/like_marks.html'
+            self.context = get_menu_context('like_marks', 'Закладки')
 
         def get(self, request) -> render:
-            return render(request, self.template_name)
+            return render(request, self.template_name, self.context)
 
 
     class PostAjax(View):

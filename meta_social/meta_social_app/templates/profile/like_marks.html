@@ -3,15 +3,23 @@
 
 {% block content %}
 <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
-    <p class="mt-3">Список лайкнутых постов.</p>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-0">Список лайкнутых постов.</h5>
+        </div>
+    </div>
     {% if user.profile.liked_posts.all %}
         {% for post in user.profile.liked_posts.all %}
             {% include 'post.html' %}
         {% endfor %}
     {% else %}
-        <p class="mt-3">Лайкнутых постов нет.</p>
+        <div class="card mt-3">
+            <div class="card-body">
+                <p class="mb-0">Лайкнутых постов нет.</p>
+            </div>
+        </div>
     {% block extra__js %}
-                <script src="{% static 'js/like_post.js' %}"></script>
+        <script src="{% static 'js/like_post.js' %}"></script>
     {% endblock extra__js %}
     {% endif %}
 {% endblock %}
