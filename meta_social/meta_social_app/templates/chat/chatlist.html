@@ -20,13 +20,21 @@
         {% for chat in chats %}
             <div>
                 <li class="list-group-item">
-                    <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                    <img src="{% if chat.is_dialog %}
+                                {% for participant in chat.participants.all %}
+                                    {% if participant != user %}
+                                        {{ participant.profile.image.url }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {{ chat.image.url }}
+                            {% endif %}" class="rounded-circle border border-dark float-left" width=35 height=35>
                     {% if chat.is_dialog %}
-                        {% if chat.participants.all.1 != user %}
-                            <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>
-                        {% else %}
-                            <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
-                        {% endif %}
+                        {% for participant in chat.participants.all %}
+                            {% if participant != user %}
+                                <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.id }}/">{{ participant.profile.get_name }}</a>
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/" id="chat-name-link">{{ chat.chat_name }}</a>
                     {% endif %}
