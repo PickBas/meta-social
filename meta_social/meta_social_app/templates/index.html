@@ -100,24 +100,35 @@
             </div>
         </div>
     </div>
-    {% if user.profile.get_newsfeed %}
-        {% for post in user.profile.get_newsfeed %}
-            <div class="card mt-3">
-                <div class="card-body text-left">
-                    <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark"
-                        width=35 height=35>
-                    <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
-                    <p class="card-text mt-2" style = "white-space: pre-wrap">{{ post.text }}</p>
-                    <div class="kollaz">
-                        {% if post.get_images %}
-                            {% for post_img in post.get_images %}
-                                {% if post.get_images.count > 1 %}
-                                    <img src="{{ post_img.image.url }}" width="50%" class="mb-1">
-                                {%else%}
-                                    <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
+    {% if newsfeed %}
+	<div class="infinite-container">
+            {% for post in newsfeed %}
+		<div class="card mt-3">
+                    <div class="card-body text-left infinite-item">
+			<img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark"
+                             width=35 height=35>
+			<a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
+			<p class="card-text mt-2">{{ post.text }}</p>
+			<div class="kollaz">
+                            {% if post.get_images %}
+				{% for post_img in post.get_images %}
+                                    {% if post.get_images.count > 1 %}
+					<img src="{{ post_img.image.url }}" width="50%" class="mb-1">
+                                    {%else%}
+					<img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                                    {% endif %}
+				{% endfor %}
+                            {% endif %}
+			</div>
+
+			<hr class="mt-1 mb-1">
+			{% if post in user.profile.liked_posts.all %}
+                            <button class="btn btn-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+			{% else %}
+                            <button class="btn btn-outline-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">{{ post.likes.count }} &#9829;</button>
+			{% endif %}
+			<a href="/post/{{ post.id }}" class="text-muted mb-0">{{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i></a>
+			<span class="text-muted mb-0 float-right">{{ post.date }}</span>
                     </div>
 
                     <hr class="mt-1 mb-1">
@@ -139,20 +150,22 @@
                         <img src="{{ comment.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 630px">
                            <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
                             <div class="media-body">
-                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px; white-space: pre-wrap">{{ comment.text }}</h5>
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">{{ comment.text }}</h5>
                                 </div>
                             <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
 
-                        </div>
-                           </div>
-
-
-                {% endfor %}
-        {% endif %}
-    </ul>
-            </div>
-        {% endfor %}
+				</div>
+</div>
+			    {% endfor %}
+			{% endif %}
+		    </ul>
+		</div>
+            {% endfor %}
+	</div>
+	{% if newsfeed.has_next %}
+	    <a class="infinite-more-link" href="?page={{ newsfeed.next_page_number }}">More</a>
+	{% endif %}
     {% else %}
         <p class="mt-3">Новостей нет.</p>
     {% endif %}
@@ -163,5 +176,12 @@
 {% endblock %}
 
 {% block extra__js %}
-  <script src="{% static 'js/like_post.js' %}"></script>
+    <script src="{% static 'js/like_post.js' %}"></script>
+    <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+     var infinite = new Waypoint.Infinite({
+	 element: $('.infinite-container')[0]
+     });
+    </script>
 {% endblock extra__js %}

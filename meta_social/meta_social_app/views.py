@@ -25,6 +25,25 @@ from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, U
     UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+PAGE_SIZE = 10
+
+def pagination_elemetns(request, elements, context, context_key: str, page_size=PAGE_SIZE):
+    """
+    elements - query elem for paginate: list
+    request
+    page => context[context_key]
+    """
+    page = request.GET.get('page', 1)
+    paginator = Paginator(elements, page_size)
+    try:
+        context[context_key] = paginator.page(page)
+    except PageNotAnInteger:
+        context[context_key] = paginator.page(1)
+    except EmptyPage:
+        context[context_key] = []
+
 
 
 def get_menu_context(page: str, pagename: str) -> dict:
@@ -95,6 +114,9 @@ class Index(View):
         context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
         context['action_type'] = '/post/create/'
 
+        pagination_elemetns(request, request.user.profile.get_newsfeed(),
+                            context, 'newsfeed')
+
         return render(request, self.template_name, context)
 
 
@@ -159,6 +181,10 @@ class ProfileViews:
 
             context['postform'] = PostForm()
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+
+            if not is_in_blacklist:
+                pagination_elemetns(request, list(user_item.profile.posts()),
+                                    context, 'c_user_posts')
 
             context['action_type'] = '/post/create/'
 
@@ -594,7 +620,8 @@ class Conversations:
                 if participant != request.user:
                     context['first_user'] = participant
 
-            context['messages_list'] = c_room.messages.all()
+            pagination_elemetns(request, c_room.messages.all(),
+                                context, 'messages_list', 20)
             context['c_room'] = c_room
             other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
             other_chats.remove(c_room)
@@ -781,7 +808,13 @@ class Communities:
 
         def get(self, request, **kwargs):
             self.context = get_menu_context('community', 'Список сообществ')
-            self.context['c_user'] = get_object_or_404(User, id=kwargs['user_id'])
+
+            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            self.context['c_user'] = c_user
+            pagination_elemetns(request,
+                                list(c_user.profile.communities.all()),
+                                self.context, 'c_user_communities')
+
             return render(request, 'community/community_list.html', self.context)
 
         def post(self, request, **kwargs):
@@ -877,7 +910,7 @@ class FriendsViews:
         query = request.POST.get('query')
         search_fields = ['username', 'first_name', 'last_name']
 
-        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
+        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)        
 
         return render(request, 'friends/list.html', context)
 
@@ -888,7 +921,17 @@ class FriendsViews:
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
-            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            c_user = User.objects.get(id=kwargs['user_id'])
+            self.context['c_user'] = c_user
+            page = request.GET.get('page', 1)
+            paginator = Paginator(c_user.profile.friends.all(), PAGE_SIZE)
+            try:
+                self.context['friendlist'] = paginator.page(page)
+            except PageNotAnInteger:
+                self.context['friendlist'] = paginator.page(1)
+            except EmptyPage:
+                self.context['friendlist'] = []
+
             return render(request, self.template_name, self.context)
 
         def post(self, request, **kwargs):

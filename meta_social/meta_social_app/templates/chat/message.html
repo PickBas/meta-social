@@ -17,18 +17,24 @@
         <div class="card-body text-center">
             <div style="display: flex; flex-direction: column; flex-wrap: nowrap; overflow-y: scroll; overflow-x: hidden;" id="messages_list" class="h-100">
                 {% if messages_list %}
-                    {% for message in messages_list %}
-                        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
-                            <div class="col-lg-1 col-sm-1">
-                                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+		    {% if messages_list.has_next %}
+			<a class="infinite-more-link" href="?page={{ messages_list.next_page_number }}">More</a>
+		    {% endif %}
+
+		    <div class="infinite-container">
+			{% for message in messages_list %}
+                            <div class="row infinite-item" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
+				<div class="col-lg-1 col-sm-1">
+                                    <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+				</div>
+				<div class="col-lg-11 col-sm-11 text-left">
+                                    <a href="#">{{ message.author.username }}</a>
+                                    <small class="text-muted ml-1">{{ message.date }}</small>
+                                    <p>{{ message.message }}</p>
+				</div>
                             </div>
-                            <div class="col-lg-11 col-sm-11 text-left">
-                                <a href="#">{{ message.author.username }}</a>
-                                <small class="text-muted ml-1">{{ message.date }}</small>
-                                <p>{{ message.message }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
+			{% endfor %}
+		    </div>
                 {% else %}
                     <p class="text-center" style="margin-top: auto;">Список сообщений пуст</p>
                 {% endif %}
@@ -55,7 +61,13 @@
     </script>
     <script src="{% static 'js/autosize.min.js' %}"></script>
     <script src="{% static 'js/messagesockets.js' %}" type="text/javascript"></script>
-
+    <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+     var infinite = new Waypoint.Infinite({
+	 element: $('.infinite-container')[0]
+     });
+    </script>
 {% endblock %}
 
 {% block right %}
