@@ -107,7 +107,7 @@
                     <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark"
                         width=35 height=35>
                     <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
-                    <p class="card-text mt-2">{{ post.text }}</p>
+                    <p class="card-text mt-2" style = "white-space: pre-wrap">{{ post.text }}</p>
                     <div class="kollaz">
                         {% if post.get_images %}
                             {% for post_img in post.get_images %}
@@ -139,7 +139,7 @@
                         <img src="{{ comment.user.profile.image.url }}" class="rounded-circle border border-dark" width=35 height=35 style="margin-right: 630px">
                            <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">  {{ comment.user.username }}</p>
                             <div class="media-body">
-                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">{{ comment.text }}</h5>
+                                    <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px; white-space: pre-wrap">{{ comment.text }}</h5>
                                 </div>
                             <hr class="mt-1 mb-1">
                             <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>

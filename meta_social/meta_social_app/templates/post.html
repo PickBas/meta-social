@@ -6,7 +6,7 @@
                         <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#removingPostModal" class="float-right"><i class="fas fa-ban"></i></button>
                         <button style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"  data-toggle="modal" data-target="#editPostModal" class="float-right"><i class="far fa-edit"></i></button>
                     {% endif %}
-                  <p class="card-text mt-2" id="id-post-text">{{ post.text }}</p>
+                  <p class="card-text mt-2" style="white-space: pre-wrap" id="id-post-text">{{ post.text }}</p>
                   <div class="kollaz">
                   {% if post.get_images %}
                     {% for post_img in post.get_images %}
