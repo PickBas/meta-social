@@ -282,12 +282,6 @@ class Profile(models.Model):
     def get_music_list(self):
         return Music.objects.filter(user=self.user)
 
-    def get_incoming_messages(self):
-        return Messages.objects.filter(to_user=self.user)
-
-    def get_outcoming_messages(self):
-        return Messages.objects.filter(from_user=self.user)
-
 
 def save_image_from_url(profile, image_url):
     """
@@ -328,6 +322,7 @@ class PostImages(models.Model):
     """
     post = models.ForeignKey(Post, models.CASCADE)
     image = models.ImageField(upload_to='post/images/')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def save(self):
         img = Image.open(self.image)
