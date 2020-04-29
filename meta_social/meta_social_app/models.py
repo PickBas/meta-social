@@ -308,7 +308,7 @@ class PostImages(models.Model):
     Posts Images class
     """
     post = models.ForeignKey(Post, models.CASCADE)
-    image = models.ImageField(upload_to='post/images/')
+    image = models.ImageField(upload_to='post/images/', blank=True, null=True)
 
     def save(self):
         img = Image.open(self.image)

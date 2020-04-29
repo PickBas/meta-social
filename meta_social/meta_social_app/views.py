@@ -297,10 +297,44 @@ class PostViews:
             self.context = get_menu_context('post', 'Редактирование поста')
 
         def post(self, request, **kwargs):
-            pass
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+            PostImageFormSet = modelformset_factory(
+                PostImages, form=PostImageForm, extra=10
+            )
+
+            postform = PostForm(request.POST)
+            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+            if request.method == 'POST':
+                if postform.is_valid() and formset.is_valid():
+                    postform.save()
+                    post_item.get_images().delete()
+
+                    for key in request.FILES:
+                        image = request.FILES[key]
+                        photo = PostImages(
+                            post=post_item,
+                            image=image
+                        )
+                        photo.save()
+                    
+                    self.context['postform'] = PostForm(instance=post_item)
+                    self.context['formset'] = PostImageFormSet(queryset=post_item.get_images())
+
+                    return render(request, self.template_name, self.context)
+
+            raise Http404()
         
         def get(self, request, **kwargs):
-            pass
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+            PostImageFormSet = modelformset_factory(
+                PostImages, form=PostImageForm, extra=10
+            )
+
+            self.context['postform'] = PostForm(instance=post_item)
+            self.context['formset'] = PostImageFormSet(queryset=post_item.get_images())
+            
+            return render(request, self.template_name, self.context)
 
 
     class PostAjax(View):
@@ -336,7 +370,8 @@ class PostViews:
         if request.method == "POST":
             postForm = PostForm(request.POST)
             formset = PostImageFormSet(
-                request.POST, request.FILES, queryset=PostImages.objects.none())
+                request.POST, request.FILES, queryset=PostImages.objects.none()
+            )
 
             if postForm.is_valid() and formset.is_valid():
                 post_form = postForm.save(commit=False)

@@ -88,7 +88,7 @@ class PostImageForm(forms.ModelForm):
     """
         Form for adding images to post
     """
-    image = forms.ImageField()
+    image = forms.ImageField(required=False)
 
     class Meta:
         model = PostImages

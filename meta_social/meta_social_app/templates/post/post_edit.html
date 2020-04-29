@@ -1,16 +1,20 @@
 {% extends 'base_menu.html' %}
 
 {% block center %}
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ post_form }}
-        
-        {{ formset.management_form }}
-        {% for form in formset %}
-            {{ form }}
-            <hr>
-        {% endfor %}
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ postform }}
+                
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {{ form }}
+                    <hr>
+                {% endfor %}
 
-        <input type="submit" value="Save">
-    </form>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+    </div>
 {% endblock center %}
