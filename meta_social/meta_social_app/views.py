@@ -42,8 +42,8 @@ def get_menu_context(page: str, pagename: str) -> dict:
         'music',
         'messages',
         'post',
-        'like_marks'
-        'files'
+        'like_marks',
+        'files',
     ]
 
     if page not in available_pages:
