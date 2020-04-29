@@ -983,7 +983,7 @@ class FriendsViews:
 class Files:
     @staticmethod
     def all_files(request, user_id):
-        context ={}
+        context = get_menu_context('files', 'Мои файлы')
         all_images_from_posts = PostImages.objects.filter(from_user_id=user_id)
         context['images'] = all_images_from_posts
         return render(request, 'files/files.html', context)
