@@ -77,18 +77,6 @@ def get_menu_context(page: str, pagename: str) -> dict:
     return context
 
 
-def get_last_act(request, user_item) -> None:
-    """
-    Get last user's action time
-    :param request: request
-    :param user_item: User
-    :return: None
-    """
-    if request.method == 'GET' and request.user == user_item:
-        user_item.profile.last_act = timezone.now()
-        user_item.profile.save()
-
-
 class Index(View):
     """
     Index Class
@@ -120,20 +108,6 @@ class Index(View):
         return render(request, self.template_name, context)
 
 
-@login_required
-def logout_track(request, user_id) -> redirect:
-    """
-    When user logs out, time is written to a database
-    :param request: request
-    :param user_id: id
-    :return: redirect
-    """
-    user_item = User.objects.get(id=user_id)
-    user_item.profile.last_logout = timezone.now()
-    user_item.profile.save()
-    return redirect('/accounts/logout/')
-
-
 class ProfileViews:
     """
     ProfileViews
@@ -158,8 +132,6 @@ class ProfileViews:
             context['profile'] = Profile.objects.get(user=kwargs['user_id'])
             user_item = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = user_item
-            context['is_online'] = context['profile'].check_online_with_afk()
-            get_last_act(request, user_item)
 
             PostImageFormSet = modelformset_factory(
                 PostImages, form=PostImageForm, extra=10)
@@ -256,7 +228,6 @@ class ProfileViews:
                 instance=Profile.objects.get(user=kwargs['user_id']))
             self.previous_birth = User.objects.get(
                 id=kwargs['user_id']).profile.birth
-            get_last_act(request, context['uedit'])
 
             return render(request, self.template_name, context)
 
@@ -302,6 +273,16 @@ class ProfileViews:
             self.context['crop_form'] = crop_form
 
             return render(request, self.template_name, self.context)
+    
+    @staticmethod
+    def set_online(request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        if user == request.user:
+            user.profile.last_act = timezone.now()
+            user.profile.save()
+            return HttpResponse('Success')
+
+        raise Http404()
 
 
 class PostViews:

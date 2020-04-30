@@ -8,7 +8,6 @@ from .views import *
 
 urlpatterns = [
     path('', login_required(Index.as_view()), name='home'),
-    path('track/logout/<int:user_id>/', logout_track),
     path('accounts/profile/<int:user_id>/', login_required(ProfileViews.ProfilePage.as_view())),
     path('accounts/profile/<int:user_id>/edit/', login_required(ProfileViews.EditProfile.as_view())),
     path('accounts/profile/change_avatar/', login_required(ProfileViews.AvatarManaging.as_view())),
@@ -46,6 +45,8 @@ urlpatterns = [
     path('music/upload/',  login_required(MusicViews.MusicUpload.as_view())),
 
     path('ajax/search/', login_required(GlobalSearch.as_view())),
+    path('ajax/set_online/<int:user_id>/', login_required(ProfileViews.set_online)),
+
     path('like/<int:post_id>/', login_required(PostViews.like_post)),
     
     path('chats/<int:user_id>/', login_required(Conversations.ChatList.as_view())),

@@ -17,7 +17,7 @@ from tempfile import NamedTemporaryFile
 from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import sys
+import sys, humanize
 
 
 class Community(models.Model):
@@ -153,10 +153,11 @@ class Profile(models.Model):
     birth = models.DateField(null=True)
     show_email = models.BooleanField(default=False)
 
-    last_logout = models.DateTimeField(
-        default=timezone.now, auto_now=False, auto_now_add=False)
     last_act = models.DateTimeField(
-        default=timezone.now, auto_now=False, auto_now_add=False)
+        default=timezone.now, 
+        auto_now=False, 
+        auto_now_add=False
+    )
 
     blacklist = models.ManyToManyField(User, 'blacklist')
     communities = models.ManyToManyField(Community)
@@ -171,45 +172,16 @@ class Profile(models.Model):
             return self.user.first_name
         return self.user.username
 
-    def check_online_with_last_log(self) -> bool:
-        """
-        Checking online status using last login/logout
-        :param self: User
-        :return: bool
-        """
-        if self.user.last_login is None or self.last_logout is None:
-            return False
-
-        if self.user.last_login.hour >= self.last_logout.hour and \
-                self.user.last_login.minute >= self.last_logout.minute and \
-                self.user.last_login.second >= self.last_logout.second:
-            return True
-        if self.user.last_login.hour >= self.last_logout.hour and \
-                self.user.last_login.minute > self.last_logout.minute:
-            return True
-        if self.user.last_login.hour > self.last_logout.hour:
-            return True
-
-        return False
-
-    def check_online_with_afk(self) -> bool:
-        """
-        Checking user afk. If user is, online status is changed to offline
-        :return: bool
-        """
-        if self.check_online_with_last_log():
-            if timezone.now().hour - self.last_act.hour == 0 and \
-                    timezone.now().minute - self.last_act.minute >= 5:
-                return False
-            if timezone.now().hour - self.last_act.hour >= 1:
-                return False
-            return True
-        return False
-
     def get_status(self):
-        if self.check_online_with_afk():
+        duration = timezone.now() - self.last_act
+        minutes = (duration.total_seconds() % 3600) // 60
+
+        if minutes <= 5:
             return 'Онлайн'
-        return 'Оффлайн'
+
+        humanize.i18n.activate('ru_RU')
+
+        return 'Был(а) в сети {} назад'.format(humanize.naturaldelta(duration))
 
     def get_social_accounts(self) -> list:
         """
