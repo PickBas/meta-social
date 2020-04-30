@@ -46,6 +46,7 @@ urlpatterns = [
 
     path('ajax/search/', login_required(GlobalSearch.as_view())),
     path('ajax/set_online/<int:user_id>/', login_required(ProfileViews.set_online)),
+    path('ajax/update_nav/', login_required(Index.update_nav)),
 
     path('like/<int:post_id>/', login_required(PostViews.like_post)),
     

@@ -41,11 +41,13 @@ function removeBlacklist (e, user_id) {
 function acceptRequest (e, user_id) {
     let link = '/friends/accept_request/' + user_id + '/'
     sendAjax(link)
+    updateNav()
 }
 
 function cancelRequest (e, user_id) {
     let link = '/friends/cancel_request/' + user_id + '/'
     sendAjax(link)
+    updateNav()
 }
 
 function addFriend (e, user_id) {
@@ -126,6 +128,8 @@ function acceptRequest2 (e, user_id) {
             if (list.children.length == 0) {
                 list.innerHTML = '<p class="mb-0 text-center">Никто не хочет с вами дружить ((</p>'
             }
+
+            updateNav()
         }
     })
 }
@@ -146,6 +150,21 @@ function cancelRequest2 (e, user_id) {
             if (list.children.length == 0) {
                 list.innerHTML = '<p class="mb-0 text-center">Исходящих заявок нет.</p>'
             }
+
+            updateNav()
+        }
+    })
+}
+
+function updateNav () {
+    $.ajax({
+        type: "POST",
+        url: '/ajax/update_nav/',
+        data: {
+            csrfmiddlewaretoken: getCookie('csrftoken'),
+        },
+        success: function (result) {
+            document.getElementById('left-nav').innerHTML = result
         }
     })
 }

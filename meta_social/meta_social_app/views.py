@@ -107,6 +107,17 @@ class Index(View):
 
         return render(request, self.template_name, context)
 
+    @staticmethod
+    def update_nav(request):
+        if request.method == 'POST':
+            context = {
+                'page': 'friends'
+            }
+
+            return render(request, 'navigation_menu.html', context)
+
+        raise Http404()
+
 
 class ProfileViews:
     """
