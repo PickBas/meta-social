@@ -66,6 +66,7 @@
         const user_id = {{ user.id }};
         const c_token = '{{ csrf_token }}';
     </script>
+    <script src="{% static 'js/autosize.min.js' %}"></script>
     <script src="{% static 'js/messagesockets.js' %}" type="text/javascript"></script>
 
 {% endblock %}

@@ -21,6 +21,7 @@
     </div>
 </div>
 
+<script src="{% static 'js/autosize.min.js' %}"></script>
 <script>
     autosize(document.getElementById('id-chat-name-input'));
     let csr_token = '{{ csrf_token }}';

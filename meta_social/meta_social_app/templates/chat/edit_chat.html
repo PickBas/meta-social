@@ -28,6 +28,7 @@
             </div>
             <hr>
             <h5 class="text-center">Имя чата</h5>
+            <script src="{% static 'js/autosize.min.js' %}"></script>
             <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="id-chat-name-change" maxlength="25">{{ c_room.chat_name }}</textarea>
             <script>autosize(document.getElementById('id-chat-name-change'))</script>
             <hr>
