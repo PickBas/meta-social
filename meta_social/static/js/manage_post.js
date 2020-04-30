@@ -34,3 +34,36 @@ function likePost(e, post_id) {
         }
     })
 }
+
+autosize(document.getElementById("updated-post-text"));
+
+function remove_post(e, link) {
+    $.ajax({
+        type: "POST",
+        url: link,
+        data: {
+            csrfmiddlewaretoken: getCookie('csrftoken')
+        },
+        success: function () {
+            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                .remove();
+        }
+    })
+
+}
+
+function edit_post(e, link) {
+    let edited_text = document.getElementById("updated-post-text");
+    let old_text = document.getElementById("id-post-text");
+    $.ajax({
+        type: "POST",
+        url: link,
+        data: {
+            csrfmiddlewaretoken: getCookie('csrftoken'),
+            text: edited_text.value
+        },
+        success: function () {
+            old_text.innerText = edited_text.value;
+        }
+    })
+}

@@ -2,170 +2,173 @@
 {% load static %}
 
 {% block content %}
-<script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
-  <div class="row text-left">
+
+<div class="row text-left">
     <div class="col-lg-3 col-md pd-left-none no-pd mb-3">
-      <div class="card">
-        <style>
-          .rollover {
-            transition: 0.3s;
-          }
+        <div class="card">
+            <style>
+                .rollover {
+                    transition: 0.3s;
+                }
 
-          .rollover:hover {
-            transition: 0.7s;
-            opacity: 0.7;
-          }
-
-          .kollaz{
-            display: flex;
-             flex-wrap: wrap;
-          }
-        </style>
-        {% if user == c_user %}
-          <a href="/accounts/profile/change_avatar/">
-            <img src="{{ c_user.profile.image.url }}" class="card-img-top rollover"></img>
-          </a>
-        {% else %}
-          <img src="{{ c_user.profile.image.url }}" class="card-img-top"></img>
-        {% endif %}
-        <div class="card-body">
-          {% if c_user == user %}
-            <hr class="mt-0">
-            <a href="/accounts/profile/{{ c_user.id }}/edit/" class="btn btn-block btn-primary">Редактировать</a>
-          {% else %}
-              <hr class="mt-0">
-              {% if not is_in_blacklist and not is_friend %}
-                <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
-                  {% csrf_token %}
-                  <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
-                </form>
-              {% else %}
-                {% if is_in_blacklist %}
-                  <p class="btn btn-block btn-primary">Вы в черном списке</p>
-                {% else %}
-                  <p class="btn btn-block btn-primary">В друзьях</p>
-                  {% endif %}
-          {% endif %}
-        {% endif %}
-        </div>
-      </div>
-      <div class="card mt-3">
-        <div class="card-body">
-          <h6 class="card-title">Друзья</h6>
-
-          {% if c_user.profile.friends.all %}
-                <ul class="list-group list-group-flush">
-                    {% for friend in c_user.profile.friends.all|slice:":6"%}
-                  <div style="display: flex; flex-wrap: wrap;">
-                        <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
-                           <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.username }}" class="ml-2" style="margin-left: 0;">
-                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark " style="margin-left: -5px;" width=35 height=35>
-                           </a>
-                          <br>
-                        </li>
-                    {% endfor %}
-                    </div>
-                </ul>
+                .rollover:hover {
+                    transition: 0.7s;
+                    opacity: 0.7;
+                }
+            </style>
+            {% if user == c_user %}
+                <a href="/accounts/profile/change_avatar/">
+                    <img src="{{ c_user.profile.image.url }}" class="card-img-top rollover"></img>
+                </a>
             {% else %}
-                Список друзей пуст.
+                <img src="{{ c_user.profile.image.url }}" class="card-img-top"></img>
             {% endif %}
-        </div>
-      </div>
-      <div class="card mt-3 mb-3">
-        <div class="card-body">
-          <h6 class="card-title">Сообщества</h6>
-        </div>
-      </div>
-       <div class="card mt-3 mb-3">
-        <div class="card-body">
-            <h6 class="card-title"><a href="/music/{{ c_user.id }}/">Музыка</a> </h6>
-        </div>
-       </div>
-    </div>
-    <div class="col-lg-9 col-md no-pd mb-3">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title float-left">{% if c_user.first_name or c_user.last_name %}{{ c_user.first_name }} {{ c_user.last_name }}{% else %}{{ c_user.username }}{% endif %}</h5>
-          <small class="float-right text-muted">{% if user == c_user %}Онлайн{% else %}{{ c_user.profile.get_status }}{% endif %}</small>
-          <br><hr>
-          <p class="card-text">
-            {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
-                Работа: {{ c_user.profile.job }}
-            {% else %}
-                {% if c_user.profile.study and not c_user.profile.job %}
-                Учеба: {{ c_user.profile.study }}
+            <div class="card-body">
+                {% if c_user == user %}
+                    <hr class="mt-0">
+                    <a href="/accounts/profile/{{ c_user.id }}/edit/" class="btn btn-block btn-primary">Редактировать</a>
                 {% else %}
-                    {% if not c_user.profile.study and not c_user.profile.job %}
-                        Место работы/учебы: -
+                    <hr class="mt-0">
+                    {% if not is_in_blacklist and not is_friend %}
+                        <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
+                            {% csrf_token %}
+                            <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
+                        </form>
+                    {% else %}
+                        {% if is_in_blacklist %}
+                            <p class="btn btn-block btn-primary">Вы в черном списке</p>
+                        {% else %}
+                            <p class="btn btn-block btn-primary">В друзьях</p>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
-          </p>
-           <p class="card-text">
-            {% if c_user.profile.job and c_user.profile.study %}
-                Учеба: {{ c_user.profile.study }}
-            {% endif %}
-          </p>
-          <p class="card-text">
-            {% if c_user.profile.biography %}
-                Биография: {{ c_user.profile.biography }}
-            {% else %}
-                Биография: -
-            {% endif %}
-          </p>
-          <p class="card-text">
-            {% if c_user.profile.country %}
-                Страна: {{ c_user.profile.country.name }}
-            {% else %}
-                Страна: -
-            {% endif %}
-          </p>
-          <p class="card-text">
-            {% if c_user.profile.birth %}
-                Дата рождения: {{ c_user.profile.birth }}
-            {% endif %}
-          </p>
-          {% if c_user.profile.show_email %}
-            <p class="card-text">
-              {% if c_user.email %}
-                Почта: {{ c_user.email }}
-              {% endif %}
-            </p>
-          {% endif %}
+            </div>
         </div>
-      </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">Друзья</h6>
 
-      {% if c_user == user %}
-        <div class="mt-3">
-            {% include 'post_menu.html' %}
+                {% if c_user.profile.friends.all %}
+                    <ul class="list-group list-group-flush">
+                        {% for friend in c_user.profile.friends.all|slice:":6"%}
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
+                                    <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.username }}" class="ml-2"
+                                        style="margin-left: 0;">
+                                        <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark "
+                                            style="margin-left: -5px;" width=35 height=35>
+                                    </a>
+                                    <br>
+                                </li>
+                            </div>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Список друзей пуст.
+                {% endif %}
+            </div>
         </div>
-      {% endif %}
-      {% if is_in_blacklist %}
-          <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
-      {% else %}
-	  {% if c_user_posts %}
-              <div class="infinite-container">
-		  {% for post in c_user_posts %}
-		      <div class="infinite-item">
-			  {% include 'post.html' %}
-		      </div>
-		  {% endfor %}
-              </div>
-	      {% if c_user_posts.has_next %}
-		  <a class="infinite-more-link" href="?page={{ c_user_posts.next_page_number }}">More</a>
-	      {% endif %}
-	  {% endif %}
-      {% endif %}
+        <div class="card mt-3 mb-3">
+            <div class="card-body">
+                <h6 class="card-title">Сообщества</h6>
+            </div>
+        </div>
+        <div class="card mt-3 mb-3">
+            <div class="card-body">
+                <h6 class="card-title"><a href="/music/{{ c_user.id }}/">Музыка</a> </h6>
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="col-lg-9 col-md no-pd mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title float-left">{{ c_user.profile.get_name }}</h5>
+                <small
+                    class="float-right text-muted">{% if user == c_user %}Онлайн{% else %}{{ c_user.profile.get_status }}{% endif %}</small>
+                <br>
+                <hr>
+                <p class="card-text">
+                    {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
+                        Работа: {{ c_user.profile.job }}
+                    {% else %}
+                        {% if c_user.profile.study and not c_user.profile.job %}
+                            Учеба: {{ c_user.profile.study }}
+                        {% else %}
+                            {% if not c_user.profile.study and not c_user.profile.job %}
+                                Место работы/учебы: -
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.job and c_user.profile.study %}
+                        Учеба: {{ c_user.profile.study }}
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.biography %}
+                        Биография: {{ c_user.profile.biography }}
+                    {% else %}
+                        Биография: -
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.country %}
+                        Страна: {{ c_user.profile.country.name }}
+                    {% else %}
+                        Страна: -
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.birth %}
+                        Дата рождения: {{ c_user.profile.birth }}
+                    {% endif %}
+                </p>
+                {% if c_user.profile.show_email %}
+                <p class="card-text">
+                    {% if c_user.email %}
+                        Почта: {{ c_user.email }}
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if c_user == user %}
+            <div class="mt-3">
+                {% include 'post_menu.html' %}
+            </div>
+        {% endif %}
+        {% if is_in_blacklist %}
+            <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
+        {% else %}
+            {% if c_user_posts %}
+                <div class="infinite-container">
+                    {% for post in c_user_posts %}
+                        <div class="infinite-item">
+                            {% include 'post.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if c_user_posts.has_next %}
+                    <a class="infinite-more-link" href="?page={{ c_user_posts.next_page_number }}">More</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
+
 {% block extra__js %}
-    <script src="{% static 'js/like_post.js' %}"></script>
-    <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
-    <script src="{% static 'js/infinite.min.js' %}"></script>
-    <script>
-     var infinite = new Waypoint.Infinite({
-	 element: $('.infinite-container')[0]
-     });
-    </script>
+
+<script src="{% static 'js/manage_post.js' %}"></script>
+<script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+<script src="{% static 'js/infinite.min.js' %}"></script>
+<script>
+    var infinite = new Waypoint.Infinite({
+        element: $('.infinite-container')[0]
+    });
+</script>
+
 {% endblock extra__js %}
