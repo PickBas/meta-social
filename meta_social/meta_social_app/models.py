@@ -78,7 +78,7 @@ class Post(models.Model):
     def get_owner_name(self):
         if self.community:
             return self.community.name
-        return self.user.username
+        return self.user.profile.get_name()
 
     def get_link(self):
         if self.community:
@@ -96,6 +96,12 @@ class Post(models.Model):
 
     def amount_of_comments(self):
         return len(self.comments())
+
+    def get_editors(self):
+        editors = []
+        if self.user:
+            editors.append(self.user)
+        return editors
 
 
 class Message(models.Model):

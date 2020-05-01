@@ -67,3 +67,45 @@ function edit_post(e, link) {
         }
     })
 }
+
+function collectionHas(a, b) {
+    for(var i = 0, len = a.length; i < len; i ++) {
+        if(a[i] == b) return true;
+    }
+    return false;
+}
+
+function findParentBySelector(elm, selector) {
+    var all = document.querySelectorAll(selector);
+    var cur = elm.parentNode;
+    while(cur && !collectionHas(all, cur)) {
+        cur = cur.parentNode;
+    }
+    return cur;
+}
+
+function sendCommentInd(e) {
+    let form = $(e.target)
+    form = form.serializeArray().reduce(function(obj, item) {
+        obj[item.name] = item.value
+        return obj
+    }, {})
+    
+    if (form['text'] && form['csrfmiddlewaretoken'] && form['post_id']) {
+        $.ajax({
+            type: "POST",
+            url: '/post/' + form['post_id'] + '/send_comment/',
+            data: {
+                csrfmiddlewaretoken: form['csrfmiddlewaretoken'],
+                text: form['text']
+            },
+            success: function (result) {
+                $(e.target).children('.comment-input').val('')
+                let post = findParentBySelector(e.target, '.post-item')
+                post.parentNode.innerHTML = result
+            }
+        })
+    }
+
+    return false
+}

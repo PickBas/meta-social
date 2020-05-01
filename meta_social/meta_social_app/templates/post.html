@@ -1,15 +1,8 @@
-<style>
-    .kollaz {
-        display: flex;
-        flex-wrap: wrap;
-    }
-</style>
-
-<div class="card mt-3 text-left">
+<div class="card mt-3 text-left post-item">
     <div class="card-body">
         <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
         <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
-        {% if c_user == user %}
+        {% if user in post.get_editors %}
             <button
                 style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"
                 data-toggle="modal" data-target="#removingPostModal" class="float-right">
@@ -47,7 +40,7 @@
         <a href="/post/{{ post.id }}" class="text-muted mb-0">
             {{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i>
         </a>
-        {% if c_user == user %}
+        {% if user in post.get_editors %}
             <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -90,27 +83,39 @@
             </div>
         {% endif %}
         <span class="text-muted mb-0 float-right">{{ post.date }}</span>
-    </div>
-    <ul id="all_comments" style="padding-left: 0;">
-        {% if post.comments %}
-            {% for comment in post.comments|slice:":1" %}
-                <div class="card" style="font-size: 15px; width: 100%; height: 130px; ">
-                    <div class="card-body" style="">
-                        <img src="{{ comment.user.profile.image.url }}" class="rounded-circle border border-dark" width=35
-                            height=35 style="margin-right: 600px">
-                        <p style="text-align: left; margin-inline-start: 2px; position: absolute; margin-left: 50px;  margin-top: -30px">
-                            <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.username }}</a>
-                        </p>
-                        <div class="media-body">
-                            <h5 style="text-align: left; margin-inline-start: 10px; padding: 5px; font-size: 15px;">
-                                {{ comment.text }}
-                            </h5>
-                        </div>
-                        <hr class="mt-1 mb-1">
-                        <p style="text-align: right; margin: 3px">Создан {{ comment.date }}</p>
-                    </div>
+        <hr class="mt-1 mb-1">
+
+        <form style="position: relative" onsubmit="return sendCommentInd(event)" method="POST" class="mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <div class="input-group-sm mt-2">
+                <input placeholder="Оставить комментарий..." 
+                    type="text" 
+                    class="form-control border-top-0 border-right-0 border-left-0 rounded-0 comment-input"
+                    name="text">
+            </div>
+            <i class="fa fa-paper-plane-o comment-send" style="position: absolute; right: 7px; top: 8px;" onclick="this.children[0].click()">
+                <input type="submit" style="display: none;">
+            </i>
+        </form>
+            
+        {% for comment in post.comments|slice:":1" %}
+            <div class="media">
+                <img src="{{ comment.user.profile.image.url }}" class="mr-2 mt-2 rounded-circle border border-dark" width=35 height=35>
+                <div class="media-body">
+                    <h6 class="mt-2 mb-0">
+                        <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.profile.get_name }}</a>
+                        <small>{{ comment.date }}</small>
+                    </h6>
+                    <p class="mb-0">
+                        {{ comment.text }}
+                    </p>
                 </div>
-            {% endfor %}
-        {% endif %}
-    </ul>
+            </div>
+            {% if not forloop.last %}
+                <hr class="mt-1 mb-0">
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
+

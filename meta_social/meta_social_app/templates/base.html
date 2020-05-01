@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{% static 'css/my_search.css' %}">
         {% block extra_head %}
         {% endblock extra_head %}
+        <script src="{% static 'js/autosize.min.js' %}"></script>
         <title>{% if pagename %}{{ pagename }}{% else %}{% block PageName %}{% endblock PageName %} {% endif %}</title>
     </head>
 
@@ -56,7 +57,6 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
-        <script src="{% static 'js/autosize.min.js' %}"></script>
         <script src="{% static 'js/my_search.js' %}"></script>
 
         {% if user.is_authenticated %}
@@ -64,14 +64,18 @@
                 function setOnline () {
                     $.ajax({
                         type: "POST",
-                        url: '/ajax/set_online/{{ user.id }}/',
+                        url: '/ajax/set_online/',
                         data: {
-                            csrfmiddlewaretoken: {{ csrf_token }}
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
                         },
+                        success: function () {
+
+                        }
                     })
                 }
 
-                setInterval(setOnline, 10 * 1000);
+                setOnline()
+                setInterval(setOnline, 60 * 1000);
             </script>
         {% endif %}
         

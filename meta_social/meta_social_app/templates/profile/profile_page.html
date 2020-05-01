@@ -1,6 +1,15 @@
 {% extends 'profile/base.html' %}
 {% load static %}
 
+
+{% block extra_head %}
+
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+
+{% endblock extra_head %}
+
+
+
 {% block content %}
 
 <div class="row text-left">
@@ -162,9 +171,9 @@
 
 {% block extra__js %}
 
-<script src="{% static 'js/manage_post.js' %}"></script>
 <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
 <script src="{% static 'js/infinite.min.js' %}"></script>
+<script src="{% static 'js/manage_post.js' %}"></script>
 <script>
     var infinite = new Waypoint.Infinite({
         element: $('.infinite-container')[0]
