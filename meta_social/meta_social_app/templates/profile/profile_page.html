@@ -48,6 +48,10 @@
                             <p class="btn btn-block btn-primary">Вы в черном списке</p>
                         {% else %}
                             <p class="btn btn-block btn-primary">В друзьях</p>
+			                <form action="/chats/{{ user.id }}/{{ c_user.id }}/" method="POST">
+                                {% csrf_token %}
+                                <input class="btn btn-block btn-primary" type="submit" value="Сообщение">
+                            </form>
                         {% endif %}
                     {% endif %}
                 {% endif %}
