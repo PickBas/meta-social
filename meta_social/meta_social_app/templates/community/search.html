@@ -14,12 +14,10 @@
 	<div class="infinite-container">
             {% for community in c_user_communities %}
 		<div class="infinite-item">
-		    {% if user != community.owner %}
 			<li class="list-group-item">
 			    <img src="{{ community.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
 			    <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
 			</li>
-		    {% endif %}
 		</div>
             {% endfor %}
 	</div>
