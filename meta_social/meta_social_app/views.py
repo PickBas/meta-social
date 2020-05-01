@@ -284,12 +284,12 @@ class ProfileViews:
             self.context['crop_form'] = crop_form
 
             return render(request, self.template_name, self.context)
-    
+
     @staticmethod
     def set_online(request):
         if request.method == 'POST':
-            user.profile.last_act = timezone.now()
-            user.profile.save()
+            request.user.profile.last_act = timezone.now()
+            request.user.profile.save()
             return HttpResponse('Success')
 
         raise Http404()
@@ -344,7 +344,7 @@ class PostViews:
 
                     return HttpResponse(json_response, content_type="application/json")
                 raise Http404()
-    
+
 
     @staticmethod
     def send_comment(request, post_id):
@@ -918,7 +918,7 @@ class FriendsViews:
         query = request.POST.get('query')
         search_fields = ['username', 'first_name', 'last_name']
 
-        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)        
+        context['f_matches'] = User.objects.filter(search_filter(search_fields, query)).exclude(id=request.user.id)
 
         return render(request, 'friends/list.html', context)
 
