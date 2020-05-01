@@ -1,6 +1,14 @@
 {% extends 'base_menu.html' %}
 {% load static %}
 
+
+{% block extra_head %}
+
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+
+{% endblock extra_head %}
+
+
 {% block center %}
 
 {% include 'post_menu.html' %}
@@ -10,7 +18,9 @@
 {% if newsfeed %}
     <div class="infinite-container">
         {% for post in newsfeed %}
-            {% include 'post.html' %}
+            <div class="infinite-item">
+                {% include 'post.html' %}
+            </div>
         {% endfor %}
     </div>
 {% endif %}
@@ -26,6 +36,7 @@
 {% block right %}
     Не знаю что сюда впихнуть
 {% endblock %}
+
 
 {% block extra__js %}
 

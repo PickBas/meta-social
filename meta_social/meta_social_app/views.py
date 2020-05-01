@@ -286,9 +286,8 @@ class ProfileViews:
             return render(request, self.template_name, self.context)
     
     @staticmethod
-    def set_online(request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        if user == request.user:
+    def set_online(request):
+        if request.method == 'POST':
             user.profile.last_act = timezone.now()
             user.profile.save()
             return HttpResponse('Success')
@@ -345,6 +344,23 @@ class PostViews:
 
                     return HttpResponse(json_response, content_type="application/json")
                 raise Http404()
+    
+
+    @staticmethod
+    def send_comment(request, post_id):
+        if request.method == 'POST' and request.POST.get('text'):
+            post_item = get_object_or_404(Post, id=post_id)
+
+            comment_item = Comment(
+                text=request.POST.get('text'),
+                post=post_item,
+                user=request.user
+            )
+            comment_item.save()
+
+            return render(request, 'post.html', {'post': post_item})
+
+        raise Http404()
 
     @staticmethod
     def post_new(request):

@@ -2,6 +2,14 @@
 {% load static %}
 
 
+{% block extra_head %}
+
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+
+{% endblock extra_head %}
+
+
+
 {% block center %}
 
 <div class="row text-left">
@@ -24,7 +32,9 @@
         {% endif %}
 
         {% for post in community.posts %}
-            {% include 'post.html' %}
+            <div class="infinite-item">
+                {% include 'post.html' %}
+            </div>
         {% empty %}
             <h5 class="mt-3 text-center">Нет постов.</h5>
         {% endfor %}

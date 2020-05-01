@@ -64,7 +64,7 @@
                 function setOnline () {
                     $.ajax({
                         type: "POST",
-                        url: '/ajax/set_online/{{ user.id }}/',
+                        url: '/ajax/set_online/',
                         data: {
                             csrfmiddlewaretoken: '{{ csrf_token }}'
                         },

@@ -1,0 +1,28 @@
+.kollaz {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.comment-input {
+    border-bottom: 1px solid gray;
+    transition-duration: 0.5s;
+}
+
+.comment-input:focus {
+    border-bottom: 2px solid;
+    border-color: rgb(0,123,255);
+    box-shadow: none;
+}
+
+.comment-send {
+    color: gray;
+}
+
+.comment-send:hover {
+    cursor: pointer;
+    color: rgb(0,123,255);
+}
+
+.comment-send:active {
+    color: black;
+}
