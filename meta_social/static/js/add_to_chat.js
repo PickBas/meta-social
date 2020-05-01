@@ -13,7 +13,8 @@ function addToChat(e, link) {
                 to_add = e.target.parentNode.parentNode;
                 to_add.remove();
             }
-            const amount_to_invite = document.getElementById('friend-list-modal').getElementsByTagName('div').length;
+            const amount_to_invite = jQuery('ul#friend-list-modal').children('div').length;
+            console.log(amount_to_invite);
             if (amount_to_invite == 0) {
                 $('#AddToConvModal').modal('hide');
             }
