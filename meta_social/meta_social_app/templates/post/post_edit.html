@@ -8,16 +8,20 @@
                 {{ postform }}
                 
                 {{ formset.management_form }}
-                <ul id="simple-list" class="list-group list-group-flush">
+                <div id="simple-list" class="mt-3" style="display: flex; flex-wrap: wrap; justify-content: space-between; resize: both;">
                     {% for form in formset %}
-                        <li class="list-group-item">
-                            {{ form.image }}
-                            {{ form.ORDER }}
-                            {{ form.id }}
-                            <img src="{{ form.initial.image.url }}" class="w-50">
-                        </li>
+                        <div class="card mb-3 ml-2" style="width: calc(50% - 9px); display: block;">
+                            <img src="{{ form.initial.image.url }}" class="card-img-top" style="max-height: 180px;">
+                            <div class="card-body">
+                                {{ form.image }}
+                                <div style="display: none">
+                                    {{ form.ORDER }}
+                                </div>
+                                {{ form.id }}
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
 
                 <input type="submit" value="Save">
             </form>
@@ -32,10 +36,12 @@
         var sortable = new Sortable(
             $('#simple-list')[0],
             {
+                animation: 150,
                 onEnd: function (evt) {
                     for (var i=0; i < $('#simple-list').children().length; i++) {
-                        let order = $('#simple-list').children().eq(i).children('input[type=number]')
-                        order.val(i + 1)
+                        let order = $('#simple-list').children().eq(i).find('input[type=number]:hidden')
+                        console.log(order)
+                        order.attr('value', i + 1)
                     }
                 },
             }

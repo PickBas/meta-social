@@ -13,6 +13,7 @@ from crispy_forms.helper import FormHelper
 from django_countries.fields import CountryField
 
 from django.utils.safestring import mark_safe
+from .widgets import MyImageFieldWidget
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -106,7 +107,7 @@ class EditPostImageForm(forms.ModelForm):
     """
         Form for adding images to post
     """
-    image = forms.ImageField(required=False)
+    image = forms.ImageField(required=False, widget=MyImageFieldWidget)
 
     class Meta:
         model = PostImages
