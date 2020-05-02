@@ -18,7 +18,7 @@ from django.forms import modelformset_factory
 
 from .models import Post, FriendshipRequest, PostImages, Music
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
-    UpdateAvatarForm, CommunityCreateForm
+    UpdateAvatarForm, CommunityCreateForm, EditPostImageForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -83,7 +83,7 @@ class Index(View):
         context['pagename'] = "Главная"
 
         PostImageFormSet = modelformset_factory(
-            PostImages, form=PostImageForm, extra=10)
+            PostImages, form=PostImageForm, extra=10, max_num=10)
 
         context['postform'] = PostForm()
         context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -135,7 +135,7 @@ class ProfileViews:
             get_last_act(request, user_item)
 
             PostImageFormSet = modelformset_factory(
-                PostImages, form=PostImageForm, extra=10)
+                PostImages, form=PostImageForm, extra=10, max_num=10)
 
             pass_add_to_friends = False
 
@@ -299,7 +299,7 @@ class PostViews:
         def post(self, request, **kwargs):
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             PostImageFormSet = modelformset_factory(
-                PostImages, form=PostImageForm, extra=10
+                PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
             )
 
             postform = PostForm(request.POST)
@@ -308,31 +308,32 @@ class PostViews:
             if request.method == 'POST':
                 if postform.is_valid() and formset.is_valid():
                     postform.save()
-                    post_item.get_images().delete()
-
-                    for key in request.FILES:
-                        image = request.FILES[key]
-                        photo = PostImages(
-                            post=post_item,
-                            image=image
-                        )
-                        photo.save()
                     
-                    self.context['postform'] = PostForm(instance=post_item)
-                    self.context['formset'] = PostImageFormSet(queryset=post_item.get_images())
+                    for form in formset.ordered_forms:
+                        if form.cleaned_data['image'] is None:
+                            form.cleaned_data['id'].order = form.cleaned_data['ORDER']
+                            form.cleaned_data['id'].save()
+                        elif form.cleaned_data['image'] == False:
+                            form.cleaned_data['id'].delete()
+                        else:
+                            form.instance.order = form.cleaned_data['ORDER']
+                            form.instance.save()
+                    
+            self.context['postform'] = PostForm(instance=post_item)
+            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
+            self.context['formset'] = PostImageFormSet(initial=initial_images)
 
-                    return render(request, self.template_name, self.context)
+            return render(request, self.template_name, self.context)
 
-            raise Http404()
-        
         def get(self, request, **kwargs):
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             PostImageFormSet = modelformset_factory(
-                PostImages, form=PostImageForm, extra=10
+                PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
             )
             
             self.context['postform'] = PostForm(instance=post_item)
-            self.context['formset'] = PostImageFormSet(queryset=post_item.get_images())
+            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
+            self.context['formset'] = PostImageFormSet(initial=initial_images)
             
             return render(request, self.template_name, self.context)
 
@@ -365,7 +366,7 @@ class PostViews:
         :return: HttpResponseRedirect
         """
         PostImageFormSet = modelformset_factory(
-            PostImages, form=PostImageForm, extra=10)
+            PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
             postForm = PostForm(request.POST)
@@ -519,7 +520,7 @@ class Communities:
 
             context['community'] = get_object_or_404(Community, id=community_id)
 
-            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
             context['postform'] = PostForm()
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -602,7 +603,7 @@ class Communities:
 
         community = get_object_or_404(Community, id=community_id)
 
-        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
             postForm = PostForm(request.POST)

@@ -10,7 +10,12 @@
                 {{ formset.management_form }}
                 <ul id="simple-list" class="list-group list-group-flush">
                     {% for form in formset %}
-                        <li class="list-group-item">{{ form }}</li>
+                        <li class="list-group-item">
+                            {{ form.image }}
+                            {{ form.ORDER }}
+                            {{ form.id }}
+                            <img src="{{ form.initial.image.url }}" class="w-50">
+                        </li>
                     {% endfor %}
                 </ul>
 
@@ -28,12 +33,9 @@
             $('#simple-list')[0],
             {
                 onEnd: function (evt) {
-                    console.clear()
                     for (var i=0; i < $('#simple-list').children().length; i++) {
-                        let nm = $('#simple-list').children().eq(i).children('input[type=file]')[0]
-                        nm.setAttribute('name', 'form-' + i + '-image')
-                        nm.setAttribute('id', 'id_form-' + i + '-image')
-                        console.log(nm)
+                        let order = $('#simple-list').children().eq(i).children('input[type=number]')
+                        order.val(i + 1)
                     }
                 },
             }

@@ -85,7 +85,7 @@ class Post(models.Model):
         return '/accounts/profile/' + str(self.user.id) + '/'
 
     def get_images(self):
-        return PostImages.objects.filter(post=self)
+        return PostImages.objects.filter(post=self).order_by('order')
 
     def get_images_count(self):
         return PostImages.objects.filter(post=self).count()
@@ -309,6 +309,7 @@ class PostImages(models.Model):
     """
     post = models.ForeignKey(Post, models.CASCADE)
     image = models.ImageField(upload_to='post/images/', blank=True, null=True)
+    order = models.IntegerField(default=0)
 
     def save(self):
         img = Image.open(self.image)
