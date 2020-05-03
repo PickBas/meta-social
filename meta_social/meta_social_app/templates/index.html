@@ -11,7 +11,7 @@
 
 {% block center %}
 
-{% include 'post_menu.html' %}
+{% include 'post/post_menu.html' %}
 
 {% include 'histories.html' %}
 
@@ -19,7 +19,7 @@
     <div class="infinite-container">
         {% for post in newsfeed %}
             <div class="infinite-item">
-                {% include 'post.html' %}
+                {% include 'post/post.html' %}
             </div>
         {% endfor %}
     </div>

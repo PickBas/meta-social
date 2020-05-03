@@ -12,6 +12,9 @@ from .models import Profile, Post, PostImages, Music, Community
 from crispy_forms.helper import FormHelper
 from django_countries.fields import CountryField
 
+from django.utils.safestring import mark_safe
+from .widgets import MyImageFieldWidget
+
 
 class ProfileUpdateForm(forms.ModelForm):
     """
@@ -130,6 +133,22 @@ class PostImageForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
+        self.fields['image'].label = ''
+
+
+
+class EditPostImageForm(forms.ModelForm):
+    """
+        Form for adding images to post
+    """
+    image = forms.ImageField(required=False, widget=MyImageFieldWidget)
+
+    class Meta:
+        model = PostImages
+        fields = ('image', )
+        
+    def __init__(self, *args, **kwargs):
+        super(EditPostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
 
 

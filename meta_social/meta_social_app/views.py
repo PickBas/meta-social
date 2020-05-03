@@ -2,27 +2,23 @@
 View module
 """
 import json
-from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404, HttpResponse
-from django.template.loader import render_to_string
+from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.utils.safestring import mark_safe
 from django.views import View
 from simple_search import search_filter
 from django.utils import timezone
-from django.urls import reverse
 from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
 from .models import Post, FriendshipRequest, PostImages, Music
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
-    UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm
+    UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm, EditPostImageForm
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -96,7 +92,7 @@ class Index(View):
         context['pagename'] = "Главная"
 
         PostImageFormSet = modelformset_factory(
-            PostImages, form=PostImageForm, extra=10)
+            PostImages, form=PostImageForm, extra=10, max_num=10)
 
         context['postform'] = PostForm()
         context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -145,7 +141,7 @@ class ProfileViews:
             context['c_user'] = user_item
 
             PostImageFormSet = modelformset_factory(
-                PostImages, form=PostImageForm, extra=10)
+                PostImages, form=PostImageForm, extra=10, max_num=10)
 
             pass_add_to_friends = False
 
@@ -201,20 +197,12 @@ class ProfileViews:
             self.profile.show_email = False if request.POST.get(
                 'show_email') is None else True
 
-            try:
-                img_manage = ImageManage(
-                    kwargs['user_id'], self.profile, request.FILES['avatar'])
-                img_manage.process_img()
-            except Exception:
-                pass
-
             profile_form = ProfileUpdateForm(request.POST,
                                              instance=self.profile)
 
             if user_form.is_valid() and profile_form.is_valid():
                 user_form.save()
                 profile_form.save()
-                tmp_user = User.objects.get(id=kwargs['user_id'])
 
                 if self.profile.birth is None:
                     self.profile.birth = self.previous_birth
@@ -268,11 +256,16 @@ class ProfileViews:
 
                 io = BytesIO()
 
-                resized_image.save(io, 'JPEG', quality=60)
-
-                request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
-                                                save=False)
-                request.user.profile.save()
+                try:
+                    resized_image.save(io, 'JPEG', quality=100)
+                    request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                                                    save=False)
+                    request.user.profile.save()
+                except:
+                    resized_image.save(io, 'PNG', quality=100)
+                    request.user.profile.image.save('image_{}.png'.format(request.user.id), ContentFile(io.getvalue()),
+                                                    save=False)
+                    request.user.profile.save()
 
                 return redirect('/accounts/profile/' + str(request.user.id))
 
@@ -307,7 +300,7 @@ class PostViews:
 
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.template_name = 'full_post.html'
+            self.template_name = 'post/full_post.html'
 
         def get(self, request, **kwargs) -> render:
             context = get_menu_context('post', 'Пост')
@@ -324,6 +317,62 @@ class PostViews:
         def get(self, request) -> render:
             return render(request, self.template_name, self.context)
 
+    class PostEdit(View):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'post/post_edit.html'
+            self.context = get_menu_context('post', 'Редактирование поста')
+
+        def post(self, request, **kwargs):
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+            PostImageFormSet = modelformset_factory(
+                PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
+            )
+
+            postform = PostForm(request.POST)
+            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+
+            if request.method == 'POST':
+                if postform.is_valid() and formset.is_valid():
+                    postform.save()
+                    
+                    for form in formset.ordered_forms:
+                        print(form.cleaned_data)
+                        if form.cleaned_data['image'] is None:
+                            form.cleaned_data['id'].order = form.cleaned_data['ORDER']
+                            form.cleaned_data['id'].save()
+                        elif form.cleaned_data['image'] == False:
+                            if form.cleaned_data['id']:
+                                form.cleaned_data['id'].delete()
+                        else:
+                            if form.cleaned_data['id']:
+                                form.cleaned_data['id'].image = form.cleaned_data['image']
+                                form.cleaned_data['id'].save()
+                            else:
+                                item = PostImages(
+                                    post=post_item,
+                                    order=form.cleaned_data['ORDER'],
+                                    image=form.cleaned_data['image']
+                                )
+                                item.save()
+                    
+            self.context['postform'] = PostForm(instance=post_item)
+            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
+            self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
+
+            return render(request, self.template_name, self.context)
+
+        def get(self, request, **kwargs):
+            post_item = get_object_or_404(Post, id=kwargs['post_id'])
+            PostImageFormSet = modelformset_factory(
+                PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
+            )
+            
+            self.context['postform'] = PostForm(instance=post_item)
+            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
+            self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
+            
+            return render(request, self.template_name, self.context)
 
     class PostAjax(View):
         @staticmethod
@@ -370,12 +419,13 @@ class PostViews:
         :return: HttpResponseRedirect
         """
         PostImageFormSet = modelformset_factory(
-            PostImages, form=PostImageForm, extra=10)
+            PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
             postForm = PostForm(request.POST)
             formset = PostImageFormSet(
-                request.POST, request.FILES, queryset=PostImages.objects.none())
+                request.POST, request.FILES, queryset=PostImages.objects.none()
+            )
 
             if postForm.is_valid() and formset.is_valid():
                 post_form = postForm.save(commit=False)
@@ -402,21 +452,6 @@ class PostViews:
             Post.objects.get(id=post_id).delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-    @staticmethod
-    def post_edit(request, post_id) -> HttpResponseRedirect:
-        """
-        Editing text of a post
-        :param request: request
-        :param post_id: id of a post want to be edited
-        :return: HttpResponseRedirect
-        """
-
-        if request.method == 'POST':
-            post_to_edit = Post.objects.get(id=post_id)
-            post_to_edit.text = request.POST.get('text')
-            post_to_edit.save()
-
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
     def like_post(request, post_id):
@@ -702,7 +737,7 @@ class Communities:
 
             context['community'] = get_object_or_404(Community, id=community_id)
 
-            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
             context['postform'] = PostForm()
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
@@ -862,7 +897,7 @@ class Communities:
 
         community = get_object_or_404(Community, id=community_id)
 
-        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10)
+        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
             postForm = PostForm(request.POST)

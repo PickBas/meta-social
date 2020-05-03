@@ -149,7 +149,7 @@
 
         {% if c_user == user %}
             <div class="mt-3">
-                {% include 'post_menu.html' %}
+                {% include 'post/post_menu.html' %}
             </div>
         {% endif %}
         {% if is_in_blacklist %}
@@ -159,7 +159,7 @@
                 <div class="infinite-container">
                     {% for post in c_user_posts %}
                         <div class="infinite-item">
-                            {% include 'post.html' %}
+                            {% include 'post/post.html' %}
                         </div>
                     {% endfor %}
                 </div>

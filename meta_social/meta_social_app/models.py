@@ -86,7 +86,7 @@ class Post(models.Model):
         return '/accounts/profile/' + str(self.user.id) + '/'
 
     def get_images(self):
-        return PostImages.objects.filter(post=self)
+        return PostImages.objects.filter(post=self).order_by('order')
 
     def get_images_count(self):
         return PostImages.objects.filter(post=self).count()
@@ -300,8 +300,9 @@ class PostImages(models.Model):
     Posts Images class
     """
     post = models.ForeignKey(Post, models.CASCADE)
-    image = models.ImageField(upload_to='post/images/')
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    image = models.ImageField(upload_to='post/images/', blank=True, null=True)
+    order = models.IntegerField(default=0)
 
     def save(self):
         img = Image.open(self.image)
@@ -311,11 +312,14 @@ class PostImages(models.Model):
 
         img = img.resize(new_size, Image.ANTIALIAS)
 
-        img.save(output, format='JPEG', quality=100)
-        output.seek(0)
-
-        self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]),
-                                          'image/jpeg', sys.getsizeof(output), None)
+        try:
+            img.save(output, format='JPEG', quality=100)
+            output.seek(0)
+            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
+        except OSError:
+            img.save(output, format='PNG', quality=100)
+            output.seek(0)
+            self.image = InMemoryUploadedFile(output, 'ImageField', "{}.png".format(self.image.name.split('.')[0]), 'image/png', sys.getsizeof(output), None)
 
         super(PostImages, self).save()
 

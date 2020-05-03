@@ -27,13 +27,13 @@
 
         {% if user in community.admin.all %}
             <div class="mt-3">
-                {% include 'post_menu.html' %}
+                {% include 'post/post_menu.html' %}
             </div>
         {% endif %}
 
         {% for post in community.posts %}
             <div class="infinite-item">
-                {% include 'post.html' %}
+                {% include 'post/post.html' %}
             </div>
         {% empty %}
             <h5 class="mt-3 text-center">Нет постов.</h5>

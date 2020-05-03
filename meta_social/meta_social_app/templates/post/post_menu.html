@@ -13,10 +13,9 @@
     }
 
     #gallery img {
-        width: 62px;
-        height: 45px;
-        margin-right: 5px;
-        margin-top: 5px;
+        width: 100%;
+        height: 100%;
+        display: block;
         vertical-align: middle;
     }
 
@@ -36,6 +35,44 @@
     #fileElem {
         display: none;
     }
+
+    .close {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 25px;
+        height: 25px;
+        color:white;
+        opacity: 0.6;
+    }
+
+    .close:hover {
+        color:white;
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    .close:before, .close:after {
+        content: ' ';
+        height: 33px;
+        width: 2px;
+        background-color: #333;
+    }
+
+    .close:before {
+        transform: rotate(45deg);
+    }
+
+    .close:after {
+        transform: rotate(-45deg);
+    }
+
+    .img-div {
+        display: inline-block;
+        height: 45px;
+        width: calc(10% - 3px);
+        margin-right: 5px;
+    }
 </style>
 <div id="drop-area" class="card">
     <div class="card-body text-left">
@@ -43,6 +80,11 @@
             {% csrf_token %}
 
             <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
+                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
+                    </button>
+                </div>
                 {{ postform }}
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">
@@ -67,10 +109,13 @@
 <script>
     autosize(document.getElementById("id_text"));
 
+    function triggerInput() {
+        $('#fileElem')[0].click()
+    }
+
     let dropArea = document.getElementById('drop-area')
 
-    ;
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, preventDefaults, false);
     });
 
@@ -79,13 +124,11 @@
         e.stopPropagation()
     }
 
-    ;
-    ['dragenter', 'dragover'].forEach(eventName => {
+    ;['dragenter', 'dragover'].forEach(eventName => {
         dropArea.addEventListener(eventName, highlight, false)
     })
 
-    ;
-    ['dragleave', 'drop'].forEach(eventName => {
+    ;['dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, unhighlight, false)
     });
 
@@ -143,18 +186,32 @@
         let current_id = e.target.id[e.target.id.length - 1];
 
         document.getElementById("id_form-" + current_id + "-image").value = '';
-        e.target.remove()
+        e.target.parentNode.remove()
     }
 
     function previewFile(file, input_id) {
         let reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = function () {
+            let imgDiv = document.createElement('div')
+            imgDiv.style.cssText = 'position: relative;'
+            imgDiv.classList.add('img-div')
+
             let img = document.createElement('img');
             img.src = reader.result;
-            img.id = "image_preview-" + input_id;
-            img.onclick = removeFile;
-            document.getElementById('gallery').appendChild(img)
+
+            let rmBtn = document.createElement('div')
+
+            rmBtn.id = "image_preview-" + input_id;
+            rmBtn.classList.add('float-left')
+            rmBtn.classList.add('close');
+            rmBtn.onclick = removeFile;
+            rmBtn.innerHTML = 'X';
+
+            imgDiv.appendChild(img)
+            imgDiv.appendChild(rmBtn)
+
+            document.getElementById('gallery').appendChild(imgDiv)
         }
     }
 </script>

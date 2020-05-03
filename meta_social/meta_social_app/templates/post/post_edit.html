@@ -1,0 +1,182 @@
+{% extends 'base_menu.html' %}
+
+{% block center %}
+    <style>
+        .list-item {
+            width: calc(50% - 9px); 
+            display: block;
+        }
+
+        #drop-area {
+            border: 2px dashed black;
+            transition-duration: 0.5s;
+        }
+
+        #drop-area:hover {
+            cursor: pointer;
+            background-color: #EBECF0;
+            transition-duration: 0.2s;
+        }
+
+        #drop-area:active {
+            background-color: #D6D7DB;
+        }
+
+        #drop-area.highlight {
+            border: 2px dashed #007BFF;
+            color: #007BFF;
+        }
+    </style>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ postform }}
+                
+                {{ formset.management_form }}
+                <div id="simple-list" class="mt-3" style="display: flex; flex-wrap: wrap; justify-content: space-between; resize: both;">
+                    {% for form in formset %}
+                        <div class="card mb-3 ml-1 mr-1 list-item file-item">
+                            <img src="{{ form.initial.image.url }}" class="card-img-top" style="max-height: 180px;">
+                            <div class="card-body">
+                                {{ form.image }}
+                                <div style="display: none">
+                                    {{ form.ORDER }}
+                                </div>
+                                {{ form.id }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="card ml-1 mr-1 list-item" style="max-height: 260px;" id="drop-area" onclick="triggerInput()">
+                        <div class="card-body">
+                            <h1 class="" style="margin-top: 30%; margin-bottom: 20%; height: 50%;">+</h1>
+                            <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)" style="display: none">
+                        </div>
+                    </div>
+                </div>
+
+                <input type="submit" value="Сохранить" class="btn btn-block btn-primary mt-3">
+            </form>
+        </div>
+    </div>
+{% endblock center %}
+
+{% block extra__js %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+    <script defer>
+        function setOrders() {
+            for (var i=0; i < $('#simple-list').children().length; i++) {
+                let order = $('#simple-list').children().eq(i).find('input[type=number]:hidden')
+                order.attr('value', i + 1)
+            }
+        }
+
+        function triggerInput() {
+            $('#fileElem')[0].click()
+        }
+
+        var sortable = new Sortable(
+            $('#simple-list')[0],
+            {
+                animation: 150,
+                draggable: ".file-item",
+                onEnd: function (evt) {
+                    setOrders()
+                },
+            }
+        )
+
+        let dropArea = document.getElementById('drop-area')
+
+        ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation()
+        }
+
+        ;['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false)
+        })
+
+        ;['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false)
+        })
+
+        function highlight(e) {
+            dropArea.classList.add('highlight')
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('highlight')
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        let before_id;
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+
+            handleFiles(files)
+        }
+
+        function handleFiles(files) {
+            before_id = Number($("#simple-list").children('.file-item').last().find('input[type=checkbox]')[0].id[5])
+
+            files = [...files];
+            files.forEach(uploadFile)
+        }
+
+        function uploadFile(file) {
+            if ($('#simple-list').children().length == 10) {
+                $('#drop-area').remove()
+                if ($('#simple-list').children().length > 10) {
+                    return
+                }
+            }
+
+            const dT = new DataTransfer();
+            dT.items.add(file);
+            
+            let to_copy = $("#simple-list").children('.file-item').last()
+            let newCard = to_copy.clone().insertAfter(to_copy)
+
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = function () {
+                newCard.find('img').attr('src', reader.result)
+                
+                let checkbox = newCard.find('input[type=checkbox]')
+                checkbox.attr('id', 'form-' + (before_id + 1) + '-image-clear_id')
+                checkbox.attr('name', 'form-' + (before_id + 1) + '-image-clear')
+
+                let image = newCard.find('input[type=file]')
+                image.attr('id', 'id_form-' + (before_id + 1) + '-image')
+                image.attr('name', 'form-' + (before_id + 1) + '-image')
+                image.attr('aria-describedby', 'form-' + (before_id + 1) + '-image-clear_id')
+                image[0].files = dT.files
+
+                let h_id = newCard.find('input[type=hidden]')
+                h_id.attr('id', 'id_form-' + (before_id + 1) + '-id')
+                h_id.attr('name', 'form-' + (before_id + 1) + '-id')
+                h_id.attr('value', '')
+
+                let order = newCard.find('input[type=number]:hidden')
+                order.attr('id', 'id_form-' + (before_id + 1) + '-ORDER')
+                order.attr('name', 'form-' + (before_id + 1) + '-ORDER')
+
+                before_id++
+
+                setOrders()
+
+                $('#id_form-TOTAL_FORMS').attr('value', Number($('#id_form-TOTAL_FORMS').attr('value')) + 1)
+            }
+        }
+    </script>
+{% endblock extra__js %}

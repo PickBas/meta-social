@@ -10,8 +10,10 @@
             </button>
             <button
                 style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"
-                data-toggle="modal" data-target="#editPostModal" class="float-right">
-                <i class="far fa-edit"></i>
+                class="float-right">
+                <a href="/post/{{ post.id }}/edit/">
+                    <i class="far fa-edit"></i>
+                </a>
             </button>
         {% endif %}
         <p class="card-text mt-2" style="white-space: pre-wrap" id="id-post-text">{{ post.text }}</p>
