@@ -407,7 +407,7 @@ class PostViews:
             )
             comment_item.save()
 
-            return render(request, 'post.html', {'post': post_item})
+            return render(request, 'post/post.html', {'post': post_item})
 
         raise Http404()
 
