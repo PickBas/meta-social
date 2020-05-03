@@ -37,7 +37,7 @@
                                                 data-placement="top"
                                                 title="Добавить"
                                                 style="display: inline-block;"
-                                                onclick="addToChat(event, '/chat/{{ c_room.id }}/add/{{ friend.id }}/')">
+                                                onclick="addToChat(event, '/chat/{{ c_room.id }}/add/{{ friend.id }}/', '{{ friend.profile.get_name }}', {{ user.id }})">
                                             <img src="https://image.flaticon.com/icons/svg/1828/1828925.svg" width="20" height="20">
                                     </button>
                                 </li>

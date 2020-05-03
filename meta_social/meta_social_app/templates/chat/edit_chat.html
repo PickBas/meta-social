@@ -65,7 +65,11 @@
                                                         data-placement="top"
                                                         title="Сделать администратором"
                                                         style="display: inline-block;"
-                                                        onclick="document.getElementById('id-form-makeadmin').submit();">
+                                                        onclick="document.getElementById('id-form-makeadmin').submit(); chatSocket.send(JSON.stringify({
+                                                        'message': 'Новый админимтратор ' + '{{ participant.profile.get_name }}' + '!',
+                                                        'author': {{ c_room.owner.id }},
+                                                        'chat_id': roomName,
+                                                    }));">
                                                     <img src="{% static 'img/add_admin.svg' %}" width="20" height="20">
                                             </button>
                                         </form>
@@ -77,7 +81,11 @@
                                                         data-placement="top"
                                                         title="Отобрать права администратора"
                                                         style="display: inline-block;"
-                                                        onclick="document.getElementById('id-form-makeadmin').submit();">
+                                                        onclick="document.getElementById('id-form-makeadmin').submit(); chatSocket.send(JSON.stringify({
+                                                        'message': '{{ participant.profile.get_name }}' + ' больше не администратор!',
+                                                        'author': {{ c_room.owner.id }},
+                                                        'chat_id': roomName,
+                                                    }));">
                                                     <img src="{% static 'img/remove_admin.svg' %}" width="20" height="20">
                                             </button>
                                         </form>
