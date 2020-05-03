@@ -310,14 +310,24 @@ class PostViews:
                     postform.save()
                     
                     for form in formset.ordered_forms:
+                        print(form.cleaned_data)
                         if form.cleaned_data['image'] is None:
                             form.cleaned_data['id'].order = form.cleaned_data['ORDER']
                             form.cleaned_data['id'].save()
                         elif form.cleaned_data['image'] == False:
-                            form.cleaned_data['id'].delete()
+                            if form.cleaned_data['id']:
+                                form.cleaned_data['id'].delete()
                         else:
-                            form.instance.order = form.cleaned_data['ORDER']
-                            form.instance.save()
+                            if form.cleaned_data['id']:
+                                form.cleaned_data['id'].image = form.cleaned_data['image']
+                                form.cleaned_data['id'].save()
+                            else:
+                                item = PostImages(
+                                    post=post_item,
+                                    order=form.cleaned_data['ORDER'],
+                                    image=form.cleaned_data['image']
+                                )
+                                item.save()
                     
             self.context['postform'] = PostForm(instance=post_item)
             initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
