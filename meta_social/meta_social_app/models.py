@@ -357,3 +357,14 @@ class Music(models.Model):
     class Meta:
         verbose_name = 'Музыка'
         verbose_name_plural = 'Музыка'
+
+
+# class Playlist(models.Model):
+#     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+#     musics = models.ManyToManyField(Music, through='PlayPosition')
+
+
+# class PlayPosition(models.Model):
+#     position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
+#     plist = models.ForeignKey(Playlist)
+#     order = models.AutoField()
