@@ -491,13 +491,13 @@ class MusicViews:
             super().__init__(**kwargs)
             self.template_name = 'music/music_upload.html'
 
-        @login_required
         def post(self, request):
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
                 music = form.save(commit=False)
                 music.user = request.user
                 music.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         def get(self, request):
             context = get_menu_context('music', 'Загрузка музыки')
