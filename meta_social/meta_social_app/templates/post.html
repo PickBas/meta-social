@@ -11,9 +11,7 @@
                   {% if post.get_images %}
                     {% for post_img in post.get_images %}
                     {% if post.get_images.count > 1 %}
-                      <div>
-                          <a data-fancybox="photo" href="{{ post_img.image.url }}"><img src="{{ post_img.image.url }}" width="50%" class="mb-1"></a>
-                      </div>
+                      <a data-fancybox="photo" href="{{ post_img.image.url }}"><img src="{{ post_img.image.url }}" width="50%" class="mb-1"></a>
                     {%else%}
                       <a data-fancybox="photo" href="{{ post_img.image.url }}"><img src="{{ post_img.image.url }}" width="100%" class="mb-1"></a>
                     {% endif %}
