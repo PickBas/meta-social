@@ -18,6 +18,7 @@
     </style>
 
     <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
+    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
     <div class="mt-3">
         <div class="button_bg w-100 text-left">
             <button type="button" class="btn btn-outline-light button1 mt-2 ml-5">
@@ -31,22 +32,25 @@
     </div>
 
     <div class="card mt-3">
-        <div class="card-body text-left">
+        <div id="simpleList" class="card-body text-left">
             {% for music in music_list %}
-                <button class="btn btn-outline-success" onclick="setMusic('{{ music.audio_file.url }}')">&#9658;</button>
-                <span>{{ music.artist }} - {{ music.title }}</span>
-                <br class="mb-3">
+		<div>
+                    <button class="btn btn-outline-success" onclick="setMusic('{{ music.audio_file.url }}')">&#9658;</button>
+                    <span>{{ music.artist }} - {{ music.title }}</span>
+                    <br class="mb-3">
+		</div>
             {% endfor %}
         </div>
     </div>
 
     <script>
-        function setMusic(link) {
-            let audio_player = document.getElementById('audio-player');
-            audio_player.src = link;
-            audio_player.autoplay = true;
-        }
+     function setMusic(link) {
+         let audio_player = document.getElementById('audio-player');
+         audio_player.src = link;
+         audio_player.autoplay = true;
+     }
 
+     Sortable.create(simpleList, { /* options */ });
     </script>
 {% endblock %}
 
