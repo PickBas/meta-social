@@ -16,7 +16,7 @@ from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Post, FriendshipRequest, PostImages, Music
+from .models import Post, FriendshipRequest, PostImages, Music, PlayPosition
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
     UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm, EditPostImageForm
 from io import BytesIO
@@ -495,8 +495,10 @@ class MusicViews:
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
                 music = form.save()
-                # music.save(commit=False)
-                request.user.profile.add_music(music)
+                playpos = PlayPosition(position=music,
+                                       plist=request.user.profile)
+                playpos.add_order()
+                playpos.save()
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         def get(self, request):

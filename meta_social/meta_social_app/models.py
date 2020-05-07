@@ -368,3 +368,6 @@ class PlayPosition(models.Model):
     position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
     plist = models.ForeignKey(to=Profile, on_delete=models.CASCADE)
     order = models.IntegerField(blank=True, null=True)
+
+    def add_order(self):
+        self.order = len(self.plist.playlist.all()) + 1
