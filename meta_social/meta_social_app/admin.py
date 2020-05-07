@@ -9,7 +9,7 @@ from .models import *
 
 
 class MusicAdmin(admin.ModelAdmin):
-    list_display = ('user', 'artist', 'title', )
+    list_display = ('artist', 'title', )
 
 
 admin.site.register(Music, MusicAdmin)

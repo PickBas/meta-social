@@ -494,9 +494,9 @@ class MusicViews:
         def post(self, request):
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
-                music = form.save(commit=False)
-                music.user = request.user
-                music.save()
+                music = form.save()
+                # music.save(commit=False)
+                request.user.profile.add_music(music)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         def get(self, request):

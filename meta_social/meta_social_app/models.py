@@ -19,7 +19,6 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys, humanize
 
-
 class Community(models.Model):
     """
     Community class
@@ -171,6 +170,9 @@ class Profile(models.Model):
     friends = models.ManyToManyField(User, related_name='friendlist')
     chats = models.ManyToManyField(Chat)
 
+    playlist = models.ManyToManyField('Music', related_name='playlist',
+                                      through='PlayPosition')
+
     def get_name(self):
         if self.user.first_name:
             if self.user.last_name:
@@ -258,8 +260,11 @@ class Profile(models.Model):
         """
         return 0
 
+    def add_music(self, music):
+        self.playlist.add(music)
+
     def get_music_list(self):
-        return Music.objects.filter(user=self.user)
+        return self.playlist.all()
 
 
 def save_image_from_url(profile, image_url):
@@ -347,24 +352,19 @@ class Comment(models.Model):
 
 
 class Music(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-
     audio_file = models.FileField(upload_to='music')
 
-    artist = models.CharField(default='Автор', max_length=100, verbose_name='Автор')
-    title = models.CharField(default='Название', max_length=100, verbose_name='Название')
+    artist = models.CharField(default='Автор', max_length=100,
+                              verbose_name='Автор')
+    title = models.CharField(default='Название', max_length=100,
+                             verbose_name='Название')
 
     class Meta:
         verbose_name = 'Музыка'
         verbose_name_plural = 'Музыка'
 
 
-# class Playlist(models.Model):
-#     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-#     musics = models.ManyToManyField(Music, through='PlayPosition')
-
-
-# class PlayPosition(models.Model):
-#     position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
-#     plist = models.ForeignKey(Playlist)
-#     order = models.AutoField()
+class PlayPosition(models.Model):
+    position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
+    plist = models.ForeignKey(to=Profile, on_delete=models.CASCADE)
+    order = models.IntegerField(blank=True, null=True)
