@@ -37,6 +37,11 @@
         </div>
         <div class="card-footer bg-white">
             <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
+                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
+                    </button>
+                </div>
                 <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" id='chat-message-submit'>
@@ -44,7 +49,7 @@
                     </button>
                 </div>
                 
-                <input type="file" id="message_files">
+                <input type="file" id="message_files" style="display: none;">
             </div>
         </div>
     </div>

@@ -67,3 +67,7 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
         messageInputDom.value = '';
     }
 };
+
+function triggerInput() {
+    $('#message_files')[0].click()
+}

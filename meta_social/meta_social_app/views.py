@@ -16,7 +16,7 @@ from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Post, FriendshipRequest, PostImages, Music
+from .models import Post, FriendshipRequest, PostImages, Music, MessageImages
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
     UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm, EditPostImageForm
 from io import BytesIO
@@ -736,9 +736,10 @@ class Conversations:
             )
 
             for image in request.FILES.getlist('images'):
-                message_item.images.create(
-                    image=image
-                )
+                img_item = MessageImages(image=image)
+                img_item.save()
+
+                message_item.images.add(img_item)
             
             return HttpResponse(message_item.id)
 
