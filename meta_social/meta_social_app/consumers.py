@@ -7,6 +7,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 from .models import Message, Chat
 
@@ -87,22 +88,25 @@ class ChatConsumer(WebsocketConsumer):
         :return: None
         """
         text_data_json = json.loads(text_data)
+
+        print('\n\n')
+        print(text_data_json)
+        print('\n\n')
+
         message = text_data_json['message']
         if not message.isspace():
-            author_user = User.objects.get(id=int(text_data_json['author']))
-            new_message = Message.objects.create(
-                author=author_user,
-                message=text_data_json['message'])
+            author_user = get_object_or_404(User, id=int(text_data_json['author']))
+            chat = get_object_or_404(Chat, id=int(text_data_json['chat_id']))
 
-            chat = Chat.objects.get(id=int(text_data_json['chat_id']))
-            chat.messages.add(new_message)
-            chat.save()
+            current_message = chat.messages.all().get(id=int(text_data_json['message_id']))
+            current_message.message = message
+            current_message.save()
 
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
-                    'message': self.message_to_json(new_message)
+                    'message': self.message_to_json(current_message)
                 }
             )
 

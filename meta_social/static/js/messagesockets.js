@@ -40,11 +40,30 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
     if (message.length) {
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'author': user_id,
-            'chat_id': roomName,
-        }));
+        let form_data = new FormData();
+        form_data.append('csrfmiddlewaretoken', c_token);
+        form_data.append('images', $('#message_files')[0].files[0]);
+
+        $.ajax({
+            type: 'POST',
+            url: '/chat/go_to_chat/' + roomName + '/send_files/',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            success: function (result) {
+                let message_id = result;
+
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'author': user_id,
+                    'chat_id': roomName,
+                    'message_id': message_id, 
+                }));
+
+                $('#message_files').val('')
+            }
+        })
+
         messageInputDom.value = '';
     }
 };

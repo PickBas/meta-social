@@ -8,6 +8,9 @@
                 <a href="/accounts/profile/{{ message.author.id }}/">{{ message.author.profile.get_name }}</a>
                 <small class="text-muted ml-1">{{ message.date }}</small>
                 <p>{{ message.message }}</p>
+                {% for image_item in message.images.all %}
+                    <img src="{{ image_item.image.url }}" class="w-50">
+                {% endfor %}
             </div>
         </div>
     {% endfor %}

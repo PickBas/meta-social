@@ -64,6 +64,7 @@ urlpatterns = [
     path('chats/<int:user_id>/<int:friend_id>/', login_required(Conversations.chat_move)),
     path('chat/go_to_chat/<int:room_id>/', login_required(Conversations.Room.as_view())),
     path('chat/go_to_chat/<int:room_id>/get_messages/', login_required(Conversations.get_messages)),
+    path('chat/go_to_chat/<int:room_id>/send_files/', login_required(Conversations.send_files)),
 
     path('files/<int:user_id>/', login_required(Files.all_files))
 ]

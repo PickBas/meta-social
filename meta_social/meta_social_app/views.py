@@ -724,6 +724,25 @@ class Conversations:
             context = {'avatar_form': avatar_form, 'crop_form': crop_form}
 
             return render(request, self.template_name, context)
+    
+    @staticmethod
+    def send_files(request, room_id):
+        chat_item = get_object_or_404(Chat, id=room_id)
+
+        if request.method == 'POST':
+            message_item = chat_item.messages.create(
+                author=request.user,
+                message=''
+            )
+
+            for image in request.FILES.getlist('images'):
+                message_item.images.create(
+                    image=image
+                )
+            
+            return HttpResponse(message_item.id)
+
+        raise Http404()
 
 
 class Communities:
