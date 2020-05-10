@@ -1,5 +1,62 @@
 {% extends 'chat/base.html' %}
+{% load static %}
+
 {% block center %}
+    <style>
+        #drop-area.highlight {
+            border: 2px dashed black;
+        }
+
+        #gallery {
+            margin-top: 10px;
+            margin-left: 2px;
+        }
+
+        #gallery img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            vertical-align: middle;
+        }
+
+        .close {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25px;
+            height: 25px;
+            color:white;
+            opacity: 0.6;
+        }
+
+        .close:hover {
+            color:white;
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .close:before, .close:after {
+            content: ' ';
+            height: 33px;
+            width: 2px;
+            background-color: #333;
+        }
+
+        .close:before {
+            transform: rotate(45deg);
+        }
+
+        .close:after {
+            transform: rotate(-45deg);
+        }
+
+        .img-div {
+            display: inline-block;
+            height: 45px;
+            width: calc(10% - 3px);
+            margin-right: 5px;
+        }
+    </style>
 
     <div class="card" style="height: 750px">
         <div class="card-header bg-white">
@@ -35,7 +92,7 @@
 
             </div>
         </div>
-        <div class="card-footer bg-white">
+        <div class="card-footer bg-white" id="drop-area">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
@@ -49,22 +106,24 @@
                     </button>
                 </div>
                 
-                <input type="file" id="message_files" style="display: none;">
+                <input type="file" id="message_files" style="display: none;" multiple>
             </div>
+            <div id="gallery" class="text-left"></div>
         </div>
     </div>
 
-    {% load static %}
     <script>
         const roomName = {{ room_name }};
         const user_id = {{ user.id }};
         const c_token = '{{ csrf_token }}';
     </script>
-    <script src="{% static 'js/autosize.min.js' %}"></script>
-    <script src="{% static 'js/messagesockets.js' %}" type="text/javascript"></script>
-
 {% endblock %}
 
 {% block right %}
     {% include 'chat/right_menu.html' %}
 {% endblock %}
+
+{% block extra__js %}
+    <script src="{% static 'js/autosize.min.js' %}"></script>
+    <script src="{% static 'js/messagesockets.js' %}" type="text/javascript"></script>
+{% endblock extra__js %}
