@@ -1,6 +1,9 @@
 {% if messages_list %}
     {% for message in messages_list %}
-        <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
+        <div class="row" 
+            style="{% if forloop.first %}margin-top: auto;{% endif %}
+            {% if not message.is_readed %}background-color: #F0F7FF;{% endif %}"
+        >
             <div class="col-lg-1 col-sm-1">
                 <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
             </div>

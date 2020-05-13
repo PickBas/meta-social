@@ -129,6 +129,7 @@ class Message(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
     message = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)
+    is_readed = models.BooleanField(default=False)
 
     images = models.ManyToManyField(MessageImages)
 
@@ -147,6 +148,9 @@ class Chat(models.Model):
 
     base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+
+    def get_unread_messages(self):
+        return self.messages.all().filter(is_readed=False)
 
     def last_message(self):
         try:
@@ -193,6 +197,15 @@ class Profile(models.Model):
     liked_posts = models.ManyToManyField(Post, 'liked_posts')
     friends = models.ManyToManyField(User, related_name='friendlist')
     chats = models.ManyToManyField(Chat)
+
+    def unread_chats_count(self):
+        count = 0
+        for chat in self.chats.all():
+            messages = chat.get_unread_messages().exclude(author=self.user)
+            if len(messages) > 0:
+                count += 1
+        
+        return count
 
     def get_name(self):
         if self.user.first_name:
