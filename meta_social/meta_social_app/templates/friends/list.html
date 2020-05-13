@@ -3,7 +3,7 @@
         {% for match in f_matches %}
             <li class="list-group-item">
                 <img src="{{ match.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-                <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
+                <a href="/accounts/profile/{{ match.id }}/">{{ match.profile.get_name }}</a>
 
                 {% if c_user == user %}
                     {% if match in user.profile.friends and user not in match.profile.blacklist.all %}
@@ -93,7 +93,7 @@
 		<div class="infinite-container">
 		    <li class="list-group-item">
 			<img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-			<a href="/accounts/profile/{{ friend.id }}/">{{ friend.username }}</a>
+			<a href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
 
 			<button type="button" 
 				class="btn btn-outline-dark float-right" 

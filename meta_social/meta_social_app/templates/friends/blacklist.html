@@ -10,7 +10,7 @@
                     {% for item in c_user.profile.blacklist.all %}
                         <li class="list-group-item">
                             <img src="{{ item.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-                            <a href="/accounts/profile/{{ item.id }}/">{{ item.username }}</a>
+                            <a href="/accounts/profile/{{ item.id }}/">{{ item.profile.get_name }}</a>
 
                             {% if c_user == user %}
                                 <button type="button" 

@@ -9,7 +9,7 @@
                     {% for request in friendship.incoming %}
                         <li class="list-group-item">
                             <img src="{{ request.from_user.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
-                            <a href="/accounts/profile/{{ request.from_user.id }}/">{{ request.from_user.username }}</a>
+                            <a href="/accounts/profile/{{ request.from_user.id }}/">{{ request.from_user.profile.get_name }}</a>
 
                             <button type="button" 
                                     class="btn btn-outline-dark float-right" 
