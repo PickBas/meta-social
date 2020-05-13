@@ -10,7 +10,7 @@
                 <p>{{ message.message }}</p>
                 {% for image_item in message.images.all %}
                 <a data-fancybox="photo" href="{{ image_item.image.url }}" class="w-50">
-                            <img src="{{ image_item.image.url }}" width="100%" class="mb-1">
+                            <img src="{{ image_item.image.url }}" class="mb-1 w-50">
                         </a>
                 {% endfor %}
             </div>
