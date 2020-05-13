@@ -460,7 +460,7 @@ class PostViews:
 
             if post_item in request.user.profile.liked_posts.all():
                 request.user.profile.liked_posts.remove(post_item)
-                post_item.likes.all().get(user=request.user).delete()
+                post_item.likes.all().filter(user=request.user).delete()
 
                 return HttpResponse('unliked')
             else:
