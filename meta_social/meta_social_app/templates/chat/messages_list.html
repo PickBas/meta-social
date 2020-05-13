@@ -9,7 +9,9 @@
                 <small class="text-muted ml-1">{{ message.date }}</small>
                 <p>{{ message.message }}</p>
                 {% for image_item in message.images.all %}
-                    <img src="{{ image_item.image.url }}" class="w-50">
+                <a data-fancybox="photo" href="{{ post_img.image.url }}" class="w-50">
+                            <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                        </a>
                 {% endfor %}
             </div>
         </div>
