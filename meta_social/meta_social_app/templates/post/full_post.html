@@ -60,7 +60,9 @@
 
         {% if post.get_images %}
             {% for post_img in post.get_images %}
-                <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                <a data-fancybox="photo" href="{{ post_img.image.url }}" class="w-100">
+                    <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                </a>
             {% endfor %}
         {% endif %}
 
