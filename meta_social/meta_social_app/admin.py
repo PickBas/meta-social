@@ -9,6 +9,9 @@ from .models import *
 
 
 class MusicAdmin(admin.ModelAdmin):
+    """
+    Class for representation music model in admin interface
+    """
     list_display = ('user', 'artist', 'title', )
 
 
@@ -22,6 +25,9 @@ class PostImagesInline(admin.TabularInline):
 
 
 class PostAdmin(admin.ModelAdmin):
+    """
+    Class for representation post model in admin interface
+    """
     list_display = ('user', 'date', )
     inlines = (PostImagesInline, )
 
@@ -48,6 +54,9 @@ class ProfileInline(admin.StackedInline):
 
 
 class CustomUserAdmin(UserAdmin):
+    """
+    Class for representation user model in admin interface
+    """
     inlines = (ProfileInline, CommentInline, MessageInline, )
 
     def get_inline_instances(self, request, obj=None):

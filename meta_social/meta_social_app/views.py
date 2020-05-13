@@ -105,6 +105,9 @@ class Index(View):
 
     @staticmethod
     def update_nav(request):
+        """
+        Method for updating navigation menu. Retutns rendered responce
+        """
         if request.method == 'POST':
             context = {
                 'page': 'friends'
@@ -237,6 +240,9 @@ class ProfileViews:
             super().__init__(**kwargs)
 
         def post(self, request):
+            """
+            Cropping and saving user avatar
+            """
             avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=request.user.profile)
             crop_form = CropAvatarForm(request.POST)
             if crop_form.is_valid() and avatar_form.is_valid():
@@ -270,6 +276,9 @@ class ProfileViews:
                 return redirect('/accounts/profile/' + str(request.user.id))
 
         def get(self, request):
+            """
+            Processing get request
+            """
             avatar_form = UpdateAvatarForm()
             crop_form = CropAvatarForm()
 
@@ -280,6 +289,9 @@ class ProfileViews:
 
     @staticmethod
     def set_online(request):
+        """
+        Method for setting last action time in user profile
+        """
         if request.method == 'POST':
             request.user.profile.last_act = timezone.now()
             request.user.profile.save()
@@ -303,6 +315,9 @@ class PostViews:
             self.template_name = 'post/full_post.html'
 
         def get(self, request, **kwargs) -> render:
+            """
+            Processing get request
+            """
             context = get_menu_context('post', 'Пост')
             context['post'] = Post.objects.get(id=kwargs['post_id'])
 
@@ -315,6 +330,9 @@ class PostViews:
             self.context = get_menu_context('like_marks', 'Закладки')
 
         def get(self, request) -> render:
+            """
+            Processing get request
+            """
             return render(request, self.template_name, self.context)
 
     class PostEdit(View):
@@ -324,6 +342,9 @@ class PostViews:
             self.context = get_menu_context('post', 'Редактирование поста')
 
         def post(self, request, **kwargs):
+            """
+            Process post request. Changing position, deleting, changing text, changing images of post
+            """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             PostImageFormSet = modelformset_factory(
                 PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
@@ -363,6 +384,9 @@ class PostViews:
             return render(request, self.template_name, self.context)
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             PostImageFormSet = modelformset_factory(
                 PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
@@ -377,6 +401,9 @@ class PostViews:
     class PostAjax(View):
         @staticmethod
         def post(request, **kwargs):
+            """
+            Send comment to post from full post page
+            """
             if request.method == "POST":
                 if len(request.POST.get('text')) > 0:
                     comment_item = Comment(
@@ -397,6 +424,9 @@ class PostViews:
 
     @staticmethod
     def send_comment(request, post_id):
+        """
+        Send comment to post from feed
+        """
         if request.method == 'POST' and request.POST.get('text'):
             post_item = get_object_or_404(Post, id=post_id)
 
@@ -455,6 +485,9 @@ class PostViews:
 
     @staticmethod
     def like_post(request, post_id):
+        """
+        Method for like or unlike post
+        """
         if request.method == 'POST':
             post_item = get_object_or_404(Post, id=post_id)
 
@@ -473,12 +506,18 @@ class PostViews:
 
 
 class MusicViews:
+    """
+    Music views
+    """
     class MusicList(View):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'music/music_list.html'
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             context = get_menu_context('music', 'Музыка')
 
             context['c_user'] = User.objects.get(id=kwargs['user_id'])
@@ -493,6 +532,9 @@ class MusicViews:
 
         @login_required
         def post(self, request):
+            """
+            Processing post request. Save uploaded music
+            """
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
                 music = form.save(commit=False)
@@ -500,6 +542,9 @@ class MusicViews:
                 music.save()
 
         def get(self, request):
+            """
+            Processing get request
+            """
             context = get_menu_context('music', 'Загрузка музыки')
 
             context['form'] = UploadMusicForm()
@@ -515,6 +560,9 @@ class Conversations:
             self.context = get_menu_context('messages', 'Чаты')
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             self.context['pagename'] = 'Чаты'
 
             c_user = User.objects.get(id=kwargs['user_id'])
@@ -526,6 +574,9 @@ class Conversations:
 
     @staticmethod
     def create_chat(request):
+        """
+        Method for creating chat. Returns rendered responce of chatlist
+        """
         if request.method == 'POST':
             context = {}
             new_chat = Chat.objects.create()
@@ -544,6 +595,9 @@ class Conversations:
 
     @staticmethod
     def remove_chat(request, room_id):
+        """
+        Method for deleting chat. Redirects to chatlist
+        """
         c_room = Chat.objects.get(id=room_id)
         if request.method == 'POST' and request.user == c_room.owner:
             c_room.delete()
@@ -554,6 +608,9 @@ class Conversations:
 
     @staticmethod
     def make_admin(request, room_id, participant_id):
+        """
+        Method for giving admin permissions in chat
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             participant = User.objects.get(id=participant_id)
@@ -564,6 +621,9 @@ class Conversations:
 
     @staticmethod
     def rm_admin(request, room_id, participant_id):
+        """
+        Method for removing admin permissions in chat
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             participant = User.objects.get(id=participant_id)
@@ -574,6 +634,9 @@ class Conversations:
 
     @staticmethod
     def quit_room(request, room_id):
+        """
+        Method for quiting room
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             c_room.participants.remove(request.user)
@@ -586,6 +649,9 @@ class Conversations:
 
     @staticmethod
     def edit_chat_name(request, room_id):
+        """
+        Method for editing chat name
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             c_room.chat_name = request.POST.get('text')
@@ -595,6 +661,9 @@ class Conversations:
 
     @staticmethod
     def chat_move(request, user_id, friend_id):
+        """
+        Method for redirecting to chat, if chat does not exists creates and redirects to it
+        """
         c_user = User.objects.get(id=user_id)
         c_friend = User.objects.get(id=friend_id)
         if request.method == "POST":
@@ -619,6 +688,9 @@ class Conversations:
 
     @staticmethod
     def add_to_chat(request, room_id, friend_id):
+        """
+        Method for adding user to chat
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             c_friend = User.objects.get(id=friend_id)
@@ -632,6 +704,9 @@ class Conversations:
 
     @staticmethod
     def remove_from_chat(request, room_id, participant_id):
+        """
+        Method for removing user from chat
+        """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
             c_participant = User.objects.get(id=participant_id)
@@ -647,12 +722,18 @@ class Conversations:
             raise Http404()
 
     class Room(View):
+        """
+        Chat view class
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name_dialog = 'chat/message.html'
             self.template_name_conv = 'chat/conv_message.html'
 
         def get(self, request, room_id):
+            """
+            Processing 
+            """
             context = {'room_name': mark_safe(json.dumps(room_id))}
             c_room = Chat.objects.get(id=room_id)
 
@@ -678,6 +759,9 @@ class Conversations:
 
     @staticmethod
     def get_messages(request, room_id):
+        """
+        Method for getting messages list. Returns rendered responce
+        """
         if request.method == 'POST':
             messages = Chat.objects.get(id=room_id).messages.all()
 
@@ -691,11 +775,17 @@ class Conversations:
         raise Http404()
 
     class AvatarManaging(View):
+        """
+        Managing avatar of chat view
+        """
         def __init__(self, **kwargs):
             self.template_name = 'profile/change_avatar.html'
             super().__init__(**kwargs)
 
         def post(self, request, **kwargs):
+            """
+            Crop and save avatar of chat
+            """
             c_room = Chat.objects.get(id=kwargs['room_id'])
             avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=c_room)
             crop_form = CropAvatarForm(request.POST)
@@ -725,6 +815,9 @@ class Conversations:
                 return redirect('/chat/go_to_chat/' + str(c_room.id))
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             avatar_form = UpdateAvatarForm()
             crop_form = CropAvatarForm()
             context = {'avatar_form': avatar_form, 'crop_form': crop_form}
@@ -733,6 +826,9 @@ class Conversations:
     
     @staticmethod
     def send_files(request, room_id):
+        """
+        Method for sending files to chat
+        """
         chat_item = get_object_or_404(Chat, id=room_id)
 
         if request.method == 'POST':
@@ -753,12 +849,21 @@ class Conversations:
 
 
 class Communities:
+    """
+    Communities class
+    """
     class CommunityView(View):
+        """
+        Community view
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/community_page.html'
 
         def get(self, request, community_id):
+            """
+            Processing get request
+            """
             context = get_menu_context('community', 'Сообщество')
 
             context['community'] = get_object_or_404(Community, id=community_id)
@@ -779,6 +884,9 @@ class Communities:
             self.context = get_menu_context('community', 'Редактирование сообщества')
 
         def post(self, request, **kwargs):
+            """
+            Changing community data (name, info, country)
+            """
             community = get_object_or_404(Community, id=kwargs['community_id'])
             self.context['community'] = community
             form = EditCommunityForm(request.POST, instance=self.context['community'])
@@ -787,18 +895,27 @@ class Communities:
             return redirect('/community/{}/'.format(community.id))
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
             self.context['form'] = EditCommunityForm(instance=self.context['community'])
 
             return render(request, self.template_name, self.context)
 
     class CommunityCreate(View):
+        """
+        Community create view
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/community_create.html'
 
         @staticmethod
         def post(request):
+            """
+            Creates community
+            """
             form = CommunityCreateForm(request.POST)
             if form.is_valid():
                 community = Community(
@@ -813,17 +930,26 @@ class Communities:
                 return redirect('/community/{}/'.format(community.id))
 
         def get(self, request):
+            """
+            Processing get request
+            """
             context = get_menu_context('community', 'Создание сообщества')
             context['form'] = CommunityCreateForm()
             return render(request, self.template_name, context)
 
     class AvatarManaging(View):
+        """
+        Managing avatar of community view
+        """
         def __init__(self, **kwargs):
             self.context = get_menu_context('community', 'Смена аватарки сообщества')
             self.template_name = 'community/change_avatar.html'
             super().__init__(**kwargs)
 
         def post(self, request, **kwargs):
+            """
+            Crop and save avatar of community
+            """
             community = get_object_or_404(Community, id=kwargs['community_id'])
             avatar_form = UpdateCommunityAvatarForm(request.POST, request.FILES, instance=community)
             crop_form = CropAvatarForm(request.POST)
@@ -853,6 +979,9 @@ class Communities:
                 return redirect('/community/' + str(community.id))
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             avatar_form = UpdateCommunityAvatarForm()
             crop_form = CropAvatarForm()
 
@@ -864,11 +993,17 @@ class Communities:
 
     @staticmethod
     def my_communities(request):
+        """
+        Method for getting all created communities. Returns rendered responce
+        """
         return render(request, 'community/own_community_list.html', {
 
         })
 
     class CommunityList(View):
+        """
+        Community list view
+        """
         def __init__(self, **kwargs):
             self.context = {}
             self.template_name_get = 'community/community_list.html'
@@ -876,6 +1011,9 @@ class Communities:
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             self.context = get_menu_context('community', 'Список сообществ')
 
             c_user = get_object_or_404(User, id=kwargs['user_id'])
@@ -887,6 +1025,9 @@ class Communities:
             return render(request, 'community/community_list.html', self.context)
 
         def post(self, request, **kwargs):
+            """
+            Searching communities by name and returns rendered responce
+            """
             self.context['matching'] = True
             if not request.POST.get('query'):
                 self.context['matching'] = False
@@ -899,6 +1040,9 @@ class Communities:
 
     @staticmethod
     def community_join(request, community_id):
+        """
+        Method for joining to community
+        """
         community = get_object_or_404(Community, id=community_id)
         if request.user not in community.users.all():
             community.users.add(request.user)
@@ -907,6 +1051,9 @@ class Communities:
 
     @staticmethod
     def community_leave(request, community_id):
+        """
+        Mthod for leaving from community
+        """
         community = get_object_or_404(Community, id=community_id)
         if request.user in community.users.all():
             community.users.remove(request.user)
@@ -944,11 +1091,17 @@ class Communities:
 
 
 class GlobalSearch(View):
+    """
+    Global search view
+    """
     def __init__(self, **kwargs):
         self.template_name = 'search_list.html'
         super().__init__(**kwargs)
 
     def post(self, request):
+        """
+        Site search. Returns rendered responce
+        """
         if request.POST.get('query'):
             context = {}
             query = request.POST.get('query')
@@ -965,12 +1118,18 @@ class GlobalSearch(View):
             return render(request, self.template_name, context)
 
     def get(self, request):
+        """
+        Processing get request
+        """
         raise Http404()
 
 
 class FriendsViews:
     @staticmethod
     def get_render(request, context):
+        """
+        Friends search. Returns rendered responce
+        """
         context['matching'] = True
         if not request.POST.get('query'):
             context['matching'] = False
@@ -984,12 +1143,18 @@ class FriendsViews:
         return render(request, 'friends/list.html', context)
 
     class FriendsList(View):
+        """
+        Friends list view
+        """
         def __init__(self, **kwargs):
             self.template_name = 'friends/friends_list.html'
             self.context = get_menu_context('friends', 'Список друзей')
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             c_user = User.objects.get(id=kwargs['user_id'])
             self.context['c_user'] = c_user
             page = request.GET.get('page', 1)
@@ -1004,15 +1169,24 @@ class FriendsViews:
             return render(request, self.template_name, self.context)
 
         def post(self, request, **kwargs):
+            """
+            Processing post request
+            """
             self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
             return FriendsViews.get_render(request, self.context)
 
     class FriendsRequests(View):
+        """
+        Requests view
+        """
         def __init__(self, **kwargs):
             self.template_name = 'friends/requests.html'
             super().__init__(**kwargs)
 
         def get(self, request):
+            """
+            Processing get request
+            """
             context = get_menu_context('friends', 'Заявки в друзья')
 
             context['c_user'] = request.user
@@ -1024,6 +1198,9 @@ class FriendsViews:
             return render(request, self.template_name, context)
 
     class FriendsBlacklist(View):
+        """
+        Blacklist view
+        """
         def __init__(self, **kwargs):
             self.template_name = 'friends/blacklist.html'
             super().__init__(**kwargs)
@@ -1043,6 +1220,9 @@ class FriendsViews:
             return render(request, self.template_name, context)
 
     class SendFriendshipRequest(View):
+        """
+        Class for sending friendship request
+        """
         def __init__(self, **kwargs):
             self.user_item = None
             super().__init__(**kwargs)
@@ -1069,9 +1249,15 @@ class FriendsViews:
                     return FriendsViews.get_render(request, {'c_user': request.user})
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             raise Http404()
 
     class AcceptRequest(View):
+        """
+        Class for accepting friendship request
+        """
         def __init__(self, **kwargs):
             self.user_item = None
             super().__init__(**kwargs)
@@ -1105,10 +1291,16 @@ class FriendsViews:
                 return FriendsViews.get_render(request, {'c_user': request.user})
 
         def get(self, request, **kwargs):
+            """
+            Processing get request
+            """
             raise Http404()
 
     @staticmethod
     def cancel_request(request, user_id):
+        """
+        Method for canceling request
+        """
         if request.method == 'POST':
             user_item = get_object_or_404(User, id=user_id)
 
@@ -1188,6 +1380,9 @@ class FriendsViews:
 class Files:
     @staticmethod
     def all_files(request, user_id):
+        """
+        My files view
+        """
         context = get_menu_context('files', 'Мои файлы')
         all_images_from_posts = PostImages.objects.filter(from_user_id=user_id)
         context['images'] = all_images_from_posts
