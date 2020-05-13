@@ -87,6 +87,7 @@
         <p class="text-center">Ничего не найдено.</p>
     {% endif %}
 {% else %}
+{% if user == c_user %}
     {% if friendlist %}
 	<div class="infinite-container">
             {% for friend in friendlist %}
@@ -121,12 +122,35 @@
 			</div>
 		    </li>
 		</div>
+
             {% endfor %}
 	</div>
 	{% if friendlist.has_next %}
 	    <a class="infinite-more-link" href="?page={{ friendlist.next_page_number }}">More</a>
 	{% endif %}
+
     {% else %}
         <p class="mb-0 text-center">Список друзей пуст.</p>
     {% endif %}
+{% else %}
+    {% if friendlist %}
+	<div class="infinite-container">
+            {% for friend in friendlist %}
+
+		        <div class="infinite-container">
+		        <li class="list-group-item">
+			    <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+			    <a href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
+                {% if friend.id == user.id %}
+                    <p class="float-right mr-2" >Это Вы</p>
+                {% endif %}
+                {% if friend in user.profile.friends  %}
+                    <p>LOX</p>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
 {% endif %}
+{% endif %}
+
+
+
