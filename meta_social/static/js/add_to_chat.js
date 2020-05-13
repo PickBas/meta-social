@@ -1,4 +1,4 @@
-function addToChat(e, link) {
+function addToChat(e, link, newUserName, editorId) {
     $.ajax({
         type: "POST",
         url: link,
@@ -6,6 +6,11 @@ function addToChat(e, link) {
             csrfmiddlewaretoken: csr_token,
         },
         success: function () {
+            chatSocket.send(JSON.stringify({
+                'message': 'Был добавлен ' + newUserName + '!',
+                'author': editorId,
+                'chat_id': roomName,
+            }));
             let to_add = e.target.parentNode.parentNode.parentNode;
             if (to_add.tagName === 'DIV') {
                 to_add.remove();
