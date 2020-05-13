@@ -20,6 +20,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys, humanize
 
 
+
 class Community(models.Model):
     """
     Community class
@@ -104,10 +105,32 @@ class Post(models.Model):
         return editors
 
 
+class MessageImages(models.Model):
+    image = models.ImageField(upload_to='messages/images')
+
+    def save(self, *args, **kwargs):
+        pil_image = Image.open(self.image)
+        output = BytesIO()
+
+        new_size = new_size = (720, (pil_image.size[1] * 720) // pil_image.size[0])
+        pil_image = pil_image.resize(new_size, Image.ANTIALIAS)
+
+        try:
+            pil_image.save(output, 'JPEG', quality=60)
+        except OSError:
+            pil_image.save(output, 'PNG', quality=60)
+
+        self.image = File(output, name=self.image.name)
+
+        super().save(*args, **kwargs)
+
+
 class Message(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
     message = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)
+
+    images = models.ManyToManyField(MessageImages)
 
     def __str__(self):
         return self.author.username
@@ -308,16 +331,16 @@ class PostImages(models.Model):
         img = Image.open(self.image)
         output = BytesIO()
 
-        new_size = (1280, (img.size[1] * 1280) // img.size[0])
+        new_size = (720, (img.size[1] * 720) // img.size[0])
 
         img = img.resize(new_size, Image.ANTIALIAS)
 
         try:
-            img.save(output, format='JPEG', quality=100)
+            img.save(output, format='JPEG', quality=60)
             output.seek(0)
             self.image = InMemoryUploadedFile(output, 'ImageField', "{}.jpg".format(self.image.name.split('.')[0]), 'image/jpeg', sys.getsizeof(output), None)
         except OSError:
-            img.save(output, format='PNG', quality=100)
+            img.save(output, format='PNG', quality=60)
             output.seek(0)
             self.image = InMemoryUploadedFile(output, 'ImageField', "{}.png".format(self.image.name.split('.')[0]), 'image/png', sys.getsizeof(output), None)
 

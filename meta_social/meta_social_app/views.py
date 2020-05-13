@@ -16,7 +16,7 @@ from .models import Profile, Comment, Message, Community, Like, Chat
 from PIL import Image
 from django.forms import modelformset_factory
 
-from .models import Post, FriendshipRequest, PostImages, Music
+from .models import Post, FriendshipRequest, PostImages, Music, MessageImages
 from .forms import ProfileUpdateForm, UserUpdateForm, PostForm, PostImageForm, UploadMusicForm, CropAvatarForm, \
     UpdateAvatarForm, CommunityCreateForm, UpdateCommunityAvatarForm, EditCommunityForm, EditPostImageForm
 from io import BytesIO
@@ -724,6 +724,26 @@ class Conversations:
             context = {'avatar_form': avatar_form, 'crop_form': crop_form}
 
             return render(request, self.template_name, context)
+    
+    @staticmethod
+    def send_files(request, room_id):
+        chat_item = get_object_or_404(Chat, id=room_id)
+
+        if request.method == 'POST':
+            message_item = chat_item.messages.create(
+                author=request.user,
+                message=''
+            )
+
+            for image in request.FILES.getlist('images'):
+                img_item = MessageImages(image=image)
+                img_item.save()
+
+                message_item.images.add(img_item)
+            
+            return HttpResponse(message_item.id)
+
+        raise Http404()
 
 
 class Communities:
