@@ -2,7 +2,9 @@
 
 cd meta_social || exit
 echo "======Собираем статику======"
+echo "Загрузка в s3 облако, это займет много времени"
 python manage.py collectstatic --noinput
+
 
 echo "======Таки ждем, пока постгра поднимется======"
 while ! curl http://db:5432/ 2>&1 | grep '52'
