@@ -1,3 +1,8 @@
+"""
+Meta social most used forms
+"""
+
+from django import forms
 
 
 class CropAvatarForm(forms.Form):

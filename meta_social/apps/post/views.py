@@ -1,4 +1,17 @@
-from django.shortcuts import render
+"""
+Meta social post views
+"""
+
+import json
+
+from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.http import Http404, HttpResponseRedirect
+from django.forms import modelformset_factory
+
+from core.views import MetaSocialView
+
+from .models import Post, PostImages, Comment
+from .forms import EditPostImageForm, PostImageForm, PostForm
 
 
 class PostViews:
@@ -6,11 +19,10 @@ class PostViews:
     PostViews
     """
 
-    class PostView(View):
+    class PostView(MetaSocialView):
         """
         PostView
         """
-
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'post/full_post.html'
@@ -19,16 +31,19 @@ class PostViews:
             """
             Processing get request
             """
-            context = get_menu_context('post', 'Пост')
+            context = self.get_menu_context('post', 'Пост')
             context['post'] = Post.objects.get(id=kwargs['post_id'])
 
             return render(request, self.template_name, context)
 
-    class PostUrLikes(View):
+    class PostUrLikes(MetaSocialView):
+        """
+        User liked posts representation
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'profile/like_marks.html'
-            self.context = get_menu_context('like_marks', 'Закладки')
+            self.context = self.get_menu_context('like_marks', 'Закладки')
 
         def get(self, request) -> render:
             """
@@ -36,11 +51,14 @@ class PostViews:
             """
             return render(request, self.template_name, self.context)
 
-    class PostEdit(View):
+    class PostEdit(MetaSocialView):
+        """
+        Post editing representaion and functionality
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'post/post_edit.html'
-            self.context = get_menu_context('post', 'Редактирование поста')
+            self.context = self.get_menu_context('post', 'Редактирование поста')
 
         def post(self, request, **kwargs):
             """
@@ -99,7 +117,10 @@ class PostViews:
             
             return render(request, self.template_name, self.context)
 
-    class PostAjax(View):
+    class PostAjax(MetaSocialView):
+        """
+        Send comment class
+        """
         @staticmethod
         def post(request, **kwargs):
             """

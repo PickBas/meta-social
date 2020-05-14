@@ -1,6 +1,13 @@
-from django.urls import path
+"""
+Meta social profile urls
+"""
 
-from .views import *
+from django.urls import path
+from django.contrib.auth.decorators import login_required
+
+from post.views import PostViews
+from user_profile.views import Files
+from .views import ProfileViews
 
 
 urlpatterns = [

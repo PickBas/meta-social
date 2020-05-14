@@ -1,3 +1,11 @@
+"""
+Meta social post forms
+"""
+
+from django import forms
+
+from .models import Post, PostImages
+from .widgets import MyImageFieldWidget
 
 
 class PostForm(forms.ModelForm):
@@ -45,7 +53,7 @@ class EditPostImageForm(forms.ModelForm):
     class Meta:
         model = PostImages
         fields = ('image', )
-        
+
     def __init__(self, *args, **kwargs):
         super(EditPostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''

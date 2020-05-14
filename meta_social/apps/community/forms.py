@@ -1,3 +1,12 @@
+"""
+Meta social community forms
+"""
+
+from django import forms
+from django_countries.fields import CountryField
+
+from .models import Community
+
 
 class EditCommunityForm(forms.ModelForm):
     """
@@ -32,5 +41,8 @@ class UpdateCommunityAvatarForm(forms.ModelForm):
     base_image = forms.ImageField(required=True)
 
     class Meta:
+        """
+        Class for representation in admin interface
+        """
         model = Community
         fields = ('base_image', )

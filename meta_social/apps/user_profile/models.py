@@ -1,4 +1,26 @@
+"""
+Meta social user profile model
+"""
+
+from urllib.request import urlopen
+from tempfile import NamedTemporaryFile
+import humanize
+
+from django.utils import timezone
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.files import File
+from django.dispatch import receiver
+
+from django_countries.fields import CountryField
+from allauth.account.signals import user_signed_up
+from allauth.socialaccount.models import SocialAccount
+
+from community.models import Community
+from post.models import Post
+from chat.models import Chat
+from friends.models import FriendshipRequest
+from music.models import Music
 
 
 class Profile(models.Model):

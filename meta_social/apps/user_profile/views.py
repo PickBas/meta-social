@@ -1,4 +1,24 @@
-from django.shortcuts import render
+"""
+Meta social user profile views
+"""
+
+from io import BytesIO
+from PIL import Image
+
+from django.core.files.base import ContentFile
+from django.shortcuts import render, HttpResponse, redirect
+from django.http import Http404
+from django.contrib.auth.models import User
+from django.forms import modelformset_factory
+from django.utils import timezone
+
+from core.views import MetaSocialView
+from core.forms import CropAvatarForm
+from post.models import PostImages
+from post.forms import PostImageForm, PostForm
+
+from .models import Profile
+from .forms import UserUpdateForm, ProfileUpdateForm, UpdateAvatarForm
 
 
 class ProfileViews:
@@ -6,7 +26,10 @@ class ProfileViews:
     ProfileViews
     """
 
-    class ProfilePage(View):
+    class ProfilePage(MetaSocialView):
+        """
+        Profile page view
+        """
         def __init__(self, **kwargs):
             self.template_name = 'profile/profile_page.html'
             super().__init__(**kwargs)
@@ -21,13 +44,14 @@ class ProfileViews:
             if not User.objects.filter(id=kwargs['user_id']).exists():
                 raise Http404()
 
-            context = get_menu_context('profile', 'Профиль')
+            context = self.get_menu_context('profile', 'Профиль')
             context['profile'] = Profile.objects.get(user=kwargs['user_id'])
             user_item = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = user_item
 
             PostImageFormSet = modelformset_factory(
-                PostImages, form=PostImageForm, extra=10, max_num=10)
+                PostImages, form=PostImageForm, extra=10, max_num=10
+            )
 
             pass_add_to_friends = False
 
@@ -48,14 +72,18 @@ class ProfileViews:
             context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
 
             if not is_in_blacklist:
-                pagination_elemetns(request, list(user_item.profile.posts()),
-                                    context, 'c_user_posts')
+                self.pagination_elemetns(
+                    request,
+                    list(user_item.profile.posts()),
+                    context,
+                    'c_user_posts'
+                )
 
             context['action_type'] = '/post/create/'
 
             return render(request, self.template_name, context)
 
-    class EditProfile(View):
+    class EditProfile(MetaSocialView):
         """
         EditProfile class
         """
@@ -103,7 +131,7 @@ class ProfileViews:
             :param kwargs: attrs
             :return: render
             """
-            context = get_menu_context('profile', 'Редактирование профиля')
+            context = self.get_menu_context('profile', 'Редактирование профиля')
             context['profile'] = Profile.objects.get(user=kwargs['user_id'])
             context['uedit'] = User.objects.get(id=kwargs['user_id'])
             context['user_form'] = UserUpdateForm(
@@ -116,9 +144,12 @@ class ProfileViews:
 
             return render(request, self.template_name, context)
 
-    class AvatarManaging(View):
+    class AvatarManaging(MetaSocialView):
+        """
+        Profile avatar manage view
+        """
         def __init__(self, **kwargs):
-            self.context = get_menu_context('profile', 'Смена аватарки')
+            self.context = self.get_menu_context('profile', 'Смена аватарки')
             self.template_name = 'profile/change_avatar.html'
             super().__init__(**kwargs)
 
@@ -150,7 +181,7 @@ class ProfileViews:
                     request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
                                                     save=False)
                     request.user.profile.save()
-                except:
+                except OSError:
                     resized_image.save(io, 'PNG', quality=100)
                     request.user.profile.image.save('image_{}.png'.format(request.user.id), ContentFile(io.getvalue()),
                                                     save=False)
@@ -184,12 +215,15 @@ class ProfileViews:
 
 
 class Files:
+    """
+    Representation of all uploaded files
+    """
     @staticmethod
     def all_files(request, user_id):
         """
         My files view
         """
-        context = get_menu_context('files', 'Мои файлы')
+        context = MetaSocialView.get_menu_context('files', 'Мои файлы')
         all_images_from_posts = PostImages.objects.filter(from_user_id=user_id)
         context['images'] = all_images_from_posts
         return render(request, 'files/files.html', context)

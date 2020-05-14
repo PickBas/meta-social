@@ -40,19 +40,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'meta_social_app',
+
     'apps.chat',
+    'apps.community',
+    'apps.core',
+    'apps.friends',
+    'apps.music',
+    'apps.post',
+    'apps.user_profile',
+
     'crispy_forms',
     'django_countries',
-    # 'django_s3_storage',
     'channels',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
-    # 'allauth.socialaccount.providers.twitter',
-    # 'allauth.socialaccount.providers.instagram',
 ]
 
 MIDDLEWARE = [

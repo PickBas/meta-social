@@ -1,7 +1,22 @@
-from django.shortcuts import render
+"""
+Meta social friends views
+"""
+
+from simple_search import search_filter
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.models import User
+from django.http import Http404
+
+from core.views import MetaSocialView
+
+from .models import FriendshipRequest
 
 
 class FriendsViews:
+    """
+    Class containing friends functionality and representation
+    """
     @staticmethod
     def get_render(request, context):
         """
@@ -19,13 +34,13 @@ class FriendsViews:
 
         return render(request, 'friends/list.html', context)
 
-    class FriendsList(View):
+    class FriendsList(MetaSocialView):
         """
         Friends list view
         """
         def __init__(self, **kwargs):
             self.template_name = 'friends/friends_list.html'
-            self.context = get_menu_context('friends', 'Список друзей')
+            self.context = self.get_menu_context('friends', 'Список друзей')
             super().__init__(**kwargs)
 
         def get(self, request, **kwargs):
@@ -33,15 +48,13 @@ class FriendsViews:
             Processing get request
             """
             c_user = User.objects.get(id=kwargs['user_id'])
-            self.context['c_user'] = c_user
-            page = request.GET.get('page', 1)
-            paginator = Paginator(c_user.profile.friends.all(), PAGE_SIZE)
-            try:
-                self.context['friendlist'] = paginator.page(page)
-            except PageNotAnInteger:
-                self.context['friendlist'] = paginator.page(1)
-            except EmptyPage:
-                self.context['friendlist'] = []
+
+            self.pagination_elemetns(
+                request,
+                c_user.profile.friends.all(),
+                self.context,
+                'friendlist'
+            )
 
             return render(request, self.template_name, self.context)
 
@@ -52,7 +65,7 @@ class FriendsViews:
             self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
             return FriendsViews.get_render(request, self.context)
 
-    class FriendsRequests(View):
+    class FriendsRequests(MetaSocialView):
         """
         Requests view
         """
@@ -64,7 +77,7 @@ class FriendsViews:
             """
             Processing get request
             """
-            context = get_menu_context('friends', 'Заявки в друзья')
+            context = self.get_menu_context('friends', 'Заявки в друзья')
 
             context['c_user'] = request.user
             context['friendship'] = {
@@ -74,7 +87,7 @@ class FriendsViews:
 
             return render(request, self.template_name, context)
 
-    class FriendsBlacklist(View):
+    class FriendsBlacklist(MetaSocialView):
         """
         Blacklist view
         """
@@ -89,14 +102,14 @@ class FriendsViews:
             :param request: request
             :return: render
             """
-            context = get_menu_context('friends', 'Черный список')
+            context = self.get_menu_context('friends', 'Черный список')
 
             c_user = get_object_or_404(User, id=kwargs['user_id'])
             context['c_user'] = c_user
 
             return render(request, self.template_name, context)
 
-    class SendFriendshipRequest(View):
+    class SendFriendshipRequest(MetaSocialView):
         """
         Class for sending friendship request
         """
@@ -131,7 +144,7 @@ class FriendsViews:
             """
             raise Http404()
 
-    class AcceptRequest(View):
+    class AcceptRequest(MetaSocialView):
         """
         Class for accepting friendship request
         """

@@ -1,6 +1,11 @@
-from django.urls import path
+"""
+Meta social music urls
+"""
 
-from .views import *
+from django.urls import path
+from django.contrib.auth.decorators import login_required
+
+from .views import MusicViews
 
 
 urlpatterns = [

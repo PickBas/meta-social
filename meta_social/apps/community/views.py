@@ -1,11 +1,30 @@
-from django.shortcuts import render
+"""
+Meta social community views
+"""
+
+from io import BytesIO
+from PIL import Image
+from simple_search import search_filter
+
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponseRedirect
+from django.forms import modelformset_factory
+from django.core.files.base import ContentFile
+from django.contrib.auth.models import User
+
+from core.views import MetaSocialView
+from core.forms import CropAvatarForm
+from post.forms import PostImageForm, PostForm
+from post.models import PostImages
+
+from .models import Community
+from .forms import EditCommunityForm, CommunityCreateForm, UpdateCommunityAvatarForm
 
 
 class Communities:
     """
     Communities class
     """
-    class CommunityView(View):
+    class CommunityView(MetaSocialView):
         """
         Community view
         """
@@ -17,7 +36,7 @@ class Communities:
             """
             Processing get request
             """
-            context = get_menu_context('community', 'Сообщество')
+            context = self.get_menu_context('community', 'Сообщество')
 
             context['community'] = get_object_or_404(Community, id=community_id)
 
@@ -30,11 +49,14 @@ class Communities:
 
             return render(request, self.template_name, context)
 
-    class EditCommunity(View):
+    class EditCommunity(MetaSocialView):
+        """
+        Edit community information view
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/edit_community.html'
-            self.context = get_menu_context('community', 'Редактирование сообщества')
+            self.context = self.get_menu_context('community', 'Редактирование сообщества')
 
         def post(self, request, **kwargs):
             """
@@ -56,10 +78,11 @@ class Communities:
 
             return render(request, self.template_name, self.context)
 
-    class CommunityCreate(View):
+    class CommunityCreate(MetaSocialView):
         """
         Community create view
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/community_create.html'
@@ -86,16 +109,16 @@ class Communities:
             """
             Processing get request
             """
-            context = get_menu_context('community', 'Создание сообщества')
+            context = self.get_menu_context('community', 'Создание сообщества')
             context['form'] = CommunityCreateForm()
             return render(request, self.template_name, context)
 
-    class AvatarManaging(View):
+    class AvatarManaging(MetaSocialView):
         """
         Managing avatar of community view
         """
         def __init__(self, **kwargs):
-            self.context = get_menu_context('community', 'Смена аватарки сообщества')
+            self.context = self.get_menu_context('community', 'Смена аватарки сообщества')
             self.template_name = 'community/change_avatar.html'
             super().__init__(**kwargs)
 
@@ -153,7 +176,7 @@ class Communities:
 
         })
 
-    class CommunityList(View):
+    class CommunityList(MetaSocialView):
         """
         Community list view
         """
@@ -167,13 +190,17 @@ class Communities:
             """
             Processing get request
             """
-            self.context = get_menu_context('community', 'Список сообществ')
+            self.context = self.get_menu_context('community', 'Список сообществ')
 
             c_user = get_object_or_404(User, id=kwargs['user_id'])
             self.context['c_user'] = c_user
-            pagination_elemetns(request,
-                                list(c_user.profile.communities.all()),
-                                self.context, 'c_user_communities')
+
+            self.pagination_elemetns(
+                request,
+                list(c_user.profile.communities.all()),
+                self.context,
+                'c_user_communities'
+            )
 
             return render(request, 'community/community_list.html', self.context)
 

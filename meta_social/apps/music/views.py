@@ -1,11 +1,23 @@
+"""
+Meta social music views
+"""
+
 from django.shortcuts import render
+from django.contrib.auth.models import User
+
+from core.views import MetaSocialView
+
+from .forms import UploadMusicForm
 
 
 class MusicViews:
     """
-    Music views
+    Class containing music functionality and representation
     """
-    class MusicList(View):
+    class MusicList(MetaSocialView):
+        """
+        Music list representaion
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'music/music_list.html'
@@ -14,19 +26,21 @@ class MusicViews:
             """
             Processing get request
             """
-            context = get_menu_context('music', 'Музыка')
+            context = self.get_menu_context('music', 'Музыка')
 
             context['c_user'] = User.objects.get(id=kwargs['user_id'])
             context['music_list'] = User.objects.get(id=kwargs['user_id']).profile.get_music_list()
 
             return render(request, self.template_name, context)
 
-    class MusicUpload(View):
+    class MusicUpload(MetaSocialView):
+        """
+        Music upload and representation
+        """
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'music/music_upload.html'
 
-        @login_required
         def post(self, request):
             """
             Processing post request. Save uploaded music
@@ -41,7 +55,7 @@ class MusicViews:
             """
             Processing get request
             """
-            context = get_menu_context('music', 'Загрузка музыки')
+            context = self.get_menu_context('music', 'Загрузка музыки')
 
             context['form'] = UploadMusicForm()
 

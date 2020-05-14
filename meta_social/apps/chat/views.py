@@ -5,69 +5,31 @@ Chat views module
 import json
 
 from django.shortcuts import render, redirect, HttpResponseRedirect, HttpResponse, get_object_or_404
-from django.views import View
 from django.http import Http404
 from django.utils.safestring import mark_safe
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 
-from .models import User, Chat, Message, MessageImages, Image, BytesIO
+from core.forms import CropAvatarForm
+from core.views import MetaSocialView
 
-
-PAGE_SIZE = 10
-
-def pagination_elemetns(request, elements, context, context_key: str, page_size=PAGE_SIZE):
-    """
-    elements - query elem for paginate: list
-    request
-    page => context[context_key]
-    """
-    page = request.GET.get('page', 1)
-    paginator = Paginator(elements, page_size)
-    try:
-        context[context_key] = paginator.page(page)
-    except PageNotAnInteger:
-        context[context_key] = paginator.page(1)
-    except EmptyPage:
-        context[context_key] = []
-
-
-def get_menu_context(page: str, pagename: str) -> dict:
-    """
-    Getting context
-    :param page: str
-    :param pagename: str
-    :return: context
-    """
-    available_pages = [
-        'profile',
-        'newsfeed',
-        'friends',
-        'community',
-        'music',
-        'messages',
-        'post',
-        'like_marks',
-        'files',
-    ]
-
-    if page not in available_pages:
-        raise KeyError
-
-    context = {
-        'page': page,
-        'pagename': pagename,
-    }
-
-    return context
+from .forms import UpdateChatAvatarForm
+from .models import User, Chat, MessageImages, Image, BytesIO
 
 
 class Conversations:
-    class ChatList(View):
+    """
+    Class containing chat functionality
+    """
+
+    class ChatList(MetaSocialView):
+        """
+        Chat list view
+        """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'chat/chat.html'
-            self.context = get_menu_context('messages', 'Чаты')
+            self.context = self.get_menu_context('messages', 'Чаты')
 
         def get(self, request, **kwargs):
             """
@@ -231,7 +193,7 @@ class Conversations:
         else:
             raise Http404()
 
-    class Room(View):
+    class Room(MetaSocialView):
         """
         Chat view class
         """
@@ -254,8 +216,14 @@ class Conversations:
                 if participant != request.user:
                     context['first_user'] = participant
 
-            pagination_elemetns(request, c_room.messages.all(),
-                                context, 'messages_list', 20)
+            self.pagination_elemetns(
+                request,
+                c_room.messages.all(),
+                context,
+                'messages_list',
+                20
+            )
+
             context['c_room'] = c_room
             other_chats = list(dict.fromkeys(request.user.profile.chats.all().order_by('-messages__date')))
             other_chats.remove(c_room)
@@ -284,7 +252,7 @@ class Conversations:
             return render(request, 'chat/messages_list.html', {'messages_list': messages})
         raise Http404()
 
-    class AvatarManaging(View):
+    class AvatarManaging(MetaSocialView):
         """
         Managing avatar of chat view
         """
@@ -297,7 +265,7 @@ class Conversations:
             Crop and save avatar of chat
             """
             c_room = Chat.objects.get(id=kwargs['room_id'])
-            avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=c_room)
+            avatar_form = UpdateChatAvatarForm(request.POST, request.FILES, instance=c_room)
             crop_form = CropAvatarForm(request.POST)
             if crop_form.is_valid() and avatar_form.is_valid():
                 avatar_form.save()
@@ -324,11 +292,11 @@ class Conversations:
 
                 return redirect('/chat/go_to_chat/' + str(c_room.id))
 
-        def get(self, request, **kwargs):
+        def get(self, request):
             """
             Processing get request
             """
-            avatar_form = UpdateAvatarForm()
+            avatar_form = UpdateChatAvatarForm()
             crop_form = CropAvatarForm()
             context = {'avatar_form': avatar_form, 'crop_form': crop_form}
 
