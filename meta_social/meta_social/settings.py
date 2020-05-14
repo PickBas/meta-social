@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'meta_social_app',
+    'apps.chat',
     'crispy_forms',
     'django_countries',
     # 'django_s3_storage',
