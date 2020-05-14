@@ -217,5 +217,6 @@ if START_WITH_DOCKER:
     STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
 
 FIXTURE_DIRS = [
-    'meta_social_app/fixtures',
+    'core/fixtures',
+    'user_profile/fixtures',
 ]
