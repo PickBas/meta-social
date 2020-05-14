@@ -48,6 +48,7 @@ class FriendsViews:
             Processing get request
             """
             c_user = User.objects.get(id=kwargs['user_id'])
+            self.context['c_user'] = c_user
 
             self.pagination_elemetns(
                 request,

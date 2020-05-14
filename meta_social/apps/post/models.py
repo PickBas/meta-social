@@ -10,8 +10,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from community.models import Community
-
 
 class Like(models.Model):
     """
@@ -26,7 +24,7 @@ class Post(models.Model):
     Post model
     """
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
-    community = models.ForeignKey(to=Community, on_delete=models.CASCADE, null=True)
+    community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True)
     text = models.TextField()
     date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
 

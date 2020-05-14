@@ -23,7 +23,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('meta_social_app.urls')),
+    path('', include('chat.urls')),
+    path('', include('core.urls')),
+    path('', include('community.urls')),
+    path('', include('friends.urls')),
+    path('', include('music.urls')),
+    path('', include('post.urls')),
+    path('', include('user_profile.urls')),
     path('accounts/', include('allauth.urls')),
 ]
 
