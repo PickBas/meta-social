@@ -33,10 +33,11 @@
 
     <div class="card mt-3">
         <div id="simpleList" class="card-body text-left">
-            {% for music in music_list %}
+            {% for pos in music_list %}
 		<div>
-                    <button class="btn btn-outline-success" onclick="setMusic('{{ music.audio_file.url }}')">&#9658;</button>
-                    <span>{{ music.artist }} - {{ music.title }}</span>
+                    <button class="btn btn-outline-success" onclick="setMusic('{{ pos.position.audio_file.url }}')">&#9658;</button>
+                    <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
+		    <input type="hidden" name="music_{{ pos.position.id }}" value="{{ pos.order }} ">
                     <br class="mb-3">
 		</div>
             {% endfor %}

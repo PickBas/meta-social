@@ -188,7 +188,8 @@ class Profile(models.Model):
         """
         Returns all music in user playlist
         """
-        return self.playlist.all()
+        res = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        return res
     
     def add_music(self, music):
         self.playlist.add(music)
