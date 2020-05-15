@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Simple changing DB and redis
 
@@ -18,6 +18,9 @@ START_WITH_DOCKER = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+APPS_DIR = os.path.join(BASE_DIR, 'apps/')
+sys.path.insert(0, APPS_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -40,18 +43,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'meta_social_app',
+
+    'chat.apps.ChatConfig',
+    'community.apps.CommunityConfig',
+    'core.apps.CoreConfig',
+    'friends.apps.FriendsConfig',
+    'music.apps.MusicConfig',
+    'post.apps.PostConfig',
+    'user_profile.apps.UserProfileConfig',
+
     'crispy_forms',
     'django_countries',
-    # 'django_s3_storage',
     'channels',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
-    # 'allauth.socialaccount.providers.twitter',
-    # 'allauth.socialaccount.providers.instagram',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +79,13 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'meta_social_app/templates',
+            os.path.join(APPS_DIR, 'chat/templates'),
+            os.path.join(APPS_DIR, 'community/templates'),
+            os.path.join(APPS_DIR, 'core/templates'),
+            os.path.join(APPS_DIR, 'friends/templates'),
+            os.path.join(APPS_DIR, 'music/templates'),
+            os.path.join(APPS_DIR, 'post/templates'),
+            os.path.join(APPS_DIR, 'user_profile/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -202,5 +217,6 @@ if START_WITH_DOCKER:
     STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
 
 FIXTURE_DIRS = [
-    'meta_social_app/fixtures',
+    'core/fixtures',
+    'user_profile/fixtures',
 ]
