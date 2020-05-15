@@ -1,124 +1,22 @@
-{% extends "account/base.html" %}
+{% extends "account/landing.html" %}
 {% load crispy_forms_tags %}
 {% load i18n %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 {% block PageName %}Регистрация{% endblock %}
 
-{% block content %}
-    <style>
-        html,
-        body,
-        header,
-        .view {
-            height: 100%;
-        }
-
-        @media (max-width: 740px) {
-            html,
-            body,
-            header,
-            .view {
-                height: 1000px;
-            }
-        }
-
-        @media (min-width: 800px) and (max-width: 850px) {
-            html,
-            body,
-            header,
-            .view {
-                height: 650px;
-            }
-        }
-
-        @media (min-width: 800px) and (max-width: 850px) {
-            .navbar:not(.top-nav-collapse) {
-                background: #1C2331!important;
-            }
-        }
-
-        .mt-min {
-            margin-top: -5%;
-        }
-
-        .separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-        }
-
-        .separator::before, .separator::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #6C757D;
-        }
-
-        .separator::before {
-            margin-right: .25em;
-        }
-
-        .separator::after {
-            margin-left: .25em;
-        }
-    </style>
-    <div class="view full-page-intro" style="background-image: url('https://www.adictiz.com/hs-fs/hubfs/header_site.png?width=4096&name=header_site.png'); background-repeat: no-repeat; background-size: cover;">
-        <div class="mask d-flex justify-content-center align-items-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-3">
-                        <div>
-                            <h1 class="text-white">Добро пожаловать в крупнейшую социальную сеть в мире</h1>
-                            <p class="text-white">
-                                Мы лучшая и самая большая социальная сеть с 5 миллиардами активных пользователей по всему миру. 
-                                Делитесь мыслями, пишите в блоге, показывайте свою любимую музыку и многое другое!
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-min">
-                        <div class="card">
-                            <div class="card-body">
-                                <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-                                    {% csrf_token %}
-                                    <h4>Регистрация в Meta Social</h4>
-                                    <hr>
-                                    {{ form | crispy }}
-                                    {% if redirect_field_value %}
-                                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-primary btn-block mb-2">Зарегистрироваться</button>
-                                    <small class="text-muted">
-                                        Уже есть аккаунт? <a href="{{ login_url }}">Войдите!</a>
-                                    </small>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock content %}
-
-{% block othet %}
-<div class="container">
-    <div class="card mt-3">
-        <div class="card-body">
-            <h1>{% trans "Sign Up" %}</h1>
-            <hr style="border: 1px solid grey;">
-
-            <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign
-                    in</a>.{% endblocktrans %}</p>
-
-            <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-                {% csrf_token %}
-                {{ form | crispy }}
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                {% endif %}
-                <button type="submit">{% trans "Sign Up" %} &raquo;</button>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% block landing %}
+    <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+        <h4>Регистрация в Meta Social</h4>
+        <hr>
+        {{ form | crispy }}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-block mb-2">Зарегистрироваться</button>
+        <small class="text-muted">
+            Уже есть аккаунт? <a href="{{ login_url }}">Войдите!</a>
+        </small>
+    </form>
+{% endblock landing %}

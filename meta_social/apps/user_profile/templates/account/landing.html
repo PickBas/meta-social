@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block main %}
+    {% block content %}
+        <style>
+            html,
+            body,
+            header,
+            .view {
+                height: 100%;
+            }
+
+            @media (max-width: 740px) {
+                html,
+                body,
+                header,
+                .view {
+                    height: 1000px;
+                }
+            }
+
+            @media (min-width: 800px) and (max-width: 850px) {
+                html,
+                body,
+                header,
+                .view {
+                    height: 650px;
+                }
+            }
+
+            .mt-min {
+                margin-top: -5%;
+            }
+
+            .separator {
+                display: flex;
+                align-items: center;
+                text-align: center;
+            }
+
+            .separator::before, .separator::after {
+                content: '';
+                flex: 1;
+                border-bottom: 1px solid #6C757D;
+            }
+
+            .separator::before {
+                margin-right: .25em;
+            }
+
+            .separator::after {
+                margin-left: .25em;
+            }
+        </style>
+        <div class="view full-page-intro" style="background-image: url('https://www.adictiz.com/hs-fs/hubfs/header_site.png?width=4096&name=header_site.png'); background-repeat: no-repeat; background-size: cover;">
+            <div class="mask d-flex justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-3">
+                            <div>
+                                <h1 class="text-white">Добро пожаловать в крупнейшую социальную сеть в мире</h1>
+                                <p class="text-white">
+                                    Мы лучшая и самая большая социальная сеть с 5 миллиардами активных пользователей по всему миру. 
+                                    Делитесь мыслями, пишите в блоге, показывайте свою любимую музыку и многое другое!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-min">
+                            <div class="card">
+                                <div class="card-body">
+                                    {% block landing %}
+                                    {% endblock landing %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}

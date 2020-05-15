@@ -1,20 +1,15 @@
-{% extends "account/base.html" %}
+{% extends "account/landing.html" %}
 
 {% load i18n %}
 
 {% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
 
-{% block content %}
-<div class="container">
-<div class="card mt-3">
-  <div class="card-body">
-
+{% block landing %}
     <h1>{% trans "Verify Your E-mail Address" %}</h1>
-<hr style="border: 1px solid grey;">
+    <hr>
+    <p>
+        Мы отправили вам письмо с подтверждением.
+        Перейдите по ссылке в письме чтобы завершить регистрирацию.
+    </p>
+{% endblock landing %}
 
-    <p>{% blocktrans %}We have sent an e-mail to you for verification. Follow the link provided to finalize the signup process. Please contact us if you do not receive it within a few minutes.{% endblocktrans %}</p>
-
-  </div>
-</div>
-</div>
-{% endblock %}

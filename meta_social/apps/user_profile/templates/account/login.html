@@ -1,4 +1,4 @@
-{% extends "account/base.html" %}
+{% extends "account/landing.html" %}
 {% load crispy_forms_tags %}
 
 {% load i18n %}
@@ -6,111 +6,35 @@
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 {% block PageName %}Login{% endblock %}
-{% block content %}
-    <style>
-        html,
-        body,
-        header,
-        .view {
-            height: 100%;
-        }
 
-        @media (max-width: 740px) {
-            html,
-            body,
-            header,
-            .view {
-                height: 1000px;
-            }
-        }
+{% block landing %}
+    <form class="login" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        <h4>Войдите в ваш аккаунт</h4>
+        <hr>
+        {{ form | crispy }}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-block">
+            Войти
+        </button>
+        <a class="button secondaryAction" href="{% url 'account_reset_password' %}" style="position: absolute; top: 44.5%; right: 25px;">
+            {% trans "Forgot Password?" %}
+        </a>
 
-        @media (min-width: 800px) and (max-width: 850px) {
-            html,
-            body,
-            header,
-            .view {
-                height: 650px;
-            }
-        }
+        <div class="separator mt-3 text-muted mb-3">Или</div>
 
-        @media (min-width: 800px) and (max-width: 850px) {
-            .navbar:not(.top-nav-collapse) {
-                background: #1C2331!important;
-            }
-        }
+        <a class="btn btn-block text-white" style="background-color: #4C75A3;" href="{% provider_login_url "vk" %}">
+            <i class="fab fa-vk pr-1"></i> ВКонтакте
+        </a>
+        <a class="btn btn-block text-white mt-2 mb-2" style="background-color: #3B5998;" href="{% provider_login_url "facebook" %}">
+            <i class="fab fa-facebook-f pr-1"></i> Facebook
+        </a>
 
-        .mt-min {
-            margin-top: -5%;
-        }
-
-        .separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-        }
-
-        .separator::before, .separator::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #6C757D;
-        }
-
-        .separator::before {
-            margin-right: .25em;
-        }
-
-        .separator::after {
-            margin-left: .25em;
-        }
-    </style>
-    <div class="view full-page-intro" style="background-image: url('https://www.adictiz.com/hs-fs/hubfs/header_site.png?width=4096&name=header_site.png'); background-repeat: no-repeat; background-size: cover;">
-        <div class="mask d-flex justify-content-center align-items-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-3">
-                        <div>
-                            <h1 class="text-white">Добро пожаловать в крупнейшую социальную сеть в мире</h1>
-                            <p class="text-white">
-                                Мы лучшая и самая большая социальная сеть с 5 миллиардами активных пользователей по всему миру. 
-                                Делитесь мыслями, пишите в блоге, показывайте свою любимую музыку и многое другое!
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-min">
-                        <div class="card">
-                            <div class="card-body">
-                                <form class="login" method="POST" action="{% url 'account_login' %}">
-                                    {% csrf_token %}
-                                    <h4>Войдите в ваш аккаунт</h4>
-                                    <hr>
-                                    {{ form | crispy }}
-                                    {% if redirect_field_value %}
-                                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                                    {% endif %}
-                                    <a class="button secondaryAction" href="{% url 'account_reset_password' %}" style="position: absolute; right: 20px; bottom: 294px;">
-                                        {% trans "Forgot Password?" %}
-                                    </a>
-                                    <button type="submit" class="btn btn-primary btn-block">Войти</button>
-
-                                    <div class="separator mt-3 text-muted mb-3">Или</div>
-
-                                    <a class="btn btn-block text-white" style="background-color: #4C75A3;" href="{% provider_login_url "vk" %}">
-                                        <i class="fab fa-vk pr-1"></i> ВКонтакте
-                                    </a>
-                                    <a class="btn btn-block text-white mt-2 mb-2" style="background-color: #3B5998;" href="{% provider_login_url "facebook" %}">
-                                        <i class="fab fa-facebook-f pr-1"></i> Facebook
-                                    </a>
-
-                                    <small class="text-muted">
-                                        Нету аккаунта? <a href="{{ signup_url }}">Зарегистрируйтесь</a> 
-                                        это действительно просто, и вы можете начать пользоваться всеми преимуществами!
-                                    </small>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <small class="text-muted">
+            Нету аккаунта? <a href="{{ signup_url }}">Зарегистрируйтесь</a> 
+            это действительно просто, и вы можете начать пользоваться всеми преимуществами!
+        </small>
+    </form>
 {% endblock %}
