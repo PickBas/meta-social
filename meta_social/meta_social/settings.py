@@ -13,12 +13,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os, sys
 
 # Simple changing DB and redis
-
 START_WITH_DOCKER = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Setup apps folder
 APPS_DIR = os.path.join(BASE_DIR, 'apps/')
 sys.path.insert(0, APPS_DIR)
 
@@ -173,40 +173,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-
-LOGOUT_URL = '/accounts/logout/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'piryazev555@gmail.com'
-# EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-
-ACCOUNT_EMAIL_REQUIRED = True
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
-
-AWS_REGION = "nl-ams"
-AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
-AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
-AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
-AWS_S3_BUCKET_NAME = "social-bucket"
 
 if START_WITH_DOCKER:
     AWS_REGION_STATIC = "nl-ams"
@@ -216,7 +188,45 @@ if START_WITH_DOCKER:
     AWS_S3_BUCKET_NAME_STATIC = "social-static"
     STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Login/Logout urls
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+
+LOGOUT_URL = '/accounts/logout/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# S3 files storage
+AWS_REGION = "nl-ams"
+AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
+AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
+AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
+AWS_S3_BUCKET_NAME = "social-bucket"
+
+DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
+
+# Crispy forms settings
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Allauth settings
+ACCOUNT_EMAIL_REQUIRED = True
+
+# Fixtures
 FIXTURE_DIRS = [
     'core/fixtures',
     'user_profile/fixtures',
 ]
+
+# Email settings
+if START_WITH_DOCKER:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # EMAIL_HOST = 'smtp'
+    # EMAIL_PORT = '25'
+    # EMAIL_USE_TLS = True
+    # EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, 'config/ssl_keys/privkey.pem')
+    # EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, 'config/ssl_keys/fullchain.pem')
+    # DEFAULT_FROM_EMAIL = 'noreply@social.savink.in'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
