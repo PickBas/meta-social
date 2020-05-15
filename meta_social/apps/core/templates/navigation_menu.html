@@ -1,0 +1,64 @@
+<nav class="nav nav-pills flex-column text-left" style="font-size: 12pt;" id="left-nav">
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'profile' %}active{% endif %}" href="/accounts/profile/{{ user.id }}/">
+            Моя страница
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'newsfeed' %}active{% endif %}" href="/">
+            Новости
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="/chats/{{ user.id }}/" 
+            {% if user.profile.unread_chats_count %}
+                class="nav-link {% if page == 'messages' %}active{% endif %} float-left w-75"
+                style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;"
+            {% else %}
+                class="nav-link {% if page == 'messages' %}active{% endif %} float-left w-100"
+            {% endif %}>
+            Сообщения
+        </a>
+        {% if user.profile.unread_chats_count %}
+            <a href="/chats/{{ user.id }}/" class="btn btn-outline-primary float-right w-25 pl-2" style="border-top-left-radius: 0px; border-bottom-left-radius: 0px; height: 40px;">
+                {{ user.profile.unread_chats_count }}
+            </a>
+        {% endif %}
+    </li>
+    <li class="nav-item w-100" style="display: table">
+        <a href="/friends/{{ user.id }}/" 
+           {% if user.profile.friendship_requests_count %}
+            class="nav-link {% if page == 'friends' %}active{% endif %} float-left w-75"
+            style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;"
+           {% else %}
+            class="nav-link {% if page == 'friends' %}active{% endif %} float-left w-100"
+           {% endif %}>
+            Друзья
+        </a>
+        {% if user.profile.friendship_requests_count %}
+            <a href="/friends/requests/" class="btn btn-outline-primary float-right w-25 pl-2" style="border-top-left-radius: 0px; border-bottom-left-radius: 0px; height: 40px;">
+                {{ user.profile.friendship_requests_count }}
+            </a>
+        {% endif %}
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'community' %}active{% endif %}" href="/community/list/{{ user.id }}/">
+            Сообщества
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'music' %}active{% endif %}" href="/music/{{ user.id }}/">
+            Музыка
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'like_marks' %}active{% endif %}" href="/accounts/profile/like_marks/">
+            Закладки
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if page == 'files' %}active{% endif %}" href="/files/{{ user.id }}/">
+            Мои файлы
+        </a>
+    </li>
+</nav>

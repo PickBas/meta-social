@@ -1,0 +1,127 @@
+<div class="card mt-3 text-left post-item">
+    <div class="card-body">
+        <img src="{{ post.get_owner.image.url }}" class="rounded-circle border border-dark" width=35 height=35>
+        <a href="{{ post.get_link }}">{{ post.get_owner_name }}</a>
+        {% if user in post.get_editors %}
+            <button
+                style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"
+                data-toggle="modal" data-target="#removingPostModal" class="float-right">
+                <i class="fa fa-trash-o"aria-hidden="true"></i>
+            </button>
+            <button
+                style="background: white; box-shadow: 0px 0px 0px transparent; border: 0px solid transparent; text-shadow: 0px 0px 0px transparent;"
+                class="float-right">
+                <a href="/post/{{ post.id }}/edit/">
+                    <i class="far fa-edit"></i>
+                </a>
+            </button>
+        {% endif %}
+        <p class="card-text mt-2" style="white-space: pre-wrap" id="id-post-text">{{ post.text }}</p>
+        <div class="kollaz">
+            {% if post.get_images %}
+                {% for post_img in post.get_images %}
+                    {% if post.get_images.count > 1 %}
+                        <a data-fancybox="photo" href="{{ post_img.image.url }}" class="w-50">
+                            <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                        </a>
+                    {% else %}
+                        <a data-fancybox="photo" href="{{ post_img.image.url }}" class="w-100">
+                            <img src="{{ post_img.image.url }}" width="100%" class="mb-1">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <hr class="mt-1 mb-1">
+        {% if post in user.profile.liked_posts.all %}
+            <button class="btn btn-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">
+                {{ post.likes.count }} &#9829;
+            </button>
+        {% else %}
+            <button class="btn btn-outline-danger px-1 py-0" onclick="likePost(event, '{{ post.id }}')">
+                {{ post.likes.count }} &#9829;
+            </button>
+        {% endif %}
+        <a href="/post/{{ post.id }}" class="text-muted mb-0">
+            {{ post.amount_of_comments }}<i class="far fa-comment ml-1"></i>
+        </a>
+        {% if user in post.get_editors %}
+            <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editPostModalLabel">Редактировать пост</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <textarea class="form-control" style="min-width: 100%"
+                                id="updated-post-text">{{ post.text }}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"
+                                onclick="edit_post(event, '/post/{{ post.id }}/edit/')">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="removingPostModal" tabindex="-1" role="dialog"
+                aria-labelledby="removingPostModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="removingPostModalLabel">Удалить пост?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                            <button type="button" class="btn btn-primary"
+                                onclick="remove_post(event, '/post/{{ post.id }}/remove/')" data-dismiss="modal">Да</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <span class="text-muted mb-0 float-right">{{ post.date }}</span>
+        <hr class="mt-1 mb-1">
+
+        <form style="position: relative" onsubmit="return sendCommentInd(event)" method="POST" class="mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <div class="input-group-sm mt-2">
+                <input placeholder="Оставить комментарий..." 
+                    type="text" 
+                    class="form-control border-top-0 border-right-0 border-left-0 rounded-0 comment-input"
+                    name="text">
+            </div>
+            <i class="fa fa-paper-plane-o comment-send" style="position: absolute; right: 7px; top: 8px;" onclick="this.children[0].click()">
+                <input type="submit" style="display: none;">
+            </i>
+        </form>
+            
+        {% for comment in post.comments|slice:":1" %}
+            <div class="media">
+                <img src="{{ comment.user.profile.image.url }}" class="mr-2 mt-2 rounded-circle border border-dark" width=35 height=35>
+                <div class="media-body">
+                    <h6 class="mt-2 mb-0">
+                        <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.profile.get_name }}</a>
+                        <small>{{ comment.date }}</small>
+                    </h6>
+                    <p class="mb-0">
+                        {{ comment.text }}
+                    </p>
+                </div>
+            </div>
+            {% if not forloop.last %}
+                <hr class="mt-1 mb-0">
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+

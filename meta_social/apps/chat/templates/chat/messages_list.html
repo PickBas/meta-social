@@ -1,0 +1,24 @@
+{% if messages_list %}
+    {% for message in messages_list %}
+        <div class="row" 
+            style="{% if forloop.first %}margin-top: auto;{% endif %}
+            {% if not message.is_readed %}background-color: #F0F7FF;{% endif %}"
+        >
+            <div class="col-lg-1 col-sm-1">
+                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+            </div>
+            <div class="col-lg-11 col-sm-11 text-left">
+                <a href="/accounts/profile/{{ message.author.id }}/">{{ message.author.profile.get_name }}</a>
+                <small class="text-muted ml-1">{{ message.date }}</small>
+                <p>{{ message.message }}</p>
+                {% for image_item in message.images.all %}
+                <a data-fancybox="photo" href="{{ image_item.image.url }}" class="w-50">
+                            <img src="{{ image_item.image.url }}" class="mb-1 w-50">
+                        </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-center" style="margin-top: auto;">Список сообщений пуст</p>
+{% endif %}
