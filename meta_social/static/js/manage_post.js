@@ -115,3 +115,21 @@ function sendCommentInd(e) {
 
     return false
 }
+
+function showComments(e, post_id) {
+    let $post_item = $(findParentBySelector(e.target, '.post-item'))
+    let $comments = $post_item.children('.post-comments')
+
+    if ($comments.length == 1) {
+        $.ajax({
+            type: 'POST',
+            url: '/post/' + post_id + '/get_comments/1/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken')
+            },
+            success: function (result) {
+                $comments[0].innerHTML = result
+            }
+        })
+    }
+}

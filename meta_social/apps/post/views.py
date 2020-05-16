@@ -2,8 +2,6 @@
 Meta social post views
 """
 
-import json
-
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
@@ -33,6 +31,7 @@ class PostViews:
             """
             context = self.get_menu_context('post', 'Пост')
             context['post'] = Post.objects.get(id=kwargs['post_id'])
+            context['all'] = True
 
             return render(request, self.template_name, context)
 
@@ -197,5 +196,17 @@ class PostViews:
                 request.user.profile.liked_posts.add(post_item)
 
                 return HttpResponse('liked')
+
+        raise Http404()
+    
+    @staticmethod
+    def get_comments(request, post_id, all):
+        """
+        Returns rendered responce of post comments
+        """
+        if request.method == 'POST' and all in [0, 1]:
+            post_item = get_object_or_404(Post, id=post_id)
+
+            return render(request, 'post/comments.html', {'post': post_item, 'all': bool(all)})
 
         raise Http404()

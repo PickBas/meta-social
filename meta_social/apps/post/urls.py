@@ -19,4 +19,5 @@ urlpatterns = [
     path('post/<int:post_id>/edit/', login_required(PostViews.PostEdit.as_view())),
 
     path('like/<int:post_id>/', login_required(PostViews.like_post)),
+    path('post/<int:post_id>/get_comments/<int:all>/', login_required(PostViews.get_comments)),
 ]

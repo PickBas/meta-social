@@ -53,18 +53,21 @@
                         </div>
                     </div>
                 </div>
+            {% endif %}
 
-                <div class="post-edit float-right">
-                    <button class="btn btn-outline-primary btn-sm px-1 py-0 my-0 mr-0 rounded-pill" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                    </button>
+            <div class="post-edit float-right">
+                <button class="btn btn-outline-primary btn-sm px-1 py-0 my-0 mr-0 rounded-pill" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                </button>
 
-                    <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/post/{{ post.id }}/">Перейти к посту</a>
+                    {% if user in post.get_editors %}
                         <a class="dropdown-item" data-toggle="modal" data-target="#removingPostModal">Удалить</a>
                         <a class="dropdown-item" href="/post/{{ post.id }}/edit/">Редактировать</a>
-                    </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+            </div>
         </div>
         
         <br style="clear: both;">
@@ -106,7 +109,7 @@
                     <i class="fa fa-heart" aria-hidden="true"></i>
                 </a>
             {% endif %}
-            <a href="/post/{{ post.id }}" class="text-muted mb-0 ml-2">
+            <a class="text-muted mb-0 ml-2" onclick="showComments(event, '{{ post.id }}')">
                 <span class="comment-counter">{{ post.amount_of_comments }}</span>
                 <i class="far fa-comment"></i>
             </a>
@@ -133,23 +136,7 @@
 
     {% if post.comments %}
         <div class="card-footer post-comments pt-1">
-            {% for comment in post.comments|slice:":1" %}
-                <div class="media">
-                    <img src="{{ comment.user.profile.image.url }}" class="mr-2 mt-2 rounded-circle border" width=40 height=40>
-                    <div class="media-body">
-                        <h6 class="mt-2 mb-0">
-                            <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.profile.get_name }}</a>
-                            <small>{{ comment.date }}</small>
-                        </h6>
-                        <p class="mb-0">
-                            {{ comment.text }}
-                        </p>
-                    </div>
-                </div>
-                {% if not forloop.last %}
-                    <hr class="mt-1 mb-0">
-                {% endif %}
-            {% endfor %}
+            {% include 'post/comments.html' %}
         </div>
     {% endif %}
 </div>
