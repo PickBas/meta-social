@@ -109,7 +109,7 @@
                     <i class="fa fa-heart" aria-hidden="true"></i>
                 </a>
             {% endif %}
-            <a class="text-muted mb-0 ml-2" onclick="showComments(event, '{{ post.id }}')">
+            <a name="comment" class="text-muted mb-0 ml-2" onclick="showComments(event, '{{ post.id }}')" js-data="1">
                 <span class="comment-counter">{{ post.amount_of_comments }}</span>
                 <i class="far fa-comment"></i>
             </a>

@@ -120,15 +120,26 @@ function showComments(e, post_id) {
     let $post_item = $(findParentBySelector(e.target, '.post-item'))
     let $comments = $post_item.children('.post-comments')
 
+    let comment_btn = $(e.target)
+    if (e.target.name != 'comment') {
+        comment_btn = $(e.target.parentNode)
+    }
+
     if ($comments.length == 1) {
         $.ajax({
             type: 'POST',
-            url: '/post/' + post_id + '/get_comments/1/',
+            url: '/post/' + post_id + '/get_comments/' + comment_btn.attr('js-data') + '/',
             data: {
                 csrfmiddlewaretoken: getCookie('csrftoken')
             },
             success: function (result) {
                 $comments[0].innerHTML = result
+
+                if (comment_btn.attr('js-data') == '0') {
+                    comment_btn.attr('js-data', '1')
+                } else {
+                    comment_btn.attr('js-data', '0')
+                }
             }
         })
     }
