@@ -5,6 +5,7 @@ cache:
   - ~/.cache/pip/
 
 before_script:
+  - pip install -r requirements.txt
   - pip install -r ci/pylint_requirements.txt
 
 
