@@ -1,2 +1,3 @@
 pylint
 pylint-django
+pip install pylint-json2html
