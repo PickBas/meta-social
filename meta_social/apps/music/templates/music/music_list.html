@@ -37,7 +37,7 @@
 		<div>
                     <button class="btn btn-outline-success" onclick="setMusic('{{ pos.position.audio_file.url }}')">&#9658;</button>
                     <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
-		    <input type="hidden" name="music_{{ pos.position.id }}" value="{{ pos.order }} ">
+		    <input type="hidden" id="music_{{ pos.position.id }}" value="{{ pos.order }} ">
                     <br class="mb-3">
 		</div>
             {% endfor %}
@@ -51,7 +51,40 @@
          audio_player.autoplay = true;
      }
 
-     Sortable.create(simpleList, { /* options */ });
+     /* Sortable.create(simpleList, { }); */
+     var sortable = new Sortable(
+	 simpleList,
+	 {
+             animation: 150,
+             onEnd: function (evt) {
+		 var matches = $('[id^=music_]')
+		 var res_elements = []
+
+		 for (const x of Array(matches.length).keys()){
+		     res_elements.push(Number(matches[x].value))
+		     //console.log(matches[x].value)
+		 }
+		 //console.log(res_elements)
+
+		 $.ajax({
+		     type: "POST",
+		     url: '/music/' + {{ c_user.id }} + '/',
+		     data: {
+			 csrfmiddlewaretoken: getCookie('csrftoken'),
+			 music_order: res_elements
+		     },
+		     success: function (result) {
+			 console.log(result)
+		     }
+		 })
+
+		 
+		 // Эта функция будет вызываться после изменения позиции
+		 // Здесь ты должен будешь получить все дочерние элементы списка и собрать данные из
+		 // полей hidden, а затем отправить ajax
+             },
+	 }
+     )
     </script>
 {% endblock %}
 
