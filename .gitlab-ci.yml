@@ -12,4 +12,6 @@ before_script:
 build:
   stage: build
   script:
-  - docker-compose -f docker-compose.yml build
+    - sudo apt install -y python-pip
+    - pip install docker-compose
+    - docker-compose up --build
