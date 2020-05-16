@@ -2,7 +2,7 @@
 Meta social post views
 """
 
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
 
@@ -73,10 +73,11 @@ class PostViews:
 
             if request.method == 'POST':
                 if postform.is_valid() and formset.is_valid():
-                    postform.save()
+                    post_item.text = postform.cleaned_data['text']
+                    post_item.save()
+
                     
                     for form in formset.ordered_forms:
-                        print(form.cleaned_data)
                         if form.cleaned_data['image'] is None:
                             form.cleaned_data['id'].order = form.cleaned_data['ORDER']
                             form.cleaned_data['id'].save()
@@ -94,12 +95,8 @@ class PostViews:
                                     image=form.cleaned_data['image']
                                 )
                                 item.save()
-                    
-            self.context['postform'] = PostForm(instance=post_item)
-            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
-            self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
 
-            return render(request, self.template_name, self.context)
+            return redirect(post_item.get_link())
 
         def get(self, request, **kwargs):
             """
@@ -113,6 +110,7 @@ class PostViews:
             self.context['postform'] = PostForm(instance=post_item)
             initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
             self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
+            self.context['images_less_ten'] = post_item.get_images().count() < 10
             
             return render(request, self.template_name, self.context)
 
