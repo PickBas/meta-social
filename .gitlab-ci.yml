@@ -1,17 +1,14 @@
-image: docker:latest
+image: python:latest
 
-variables:
-  DOCKER_DRIVER: overlay
-
-services:
-- docker:dind
+cache:
+  paths:
+  - ~/.cache/pip/
 
 before_script:
-- docker info
+  - pip install -r requirements.txt
+  - pip install -r ci/pylint_requirements.txt
 
-build:
-  stage: build
+
+pylint:
   script:
-    - sudo apt install -y python-pip
-    - pip install docker-compose
-    - docker-compose up --build
+  - ci/pylint_runner.sh
