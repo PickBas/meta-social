@@ -1,0 +1,15 @@
+.masonry-grid:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.masonry-grid-item {
+    width: calc(25% - 15px);
+    float: left;
+    margin-bottom: 8px;
+}
+
+.masonry-grid-item--width2 {
+    width: calc(75% - 15px);
+}

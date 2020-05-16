@@ -1,52 +1,47 @@
 {% extends 'base_menu.html' %}
 {% load static %}
 
-
-{% block extra_head %}
-
-<link rel="stylesheet" href="{% static 'css/post.css' %}">
-
-{% endblock extra_head %}
-
-
 {% block center %}
+    {% include 'post/post_menu.html' %}
 
-{% include 'post/post_menu.html' %}
-
-{% include 'histories.html' %}
-
-{% if newsfeed %}
-    <div class="infinite-container">
-        {% for post in newsfeed %}
+    <div class="infinite-container mt-3">
+        {% for post in user.profile.get_newsfeed %}
             <div class="infinite-item">
                 {% include 'post/post.html' %}
             </div>
+        {% empty %}
+            <div class="card card-body mt-3">
+                <p>Новостей нет</p>
+            </div>
         {% endfor %}
     </div>
-{% endif %}
-
-{% if newsfeed.has_next %}
-    <a class="infinite-more-link" href="?page={{ newsfeed.next_page_number }}">More</a>
-{% else %}
-    <p class="mt-3">Новостей нет.</p>
-{% endif %}
-
 {% endblock center %}
 
 {% block right %}
-    Не знаю что сюда впихнуть
-{% endblock %}
-
+    <div class="card mb-3">
+        <div class="card-body px-0 py-0">
+            Впихнуть сюда погоду из яндекса
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <p class="text-danger mb-0">TODO: Впихнуть сюда рекомендуемые сообщества</p>
+            <p>Mожно добавить такое поле при регистрации и создании сообщества</p>
+            <select class="w-100">
+                <option>Ваше хобби/Тема сообщества</option>
+                <option>Программирование</option>
+            </select>
+            <p class="mt-3 mb-0">И на основе его делать рекомендации</p>
+        </div>
+    </div>
+{% endblock right %}
 
 {% block extra__js %}
-
-<script src="{% static 'js/manage_post.js' %}"></script>
-<script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
-<script src="{% static 'js/infinite.min.js' %}"></script>
-<script>
-    var infinite = new Waypoint.Infinite({
-        element: $('.infinite-container')[0]
-    });
-</script>
-
+    <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+        var infinite = new Waypoint.Infinite({
+            element: $('.infinite-container')[0]
+        });
+    </script>
 {% endblock extra__js %}

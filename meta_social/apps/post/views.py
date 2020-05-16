@@ -117,32 +117,6 @@ class PostViews:
             
             return render(request, self.template_name, self.context)
 
-    class PostAjax(MetaSocialView):
-        """
-        Send comment class
-        """
-        @staticmethod
-        def post(request, **kwargs):
-            """
-            Send comment to post from full post page
-            """
-            if request.method == "POST":
-                if len(request.POST.get('text')) > 0:
-                    comment_item = Comment(
-                        text=request.POST.get('text'),
-                        post=Post.objects.get(id=kwargs['post_id']),
-                        user=request.user
-                    )
-                    comment_item.save()
-
-                    json_response = json.dumps({'id': comment_item.user.id,
-                                                'username': comment_item.user.username,
-                                                'text': comment_item.text,
-                                                'date': str(comment_item.date)})
-
-                    return HttpResponse(json_response, content_type="application/json")
-                raise Http404()
-
 
     @staticmethod
     def send_comment(request, post_id):
