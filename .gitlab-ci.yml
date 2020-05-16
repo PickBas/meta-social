@@ -11,4 +11,6 @@ before_script:
 
 pylint:
   script:
-  - ci/pylint_runner.sh
+    - ci/pylint_runner.sh
+  only:
+    - devel

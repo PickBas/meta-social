@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run pylint
-pylint $(ls -d */) --disable="C0111" | tee pylint.txt
+pylint $(ls meta_social/apps/ -d */) --disable="C0111" | tee pylint.txt
 
 # get badge
 mkdir public
