@@ -13,8 +13,6 @@ services:
     container_name: social
     volumes:
       - ./:/code
-    environment:
-      START_WITH_DOCKER: 'True'
 
   db:
     image: postgres
