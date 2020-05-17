@@ -9,12 +9,12 @@
                 {% if c_user.profile.blacklist.all %}
                     {% for item in c_user.profile.blacklist.all %}
                         <li class="list-group-item">
-                            <img src="{{ item.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <img src="{{ item.profile.image.url }}" class="rounded-circle border" width="40" height="40">
                             <a href="/accounts/profile/{{ item.id }}/">{{ item.profile.get_name }}</a>
 
                             {% if c_user == user %}
                                 <button type="button" 
-                                        class="btn btn-outline-dark float-right" 
+                                        class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" 
                                         data-toggle="tooltip" 
                                         data-placement="top" 
                                         title="Удалить из черного списка"

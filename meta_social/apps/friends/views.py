@@ -25,6 +25,7 @@ class FriendsViews:
         context['matching'] = True
         if not request.POST.get('query'):
             context['matching'] = False
+            context['friendlist'] = context['c_user'].profile.friends.all()
             return render(request, 'friends/list.html', context)
 
         query = request.POST.get('query')

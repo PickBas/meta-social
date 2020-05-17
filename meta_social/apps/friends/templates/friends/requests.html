@@ -8,11 +8,11 @@
                 {% if friendship.incoming %}
                     {% for request in friendship.incoming %}
                         <li class="list-group-item">
-                            <img src="{{ request.from_user.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <img src="{{ request.from_user.profile.image.url }}" class="rounded-circle border" width="40" height="40">
                             <a href="/accounts/profile/{{ request.from_user.id }}/">{{ request.from_user.profile.get_name }}</a>
 
                             <button type="button" 
-                                    class="btn btn-outline-dark float-right" 
+                                    class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" 
                                     data-toggle="tooltip" 
                                     data-placement="top" 
                                     title="Принять заявку в друзья"
@@ -21,7 +21,7 @@
                             </button>
 
                             <button type="button" 
-                                    class="btn btn-outline-dark float-right mr-2" 
+                                    class="btn btn-outline-dark float-right mr-2 btn-lg px-3 my-0 py-2" 
                                     data-toggle="tooltip" 
                                     data-placement="top" 
                                     title="Отклонить заявку в друзья"
@@ -40,11 +40,11 @@
                 {% if friendship.outcoming %}
                     {% for request in friendship.outcoming %}
                         <li class="list-group-item">
-                            <img src="{{ request.to_user.profile.image.url }}" class="rounded-circle border border-dark" width="35" height="35">
+                            <img src="{{ request.to_user.profile.image.url }}" class="rounded-circle border" width="40" height="40">
                             <a href="/accounts/profile/{{ request.to_user.id }}/">{{ request.to_user.username }}</a>
 
                             <button type="button" 
-                                    class="btn btn-outline-dark float-right" 
+                                    class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" 
                                     data-toggle="tooltip" 
                                     data-placement="top" 
                                     title="Отменить заявку в друзья"
