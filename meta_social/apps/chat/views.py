@@ -206,7 +206,8 @@ class Conversations:
             """
             Processing get request
             """
-            context = {'room_name': mark_safe(json.dumps(room_id))}
+            context = self.get_menu_context('messages', 'Чат')
+            context['room_name'] = mark_safe(json.dumps(room_id))
             c_room = Chat.objects.get(id=room_id)
 
             if request.user not in c_room.participants.all():
@@ -257,7 +258,7 @@ class Conversations:
         Managing avatar of chat view
         """
         def __init__(self, **kwargs):
-            self.template_name = 'profile/change_avatar.html'
+            self.template_name = 'chat/change_avatar.html'
             super().__init__(**kwargs)
 
         def post(self, request, **kwargs):
@@ -292,13 +293,19 @@ class Conversations:
 
                 return redirect('/chat/go_to_chat/' + str(c_room.id))
 
-        def get(self, request):
+        def get(self, request, room_id):
             """
             Processing get request
             """
-            avatar_form = UpdateChatAvatarForm()
+            context = self.get_menu_context('messages', 'Смена аватарки')
+            chat_item = get_object_or_404(Chat, id=room_id)
+
+            avatar_form = UpdateChatAvatarForm(instance=chat_item)
             crop_form = CropAvatarForm()
-            context = {'avatar_form': avatar_form, 'crop_form': crop_form}
+
+            context['avatar_form'] = avatar_form
+            context['crop_form'] = crop_form
+            context['chat'] = chat_item
 
             return render(request, self.template_name, context)
     

@@ -1,4 +1,4 @@
-{% extends 'chat/base.html' %}
+{% extends 'base_menu.html' %}
 {% load static %}
 
 
@@ -73,7 +73,7 @@
         <div class="card-header bg-white">
             <div class="row">
                 <div class="col-5 text-right pr-0">
-                    <img src="{{ c_room.image.url }}" id="chat_avatar" class="rounded-circle border border-dark" width=35 height=35>
+                    <img src="{{ c_room.image.url }}" id="chat_avatar" class="rounded-circle border" width=40 height=40>
                 </div>
                 <div class="col-7 text-left pl-2">
                     {% include 'chat/list_of_participants.html' %}
@@ -90,7 +90,7 @@
                     {% for message in messages_list %}
                         <div class="row" {% if forloop.first %}style="margin-top: auto;"{% endif %}>
                             <div class="col-lg-1 col-sm-1">
-                                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+                                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border ml-lg-2 ml-md-1" width=40 height=40>
                             </div>
                             <div class="col-lg-11 col-sm-11 text-left">
 				                        <a href="/accounts/profile/{{ message.author.id }}/">{{ message.author.profile.get_name }}</a>
@@ -102,21 +102,22 @@
                 {% else %}
                     <p class="text-center" style="margin-top: auto;">Список сообщений пуст</p>
                 {% endif %}
-
             </div>
         </div>
         <div class="card-footer bg-white" id="drop-area">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
-                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
-                    </button>
-                </div>
-                <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" id='chat-message-submit'>
-                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
-                    </button>
+            <div>
+                <div class="md-form input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" onclick="triggerInput()" style="font-size: 12pt;">
+                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <textarea class="form-control w-100 md-textarea" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary btn-sm py-0 my-0" id='chat-message-submit' style="font-size: 12pt;">
+                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <input type="file" id="message_files" style="display: none;" multiple>

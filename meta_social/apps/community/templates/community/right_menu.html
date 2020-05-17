@@ -1,5 +1,11 @@
-<ul class="list-group list-group-flush border">
-  <li class="list-group-item"><a href="/community/mylist/">Мои сообщества</a></li>
-  <li class="list-group-item"><a href="/community/list/{{ user.id }}/">Подписки</a></li>
-  <li class="list-group-item"><a href="/community/create/">Создать сообщество</a></li>
-</ul>
+<div class="community-right-menu">
+    <a class="mt-0 btn btn{% if community_pages != 'subs' %}-outline-primary{% else %}-primary{% endif %} waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2" href="/community/list/{{ user.id }}/">
+        Подписки
+    </a>
+    <a class="btn btn{% if community_pages != 'created' %}-outline-primary{% else %}-primary{% endif %} waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2" href="/community/mylist/">
+        Созданные сообщества
+    </a>
+    <a class="btn btn{% if community_pages != 'create' %}-outline-primary{% else %}-primary{% endif %} waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2" href="/community/create/">
+        Создать сообщество
+    </a>
+</div>

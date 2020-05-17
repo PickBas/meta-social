@@ -5,7 +5,7 @@
             {% if not message.is_readed %}background-color: #F0F7FF;{% endif %}"
         >
             <div class="col-lg-1 col-sm-1">
-                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border border-dark ml-lg-2 ml-md-1" width=35 height=35>
+                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border ml-lg-2 ml-md-1" width=40 height=40>
             </div>
             <div class="col-lg-11 col-sm-11 text-left">
                 <a href="/accounts/profile/{{ message.author.id }}/">{{ message.author.profile.get_name }}</a>

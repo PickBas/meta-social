@@ -1,3 +1,5 @@
+{% load static %}
+
 <style>
     #id-last-msg {
         display: inline-block;
@@ -16,38 +18,33 @@
 </style>
 
 {% if chats %}
-    <ul class="list-group list-group-flush" id="chat-list">
-        {% for chat in chats %}
-            <div>
-                <li class="list-group-item">
-                    <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != c_user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border border-dark float-left" width=35 height=35>
-                    {% if chat.is_dialog %}
-                        {% if chat.participants.all.1 != c_user %}
-                            <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>
-                        {% else %}
-                            <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
-                        {% endif %}
-                    {% else %}
-                        <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/" id="chat-name-link">{{ chat.chat_name }}</a>
-                    {% endif %}
-                    {% if chat.last_message %}
-                        <p id="id-last-msg" class="float-left text-muted ml-3">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
-                    {% endif %}
-                    {% load static %}
-                    <script src="{% static 'js/quitChat.js' %}"></script>
-                    <script>
-                        csr_token = '{{ csrf_token }}';
-                    </script>
-                    {% if not chat.is_dialog and user != chat.owner %}
-                        <button class="float-right btn btn-outline-secondary" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
-                    {% endif %}
-                    <a class="float-right btn btn-outline-secondary mr-2" href="/chat/go_to_chat/{{ chat.id }}/">Text</a>
-                    <script>
-                    </script>
-                </li>
-            </div>
-        {% endfor %}
-    </ul>
+    {% for chat in chats %}
+        <div class="btn btn-lg btn-flat pl-3 pr-1 py-2 mx-0 my-0" 
+            onclick="window.location.href = '/chat/go_to_chat/{{ chat.id }}/';" 
+            style="box-shadow: none; text-transform: none; width: {% if not chat.is_dialog and user != chat.owner %}90%{% else %}100%{% endif %}; {% if not forloop.last %}border-bottom: 1px solid #cfd8dc{% endif %};">
+            <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != c_user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border float-left" width=40 height=40>
+            {% if chat.is_dialog %}
+                {% if chat.participants.all.1 != c_user %}
+                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>
+                {% else %}
+                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
+                {% endif %}
+            {% else %}
+                <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/" id="chat-name-link">{{ chat.chat_name }}</a>
+            {% endif %}
+            {% if chat.last_message %}
+                <p id="id-last-msg" class="float-left text-muted ml-3">{{ chat.last_message.author.profile.get_name }}: {{ chat.last_message.message }}</p>
+            {% endif %}
+        </div>
+        {% if not chat.is_dialog and user != chat.owner %}
+            <button class="float-right btn btn-outline-secondary px-1 mx-0 my-0 py-3" style="width: 10%;" onclick="quitChat(event, '/chat/quit/{{ chat.id }}/')">Quit</button>
+        {% endif %}
+    {% endfor %}
 {% else %}
     Список чатов пуст
 {% endif %}
+
+<script src="{% static 'js/quitChat.js' %}"></script>
+<script>
+    csr_token = '{{ csrf_token }}';
+</script>

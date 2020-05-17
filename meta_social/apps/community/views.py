@@ -103,6 +103,7 @@ class Communities:
                 community.save()
                 community.users.add(request.user)
                 request.user.profile.communities.add(community)
+                community.admins.add(request.user)
                 return redirect('/community/{}/'.format(community.id))
 
         def get(self, request):
@@ -111,6 +112,7 @@ class Communities:
             """
             context = self.get_menu_context('community', 'Создание сообщества')
             context['form'] = CommunityCreateForm()
+            context['community_pages'] = 'create'
             return render(request, self.template_name, context)
 
     class AvatarManaging(MetaSocialView):
@@ -173,7 +175,7 @@ class Communities:
         Method for getting all created communities. Returns rendered responce
         """
         return render(request, 'community/own_community_list.html', {
-
+            'community_pages': 'created'
         })
 
     class CommunityList(MetaSocialView):
@@ -194,6 +196,7 @@ class Communities:
 
             c_user = get_object_or_404(User, id=kwargs['user_id'])
             self.context['c_user'] = c_user
+            self.context['community_pages'] = 'subs'
 
             self.pagination_elemetns(
                 request,
@@ -208,9 +211,13 @@ class Communities:
             """
             Searching communities by name and returns rendered responce
             """
+
+            c_user = get_object_or_404(User, id=kwargs['user_id'])
+
             self.context['matching'] = True
             if not request.POST.get('query'):
                 self.context['matching'] = False
+                self.context['c_user_communities'] = c_user.profile.communities.all()
                 return render(request, 'community/search.html', self.context)
             query = request.POST.get('query')
             search_fields = ['name']

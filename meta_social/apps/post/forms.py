@@ -23,8 +23,9 @@ class PostForm(forms.ModelForm):
         self.fields['text'].label = ''
         self.fields['text'].widget = forms.Textarea()
         self.fields['text'].widget.attrs['width'] = '100%'
-        self.fields['text'].widget.attrs['class'] = 'form-control'
+        self.fields['text'].widget.attrs['class'] = 'form-control md-textarea'
         self.fields['text'].widget.attrs['rows'] = '1'
+        self.fields['text'].widget.attrs['placeholder'] = 'Поделитель своими новостями...'
         self.fields['text'].widget.attrs['style'] = 'resize: none; padding: 0px 2px;'
 
 

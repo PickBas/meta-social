@@ -22,14 +22,20 @@ function likePost(e, post_id) {
             csrfmiddlewaretoken: getCookie('csrftoken')
         },
         success: function (result) {
+            let obj = e.target
+
+            if (obj.name != 'like') {
+                obj = obj.parentNode
+            }
+
             if (result == 'liked') {
-                e.target.classList.remove('btn-outline-danger')
-                e.target.classList.add('btn-danger')
-                e.target.innerHTML = (Number(e.target.innerHTML.split(' ')[0]) + 1) + ' ♥'
-            } else {
-                e.target.classList.remove('btn-danger')
-                e.target.classList.add('btn-outline-danger')
-                e.target.innerHTML = (Number(e.target.innerHTML.split(' ')[0]) - 1) + ' ♥'
+                obj.classList.remove('text-muted')
+                obj.classList.add('text-danger')
+                $(obj).children('.like-counter')[0].innerHTML = Number($(obj).children('.like-counter').html()) + 1;
+            } else if (result == 'unliked') {
+                obj.classList.remove('text-danger')
+                obj.classList.add('text-muted')
+                $(obj).children('.like-counter')[0].innerHTML = Number($(obj).children('.like-counter').html()) - 1;
             }
         }
     })
@@ -45,7 +51,7 @@ function remove_post(e, link) {
             csrfmiddlewaretoken: getCookie('csrftoken')
         },
         success: function () {
-            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
                 .remove();
         }
     })
@@ -108,4 +114,33 @@ function sendCommentInd(e) {
     }
 
     return false
+}
+
+function showComments(e, post_id) {
+    let $post_item = $(findParentBySelector(e.target, '.post-item'))
+    let $comments = $post_item.children('.post-comments')
+
+    let comment_btn = $(e.target)
+    if (e.target.name != 'comment') {
+        comment_btn = $(e.target.parentNode)
+    }
+
+    if ($comments.length == 1) {
+        $.ajax({
+            type: 'POST',
+            url: '/post/' + post_id + '/get_comments/' + comment_btn.attr('js-data') + '/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken')
+            },
+            success: function (result) {
+                $comments[0].innerHTML = result
+
+                if (comment_btn.attr('js-data') == '0') {
+                    comment_btn.attr('js-data', '1')
+                } else {
+                    comment_btn.attr('js-data', '0')
+                }
+            }
+        })
+    }
 }

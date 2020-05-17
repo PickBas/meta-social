@@ -164,7 +164,9 @@ function updateNav () {
             csrfmiddlewaretoken: getCookie('csrftoken'),
         },
         success: function (result) {
-            document.getElementById('left-nav').innerHTML = result
+            document.getElementById('left-nav').parentNode.innerHTML = result
+            msNavButtonsInit()
+            msNavButtonsInit()
         }
     })
 }

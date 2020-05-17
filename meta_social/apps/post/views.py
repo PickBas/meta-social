@@ -2,9 +2,7 @@
 Meta social post views
 """
 
-import json
-
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
 
@@ -33,6 +31,7 @@ class PostViews:
             """
             context = self.get_menu_context('post', 'Пост')
             context['post'] = Post.objects.get(id=kwargs['post_id'])
+            context['all'] = True
 
             return render(request, self.template_name, context)
 
@@ -74,10 +73,11 @@ class PostViews:
 
             if request.method == 'POST':
                 if postform.is_valid() and formset.is_valid():
-                    postform.save()
+                    post_item.text = postform.cleaned_data['text']
+                    post_item.save()
+
                     
                     for form in formset.ordered_forms:
-                        print(form.cleaned_data)
                         if form.cleaned_data['image'] is None:
                             form.cleaned_data['id'].order = form.cleaned_data['ORDER']
                             form.cleaned_data['id'].save()
@@ -95,12 +95,8 @@ class PostViews:
                                     image=form.cleaned_data['image']
                                 )
                                 item.save()
-                    
-            self.context['postform'] = PostForm(instance=post_item)
-            initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
-            self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
 
-            return render(request, self.template_name, self.context)
+            return redirect(post_item.get_link())
 
         def get(self, request, **kwargs):
             """
@@ -114,34 +110,9 @@ class PostViews:
             self.context['postform'] = PostForm(instance=post_item)
             initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
             self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
+            self.context['images_less_ten'] = post_item.get_images().count() < 10
             
             return render(request, self.template_name, self.context)
-
-    class PostAjax(MetaSocialView):
-        """
-        Send comment class
-        """
-        @staticmethod
-        def post(request, **kwargs):
-            """
-            Send comment to post from full post page
-            """
-            if request.method == "POST":
-                if len(request.POST.get('text')) > 0:
-                    comment_item = Comment(
-                        text=request.POST.get('text'),
-                        post=Post.objects.get(id=kwargs['post_id']),
-                        user=request.user
-                    )
-                    comment_item.save()
-
-                    json_response = json.dumps({'id': comment_item.user.id,
-                                                'username': comment_item.user.username,
-                                                'text': comment_item.text,
-                                                'date': str(comment_item.date)})
-
-                    return HttpResponse(json_response, content_type="application/json")
-                raise Http404()
 
 
     @staticmethod
@@ -223,5 +194,17 @@ class PostViews:
                 request.user.profile.liked_posts.add(post_item)
 
                 return HttpResponse('liked')
+
+        raise Http404()
+    
+    @staticmethod
+    def get_comments(request, post_id, all):
+        """
+        Returns rendered responce of post comments
+        """
+        if request.method == 'POST' and all in [0, 1]:
+            post_item = get_object_or_404(Post, id=post_id)
+
+            return render(request, 'post/comments.html', {'post': post_item, 'all': bool(all)})
 
         raise Http404()

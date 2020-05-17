@@ -3,14 +3,14 @@
 
 {% block content %}
 <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-body">
             <h5 class="mb-0">Список лайкнутых постов.</h5>
         </div>
     </div>
     {% if user.profile.liked_posts.all %}
         {% for post in user.profile.liked_posts.all %}
-            {% include 'post.html' %}
+            {% include 'post/post.html' %}
         {% endfor %}
     {% else %}
         <div class="card mt-3">

@@ -30,6 +30,31 @@
 
     <div class="card">
         <div class="card-body">
+            <div id="elem-to-copy" style="display: none;">
+                <div class="card mb-3 ml-1 mr-1 list-item file-item">
+                    <img src="" class="card-img-top" style="max-height: 180px;">
+                    <div class="card-body">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" name="form-0-image-clear" id="form-0-image-clear_id">
+                                    <label for="form-0-image-clear_id" class="my-0 ml-1">Очистить</label>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="form-0-image" aria-describedby="form-0-image-clear_id" accept="image/*" id="id_form-0-image">
+                                <label class="custom-file-label">Изменить</label>
+                            </div>
+                        </div>
+                        <div style="display: none">
+                            <input type="number" name="form-0-ORDER" value="1" id="id_form-0-ORDER">
+                        </div>
+                        <input type="hidden" name="form-0-id" value="1" id="id_form-0-id">
+                    </div>
+                </div>
+            </div>
+
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ postform }}
@@ -48,15 +73,17 @@
                             </div>
                         </div>
                     {% endfor %}
-                    <div class="card ml-1 mr-1 list-item" style="max-height: 260px;" id="drop-area" onclick="triggerInput()">
-                        <div class="card-body">
-                            <h1 class="" style="margin-top: 30%; margin-bottom: 20%; height: 50%;">+</h1>
-                            <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)" style="display: none">
+                    {% if images_less_ten %}
+                        <div class="card ml-1 mr-1 list-item" style="max-height: 260px;" id="drop-area" onclick="triggerInput()">
+                            <div class="card-body">
+                                <h1 class="text-center" style="margin-top: 25%; margin-bottom: 25%; height: 50%;">+</h1>
+                                <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)" style="display: none">
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
 
-                <input type="submit" value="Сохранить" class="btn btn-block btn-primary mt-3">
+                <button type="submit" class="btn btn-block btn-primary mt-3">Сохранить</button>
             </form>
         </div>
     </div>
@@ -127,7 +154,11 @@
         }
 
         function handleFiles(files) {
-            before_id = Number($("#simple-list").children('.file-item').last().find('input[type=checkbox]')[0].id[5])
+            try {
+                before_id = Number($("#simple-list").children('.file-item').last().find('input[type=checkbox]')[0].id[5])
+            } catch (TypeError) {
+                before_id = -1
+            }
 
             files = [...files];
             files.forEach(uploadFile)
@@ -144,8 +175,8 @@
             const dT = new DataTransfer();
             dT.items.add(file);
             
-            let to_copy = $("#simple-list").children('.file-item').last()
-            let newCard = to_copy.clone().insertAfter(to_copy)
+            let to_copy = $('#elem-to-copy').children().first()
+            let newCard = to_copy.clone().insertBefore($('#drop-area'))
 
             let reader = new FileReader();
             reader.readAsDataURL(file);

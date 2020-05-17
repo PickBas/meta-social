@@ -12,11 +12,13 @@
 </style>
 
 <div class="card" style="max-height: 325px;">
-    <div class="card-body text-left">
-        <p>Чаты:</p>
+    <div class="card-body text-left py-2 px-2">
+        <p class="mb-0">Чаты:</p>
+    </div>
+    <div class="card-footer px-1">
         {% if user.profile.chats.all and len_other_chats > 0 %}
             {% for chat in other_chats %}
-                <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border border-dark" width=35 height=35>
+                <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border" width=40 height=40>
                 <a href="/chat/go_to_chat/{{ chat.id }}/" class="names-chats">
                     {% if chat.is_dialog %}
                         {% if chat.participants.all.1 != user %}

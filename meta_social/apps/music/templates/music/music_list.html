@@ -3,39 +3,21 @@
 {% load static %}
 
 {% block center %}
-    <style>
-        .button_bg { 
-            background-color: rgb(241, 242, 244);
-            border-radius: 20%; 
-            height: 55px;
-            padding: 0px;
-        }
-        .player {
-            color: rgba(255, 255, 255, .5);
-            color: #343a40;
-            width: 68%;
-        }
-    </style>
-
-    <script src="https://kit.fontawesome.com/8c5f8983b2.js" crossorigin="anonymous"></script>
-    <div class="mt-3">
-        <div class="button_bg w-100 text-left">
-            <button type="button" class="btn btn-outline-light button1 mt-2 ml-5">
-                <img src="{% static 'img/left.png' %}" alt="" style="width: 25px; height: 25px;">
-            </button>
-            <button type="button" class="btn btn-outline-light button2 mt-2 ml-3">
-                <img src="{% static 'img/right.png' %}" alt="" style="width: 25px; height: 25px;">
-            </button>
-            <audio id="audio-player" class="float-right mr-5 player" controls></audio>
-        </div>
+    <div class="card card-body">
+        <audio id="audio-player" class="float-right player" controls></audio>
     </div>
 
     <div class="card mt-3">
         <div class="card-body text-left">
             {% for music in music_list %}
-                <button class="btn btn-outline-success" onclick="setMusic('{{ music.audio_file.url }}')">&#9658;</button>
+                <button class="btn btn-outline-success px-3 py-2" onclick="setMusic('{{ music.audio_file.url }}')">
+                    <i class="fa fa-play" aria-hidden="true"></i>
+                </button>
                 <span>{{ music.artist }} - {{ music.title }}</span>
                 <br class="mb-3">
+                {% if not forloop.last %}<hr>{% endif %}
+            {% empty %}
+                <p class="mb-0">Список музыки пуст</p>
             {% endfor %}
         </div>
     </div>

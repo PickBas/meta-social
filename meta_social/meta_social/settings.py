@@ -213,6 +213,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Allauth settings
 ACCOUNT_EMAIL_REQUIRED = True
 
+# Обязательное подтверждение мыла
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
 # Fixtures
 FIXTURE_DIRS = [
     'core/fixtures',

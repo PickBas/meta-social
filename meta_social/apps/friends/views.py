@@ -25,6 +25,7 @@ class FriendsViews:
         context['matching'] = True
         if not request.POST.get('query'):
             context['matching'] = False
+            context['friendlist'] = context['c_user'].profile.friends.all()
             return render(request, 'friends/list.html', context)
 
         query = request.POST.get('query')
@@ -49,6 +50,7 @@ class FriendsViews:
             """
             c_user = User.objects.get(id=kwargs['user_id'])
             self.context['c_user'] = c_user
+            self.context['friends_pages'] = 'my_list'
 
             self.pagination_elemetns(
                 request,
@@ -81,6 +83,7 @@ class FriendsViews:
             context = self.get_menu_context('friends', 'Заявки в друзья')
 
             context['c_user'] = request.user
+            context['friends_pages'] = 'requests'
             context['friendship'] = {
                 'incoming': request.user.profile.friendship_inbox_requests(),
                 'outcoming': request.user.profile.friendship_outbox_requests(),
@@ -107,6 +110,7 @@ class FriendsViews:
 
             c_user = get_object_or_404(User, id=kwargs['user_id'])
             context['c_user'] = c_user
+            context['friends_pages'] = 'blacklist'
 
             return render(request, self.template_name, context)
 

@@ -2,12 +2,15 @@
 {% block center %}
 
 <div class="card">
-        <div class="card">
+    <div class="card">
         <div class="card-body">
             {% if user == c_user %}
-                <h5>Ваши чаты</h5>
+                <h5 class="float-left mt-2">Ваши чаты</h5>
                 {% include 'chat/create_chat_modal.html' %}
-                <hr>
+            {% endif %}
+        </div>
+        <div class="card-footer px-0 py-0">
+            {% if user == c_user %}
                 <div id="chat-list">
                     {% include 'chat/chatlist.html' %}
                 </div>

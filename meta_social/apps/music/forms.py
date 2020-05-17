@@ -13,3 +13,6 @@ class UploadMusicForm(forms.ModelForm):
     class Meta:
         model = Music
         fields = ('audio_file', 'artist', 'title', )
+        labels = {
+            'audio_file': 'Аудио файл',
+        }

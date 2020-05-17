@@ -1,5 +1,9 @@
 {% load static %}
-<button class="btn btn-primary w-30" id="friends-search-input" data-toggle="modal" data-target="#creatingChatModal">Создать чат</button>
+<button class="btn btn-flat btn-lg float-right my-0 py-2" 
+        id="friends-search-input" 
+        data-toggle="modal" 
+        data-target="#creatingChatModal"
+        style="box-shadow: none;"><i class="fa fa-plus" aria-hidden="true"></i></button>
 <div class="modal fade" id="creatingChatModal" tabindex="-1" role="dialog" aria-labelledby="creatingChatModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -15,7 +19,7 @@
           <div class="modal-footer">
               <script src="{% static 'js/create_conv.js' %}"></script>
               <button class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-              <button class="btn btn-primary" data-dismiss="modal" onclick="createConversation(event, '/chat/create/')">Созать</button>
+              <button class="btn btn-primary" data-dismiss="modal" onclick="createConversation(event, '/chat/create/')">Создать</button>
           </div>
         </div>
     </div>

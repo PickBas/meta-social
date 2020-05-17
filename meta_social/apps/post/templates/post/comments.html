@@ -1,0 +1,37 @@
+{% if all %}
+    {% for comment in post.comments %}
+        <div class="media">
+            <img src="{{ comment.user.profile.image.url }}" class="mr-2 mt-2 rounded-circle border" width=40 height=40>
+            <div class="media-body">
+                <h6 class="mt-2 mb-0">
+                    <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.profile.get_name }}</a>
+                    <small>{{ comment.date }}</small>
+                </h6>
+                <p class="mb-0">
+                    {{ comment.text }}
+                </p>
+            </div>
+        </div>
+        {% if not forloop.last %}
+            <hr class="mt-1 mb-0">
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {% for comment in post.comments|slice:":1" %}
+        <div class="media">
+            <img src="{{ comment.user.profile.image.url }}" class="mr-2 mt-2 rounded-circle border" width=40 height=40>
+            <div class="media-body">
+                <h6 class="mt-2 mb-0">
+                    <a href="/accounts/profile/{{ comment.user.id }}/">{{ comment.user.profile.get_name }}</a>
+                    <small>{{ comment.date }}</small>
+                </h6>
+                <p class="mb-0">
+                    {{ comment.text }}
+                </p>
+            </div>
+        </div>
+        {% if not forloop.last %}
+            <hr class="mt-1 mb-0">
+        {% endif %}
+    {% endfor %}
+{% endif %}

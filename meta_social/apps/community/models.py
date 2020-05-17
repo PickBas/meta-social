@@ -28,7 +28,7 @@ class Community(models.Model):
         """
         Get community's posts
         """
-        return Post.objects.filter(community=self)
+        return Post.objects.filter(community=self)[::-1]
 
     def amount_of_posts(self) -> int:
         """

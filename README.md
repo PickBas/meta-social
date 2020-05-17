@@ -22,6 +22,11 @@
         python manage.py migrate
         python manage.py loaddata db.json
 
+## Как создать админа?
+
+Из-за кастомного профиля админ создается криво, так что делаем так и не паримся
+
+    python manage.py createsuperuser_ms
 
 ## Что делать если django не видит миграции?
 

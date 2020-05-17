@@ -1,9 +1,9 @@
 {% load static %}
 <button type="button"
-            class="btn btn-outline-dark float-right"
+            class="btn btn-flat btn-sm px-3 my-0 ml-0 float-right"
             data-placement="top"
             title="Добавить участника"
-            style="display: inline-block;"
+            style="display: inline-block; box-shadow: none;"
             data-toggle="modal"
             data-target="#AddToConvModal"
             onclick="">
@@ -26,14 +26,14 @@
                         {% if friend not in c_room.participants.all %}
                             <div>
                                 <li class="list-group-item">
-                                    <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                                    <img src="{{ friend.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
                                     <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
                                     <script src="{% static 'js/add_to_chat.js' %}"></script>
                                     <script>
                                         csr_token = '{{ csrf_token }}';
                                     </script>
                                     <button type="button"
-                                                class="btn btn-outline-dark float-right"
+                                                class="btn btn-outline-dark float-right btn-sm px-3 my-0 mx-0"
                                                 data-placement="top"
                                                 title="Добавить"
                                                 style="display: inline-block;"

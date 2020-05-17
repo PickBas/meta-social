@@ -1,4 +1,10 @@
-<ul class="list-group list-group-flush border">
-  <li class="list-group-item"><a href="/music/{{ user.id }}/">Моя музыка</a></li>
-  <li class="list-group-item"><a href="/music/upload/">Добавить музыку</a></li>
-</ul>
+<div class="music-right-menu">
+    <a class="mt-0 btn waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2 
+        {% if music_pages == 'my_list' and user == c_user %}btn-primary{% else %}btn-outline-primary{% endif %}" href="/music/{{ user.id }}/">
+        Моя музыка
+    </a>
+    <a class="btn waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2 
+        {% if music_pages == 'upload' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="/music/upload/">
+        Добавить музыку
+    </a>
+</div>

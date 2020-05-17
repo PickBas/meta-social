@@ -36,59 +36,52 @@
         display: none;
     }
 
-    .close {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 25px;
-        height: 25px;
-        color:white;
-        opacity: 0.6;
-    }
-
-    .close:hover {
-        color:white;
-        opacity: 1;
-        cursor: pointer;
-    }
-
-    .close:before, .close:after {
-        content: ' ';
-        height: 33px;
-        width: 2px;
-        background-color: #333;
-    }
-
-    .close:before {
-        transform: rotate(45deg);
-    }
-
-    .close:after {
-        transform: rotate(-45deg);
-    }
-
     .img-div {
+        position: relative;
         display: inline-block;
         height: 45px;
         width: calc(10% - 3px);
         margin-right: 5px;
     }
+
+    .post-image-badge {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        color: white;
+        border-radius: 50%;
+        background-color: #ff4444;
+        width: 23px;
+        height: 23px;
+        z-index: 99;
+        border: 1px solid white;
+    }
+
+    .post-image-badge:hover {
+        cursor: pointer;
+        background-color: #F13636;
+    }
+
+    .post-image-badge:active {
+        background-color: #CC0000;
+    }
 </style>
+
 <div id="drop-area" class="card">
     <div class="card-body text-left">
         <form method="POST" action="{{ action_type }}" enctype="multipart/form-data" class="post-form">
             {% csrf_token %}
 
-            <div class="input-group">
+            <div class="md-form input-group">
                 <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
-                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
+                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" onclick="triggerInput()" style="font-size: 12pt;">
+                        <i class="fa fa-paperclip" aria-hidden="true"></i>
                     </button>
                 </div>
                 {{ postform }}
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="submit">
-                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
+                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="submit" style="font-size: 12pt;">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -194,17 +187,16 @@
         reader.readAsDataURL(file);
         reader.onloadend = function () {
             let imgDiv = document.createElement('div')
-            imgDiv.style.cssText = 'position: relative;'
             imgDiv.classList.add('img-div')
 
             let img = document.createElement('img');
             img.src = reader.result;
 
-            let rmBtn = document.createElement('div')
+            let rmBtn = document.createElement('span')
 
             rmBtn.id = "image_preview-" + input_id;
-            rmBtn.classList.add('float-left')
-            rmBtn.classList.add('close');
+            rmBtn.classList.add('post-image-badge');
+            rmBtn.classList.add('text-center');
             rmBtn.onclick = removeFile;
             rmBtn.innerHTML = 'X';
 

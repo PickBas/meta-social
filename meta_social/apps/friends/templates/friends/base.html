@@ -6,13 +6,22 @@
 {% endblock center %}
 
 {% block right %}
-    <ul class="list-group list-group-flush border">
-        <li class="list-group-item"><a href="/friends/{{ user.id }}/">Мои друзья</a></li>
+    <div class="friends-right-menu">
+        <a class="mt-0 btn waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2
+        {% if friends_pages == 'my_list' and user == c_user %}btn-primary{% else %}btn-outline-primary{% endif %}" href="/friends/{{ user.id }}/">
+            Мои друзья
+        </a>
         {% if user == c_user %}
-            <li class="list-group-item"><a href="/friends/requests/">Заявки</a></li>
+            <a class="btn waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2
+            {% if friends_pages == 'requests' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="/friends/requests/">
+                Заявки
+            </a>
         {% endif %}
-        <li class="list-group-item"><a href="/friends/{{ user.id }}/blacklist/">Черный список</a></li>
-    </ul>
+        <a class="btn waves-effect mx-0 w-100 pl-3 pr-1 text-left py-2
+        {% if friends_pages == 'blacklist' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="/friends/{{ user.id }}/blacklist/">
+            Черный список
+        </a>
+    </div>
 {% endblock right %}
 
 {% block extra__js %}

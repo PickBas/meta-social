@@ -11,7 +11,7 @@
                     {% for community in user.profile.communities.all %}
                         {% if user == community.owner %}
                             <li class="list-group-item">
-                                <img src="{{ community.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                                <img src="{{ community.image.url }}" class="rounded-circle border float-left" width=40 height=40>
                                 <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
                             </li>
                         {% endif %}

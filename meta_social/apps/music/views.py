@@ -2,7 +2,7 @@
 Meta social music views
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 
 from core.views import MetaSocialView
@@ -29,6 +29,7 @@ class MusicViews:
             context = self.get_menu_context('music', 'Музыка')
 
             context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            context['music_pages'] = 'my_list'
             context['music_list'] = User.objects.get(id=kwargs['user_id']).profile.get_music_list()
 
             return render(request, self.template_name, context)
@@ -50,6 +51,8 @@ class MusicViews:
                 music = form.save(commit=False)
                 music.user = request.user
                 music.save()
+            
+            return redirect('/music/{}/'.format(request.user.id))
 
         def get(self, request):
             """
@@ -58,5 +61,6 @@ class MusicViews:
             context = self.get_menu_context('music', 'Загрузка музыки')
 
             context['form'] = UploadMusicForm()
+            context['music_pages'] = 'upload'
 
             return render(request, self.template_name, context)
