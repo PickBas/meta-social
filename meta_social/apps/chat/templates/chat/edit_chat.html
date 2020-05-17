@@ -1,9 +1,9 @@
 {% load static %}
 <button type="button"
-        class="btn btn-outline-dark float-right mr-3"
+        class="btn btn-flat btn-sm px-3 my-0 float-right mr-3"
         data-placement="top"
         title="Редактировать"
-        style="display: inline-block;"
+        style="display: inline-block; box-shadow: none;"
         data-toggle="modal"
         data-target="#EditConvModal"
         onclick="" xmlns="http://www.w3.org/1999/html">
@@ -20,13 +20,6 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="text-center">
-                <h5 class="text-center">Аватар</h5>
-                <a href="/chat/change_avatar/{{ c_room.id }}/">
-                    <button class="btn btn-primary text-center">Сменить</button>
-                </a>
-            </div>
-            <hr>
             <h5 class="text-center">Имя чата</h5>
             <script src="{% static 'js/autosize.min.js' %}"></script>
             <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="id-chat-name-change" maxlength="25">{{ c_room.chat_name }}</textarea>
@@ -40,7 +33,7 @@
                         {% if participant != c_room.owner %}
                             <div>
                                 <li class="list-group-item">
-                                    <img src="{{ participant.profile.image.url }}" class="rounded-circle border border-dark float-left" width=35 height=35>
+                                    <img src="{{ participant.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
                                     <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.id }}/">{{ participant.profile.get_name }}</a>
                                     {% if participant in c_room.administrators.all %}
                                         <small class="text-muted float-left">(admin)</small>
@@ -50,9 +43,9 @@
                                         csr_token = '{{ csrf_token }}';
                                     </script>
                                     <button type="button"
-                                                class="btn btn-outline-dark float-right"
+                                                class="btn btn-outline-dark float-right btn-sm px-3 my-0 mr-0"
                                                 data-placement="top"
-                                                title="Добавить"
+                                                title="Исключить"
                                                 style="display: inline-block;"
                                                 onclick="removeFromChat(event, '/chat/{{ c_room.id }}/remove/{{ participant.id }}/')">
                                             <img src="{% static 'img/cross_icon.svg' %}" width="20" height="20">
@@ -61,7 +54,7 @@
                                         <form method="POST" action="/chat/{{ c_room.id }}/makeadmin/{{ participant.id }}/" id="id-form-makeadmin" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="button"
-                                                        class="btn btn-outline-dark float-right mr-2"
+                                                        class="btn btn-outline-dark float-right mr-2 btn-sm px-3 my-0"
                                                         data-placement="top"
                                                         title="Сделать администратором"
                                                         style="display: inline-block;"
@@ -99,12 +92,12 @@
                 Список участников пуст
             {% endif %}
             </div>
+            <hr>
             {% if user == c_room.owner %}
-                <hr>
                  <form method="POST" action="/chat/{{ c_room.id }}/remove/" id="id-form-removechat" class="text-center">
                     {% csrf_token %}
                     <button type="button"
-                                class="btn btn-danger text-center mr-2"
+                                class="btn btn-danger text-center mr-2 float-left"
                                 data-placement="top"
                                 title="Удалить чат"
                                 style="display: inline-block;"
@@ -113,15 +106,15 @@
                     </button>
                 </form>
             {% endif %}
-          </div>
-          <div class="modal-footer">
-              <script src="{% static 'js/edit_chat_name.js' %}"></script>
-              <script>
-                  csr_token = '{{ csrf_token }}';
-              </script>
-              <button class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-              <button class="btn btn-primary" data-dismiss="modal" onclick="editChatName(event, '/chat/edit_chat_name/{{ c_room.id }}/')">Сохранить</button>
+            <a href="/chat/change_avatar/{{ c_room.id }}/" class="btn btn-primary float-left">Сменить аватар</a>
+            <button class="btn btn-secondary float-right" data-dismiss="modal">Закрыть</button>
+            <button class="btn btn-primary float-right" data-dismiss="modal" onclick="editChatName(event, '/chat/edit_chat_name/{{ c_room.id }}/')">Сохранить</button>
           </div>
         </div>
     </div>
 </div>
+
+<script src="{% static 'js/edit_chat_name.js' %}"></script>
+<script>
+    csr_token = '{{ csrf_token }}';
+</script>
