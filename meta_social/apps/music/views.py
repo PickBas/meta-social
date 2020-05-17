@@ -36,6 +36,17 @@ class MusicViews:
 
             return render(request, self.template_name, context)
 
+        def post(self, request, **kwargs):
+            """
+            Replace order
+            """
+            str_arr = request.POST.get('music_order')
+            arr = list(map(int, str_arr.split(',')))
+            c_user = User.objects.get(id=kwargs['user_id'])
+            c_user.profile.change_playlist(arr)
+            return render(request, self.template_name, {})
+
+
     class MusicUpload(MetaSocialView):
         """
         Music upload and representation

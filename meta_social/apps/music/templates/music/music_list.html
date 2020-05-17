@@ -59,29 +59,21 @@
              onEnd: function (evt) {
 		 var matches = $('[id^=music_]')
 		 var res_elements = []
-
 		 for (const x of Array(matches.length).keys()){
 		     res_elements.push(Number(matches[x].value))
-		     //console.log(matches[x].value)
 		 }
-		 //console.log(res_elements)
 
 		 $.ajax({
 		     type: "POST",
 		     url: '/music/' + {{ c_user.id }} + '/',
 		     data: {
 			 csrfmiddlewaretoken: getCookie('csrftoken'),
-			 music_order: res_elements
+			 'music_order': String(res_elements)
 		     },
 		     success: function (result) {
 			 console.log(result)
 		     }
-		 })
-
-		 
-		 // Эта функция будет вызываться после изменения позиции
-		 // Здесь ты должен будешь получить все дочерние элементы списка и собрать данные из
-		 // полей hidden, а затем отправить ajax
+		 })		 
              },
 	 }
      )

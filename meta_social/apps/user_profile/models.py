@@ -189,11 +189,25 @@ class Profile(models.Model):
         Returns all music in user playlist
         """
         res = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        res.sort(key=lambda x: x.order, reverse=True)
         return res
     
     def add_music(self, music):
         self.playlist.add(music)
 
+    def change_playlist(self, new_order):
+        ymusics = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        ymusics.sort(key=lambda x: x.order)
+        if len(new_order) < len(ymusics):
+            pass                # TODO для постепенной загрузки infinite scroll
+        new_mlist = []
+        for i in new_order:
+            new_mlist.append(ymusics[i-1])
+        new_mlist.reverse()
+            
+        for i in range(len(new_order)):
+            new_mlist[i].order = i + 1
+            new_mlist[i].save()
 
 def save_image_from_url(profile, image_url):
     """
