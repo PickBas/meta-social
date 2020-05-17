@@ -13,6 +13,9 @@ class EditCommunityForm(forms.ModelForm):
     Community editing form
     """
     class Meta:
+        """
+        Manage modelform
+        """
         model = Community
         fields = ('name', 'info', 'country',)
         widgets = {
@@ -29,9 +32,9 @@ class CommunityCreateForm(forms.Form):
     """
     Form for creation community
     """
-    name = forms.CharField(max_length=100)
-    info = forms.CharField(max_length=1000)
-    country = CountryField().formfield()
+    name = forms.CharField(max_length=100, label='Название')
+    info = forms.CharField(max_length=1000, label='О сообществе')
+    country = CountryField().formfield(label='Страна')
 
 
 class UpdateCommunityAvatarForm(forms.ModelForm):
