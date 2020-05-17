@@ -77,7 +77,7 @@ class Profile(models.Model):
         """
         if self.user.first_name:
             if self.user.last_name:
-                return '{} {}'.format(self.user.first_name, self.user.last_name)
+                return '{} {}'.format(self.user.last_name, self.user.first_name)
             return self.user.first_name
         return self.user.username
 

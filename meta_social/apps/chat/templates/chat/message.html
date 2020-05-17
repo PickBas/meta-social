@@ -1,4 +1,4 @@
-{% extends 'chat/base.html' %}
+{% extends 'base_menu.html' %}
 {% load static %}
 
 {% block center %}
@@ -93,17 +93,19 @@
             </div>
         </div>
         <div class="card-footer bg-white" id="drop-area">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary" type="button" onclick="triggerInput()">
-                        <img src="https://image.flaticon.com/icons/svg/1507/1507585.svg" width=20 height=20>
-                    </button>
-                </div>
-                <textarea class="form-control w-100" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" id='chat-message-submit'>
-                        <img src="https://image.flaticon.com/icons/svg/786/786205.svg" width=20 height=20>
-                    </button>
+            <div>
+                <div class="md-form input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" onclick="triggerInput()" style="font-size: 12pt;">
+                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <textarea class="form-control w-100 md-textarea" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary btn-sm py-0 my-0" id='chat-message-submit' style="font-size: 12pt;">
+                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <input type="file" id="message_files" style="display: none;" multiple>

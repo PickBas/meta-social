@@ -1,4 +1,4 @@
-{% extends 'community/base.html' %}
+{% extends 'base_menu.html' %}
 {% load static %}
 
 
@@ -68,13 +68,13 @@
         <div class="card-body">
             <hr class="mt-0">
             {% if user == community.owner %}
-                <a href="/community/{{ community.id }}/edit/" class="btn btn-block btn-primary">Редактировать</a>
+                <a href="/community/{{ community.id }}/edit/" class="btn btn-block btn-primary px-1">Редактировать</a>
                 <hr class="mt-0">
             {% endif %}
             {% if user in community.users.all %}
-                <a href="/community/{{ community.id }}/leave/" class="btn btn-block btn-primary">Отписаться</a>
+                <a href="/community/{{ community.id }}/leave/" class="btn btn-block btn-primary px-1">Отписаться</a>
             {% else %}
-                <a href="/community/{{ community.id }}/join/" class="btn btn-block btn-primary">Подписаться</a>
+                <a href="/community/{{ community.id }}/join/" class="btn btn-block btn-primary px-1">Подписаться</a>
             {% endif %}
         </div>
     </div>
