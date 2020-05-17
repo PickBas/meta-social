@@ -14,3 +14,14 @@ $(document).ready(function () {
 
     msNavButtonsInit()
 })
+
+var $grid = $('.masonry-grid').masonry({
+    itemSelector: '.masonry-grid-item',
+    percentPosition: true,
+    columnWidth: 10,
+    gutter: 1
+});
+
+$grid.imagesLoaded().progress( function() {
+    $grid.masonry();
+});
