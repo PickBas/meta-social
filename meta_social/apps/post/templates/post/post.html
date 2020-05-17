@@ -123,8 +123,7 @@
             <form onsubmit="return sendCommentInd(event)" method="POST" class="md-form input-group mt-2 mb-2">
                 {% csrf_token %}
                 <input type="hidden" name="post_id" value="{{ post.id }}">
-                <input type="text" class="form-control comment-input" name='text' id="form1">
-                <label for="form1">Оставить комментарий...</label>
+                <input type="text" class="form-control comment-input" name='text' placeholder="Оставить комментарий...">
                 <div class="input-group-append">
                     <button class="btn btn-md btn-outline-primary m-0 px-3" type="submit">
                         <i class="fa fa-paper-plane" aria-hidden="true"></i>
