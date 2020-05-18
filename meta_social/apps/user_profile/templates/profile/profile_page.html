@@ -39,7 +39,7 @@
                 {% else %}
                     <hr class="mt-0">
                     {% if not is_in_blacklist and not is_friend %}
-                        <form method="POST" action="/friends/send_request/{{ c_user.profile.custom_url }}/">
+                        <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
                             {% csrf_token %}
                             <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
                         </form>
@@ -47,7 +47,7 @@
                         {% if is_in_blacklist %}
                             <p class="btn btn-block btn-primary">Вы в черном списке</p>
                         {% else %}
-			                <form action="/chats/{{ user.profile.custom_url }}/{{ c_user.profile.custom_url }}/" method="POST">
+			                <form action="/chats/{{ user.id }}/{{ c_user.id }}/" method="POST">
                                 {% csrf_token %}
                                 <button class="btn btn-block btn-primary px-1 mx-0" type="submit">Сообщение</button>
                             </form>
@@ -59,12 +59,18 @@
         {% if c_user.profile.friends.count %}
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/friends/{{ c_user.profile.custom_url }}/">Друзья</a> </h6>
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/friends/">Друзья</a>
+                        {% else %}
+                             <a href="/friends/?username={{ c_user.profile.custom_url }}">Друзья</a>
+                        {% endif %}
+                    </h6>
                     <ul class="list-group list-group-flush">
                         {% for friend in c_user.profile.friends.all|slice:":6"%}
                             <div style="display: flex; flex-wrap: wrap;">
                                 <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
-                                    <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.profile.get_name }}" class="ml-2"
+                                    <a href="/accounts/profile/{{ friend.profile.custom_url }}/" title="{{ friend.profile.get_name }}" class="ml-2"
                                         style="margin-left: 0;">
                                         <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark "
                                             style="margin-left: -5px;" width=35 height=35>

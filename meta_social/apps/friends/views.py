@@ -11,6 +11,7 @@ from django.http import Http404
 from core.views import MetaSocialView
 
 from .models import FriendshipRequest
+from user_profile.models import Profile
 
 
 class FriendsViews:
@@ -48,13 +49,16 @@ class FriendsViews:
             """
             Processing get request
             """
-
+            requested = request.GET.get('username')
+            print(requested)
             self.context['c_user'] = request.user
+            if requested:
+                self.context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested))
             self.context['friends_pages'] = 'my_list'
 
             self.pagination_elemetns(
                 request,
-                request.user.profile.friends.all(),
+                self.context['c_user'].profile.friends.all(),
                 self.context,
                 'friendlist'
             )

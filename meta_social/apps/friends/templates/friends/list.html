@@ -3,7 +3,7 @@
         {% for match in f_matches %}
             <li class="list-group-item">
                 <img src="{{ match.profile.image.url }}" class="rounded-circle border" width="40" height="40">
-                <a href="/accounts/profile/{{ match.id }}/">{{ match.profile.get_name }}</a>
+                <a href="/accounts/profile/{{ match.profile.custom_url }}/">{{ match.profile.get_name }}</a>
 
                 {% if c_user == user %}
                     {% if match in user.profile.friends.all and user not in match.profile.blacklist.all %}
@@ -62,7 +62,7 @@
                     <div class="infinite-container">
                         <li class="list-group-item">
                             <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width="40" height="40">
-                            <a href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
 
                             <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
                                 title="Добавить в черный список" onclick="addBlacklist(event, {{ friend.id }})">
@@ -95,7 +95,7 @@
                     <div class="infinite-container">
                         <li class="list-group-item">
                             <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width="40" height="40">
-                            <a href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
                             {% if friend.id == user.id %}
                                 <p class="float-right mr-2">Это Вы</p>
                             {% endif %}
