@@ -27,7 +27,7 @@
                             <div>
                                 <li class="list-group-item">
                                     <img src="{{ friend.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
+                                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
                                     <script src="{% static 'js/add_to_chat.js' %}"></script>
                                     <script>
                                         csr_token = '{{ csrf_token }}';

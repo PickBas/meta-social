@@ -25,7 +25,7 @@
             <img src="  {% if chat.is_dialog %}
                             {% for participant in chat.participants.all %}
                                 {% if participant != c_user %}
-                                    {{ chat.participants.all.1.profile.image.url }}
+                                    {{ participant.profile.image.url }}
                                 {% endif %}
                             {% endfor %}
                         {% else %}
@@ -34,7 +34,7 @@
             {% if chat.is_dialog %}
                 {% for participant in chat.participants.all %}
                     {% if participant != c_user %}
-                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.profile.custom_url }}/">{{ chat.participants.all.1.profile.get_name }}</a>
                     {% endif %}
                 {% endfor %}
             {% else %}
