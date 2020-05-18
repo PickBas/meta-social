@@ -31,7 +31,11 @@ SECRET_KEY = '#bhq1g66br=mwyxcvxxc+1yu=1fq@wcv--ys&&7=233@0^zv5!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not START_WITH_DOCKER
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'social.savink.in',
+    '127.0.0.1',
+    'localhost',
+]
 
 # Application definition
 
