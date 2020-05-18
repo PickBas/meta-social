@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from core.views import MetaSocialView
 
 from .forms import UploadMusicForm
+from user_profile.models import Profile
 
 
 class MusicViews:
@@ -28,9 +29,12 @@ class MusicViews:
             """
             context = self.get_menu_context('music', 'Музыка')
 
-            context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            requested = request.GET.get('username')
+
+            context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested)) if requested \
+                else request.user
             context['music_pages'] = 'my_list'
-            context['music_list'] = User.objects.get(id=kwargs['user_id']).profile.get_music_list()
+            context['music_list'] = context['c_user'].profile.get_music_list()
 
             return render(request, self.template_name, context)
 
@@ -52,7 +56,7 @@ class MusicViews:
                 music.user = request.user
                 music.save()
             
-            return redirect('/music/{}/'.format(request.user.id))
+            return redirect('/music/')
 
         def get(self, request):
             """

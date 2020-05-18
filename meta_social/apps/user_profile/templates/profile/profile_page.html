@@ -101,7 +101,13 @@
         {% if c_user.profile.get_music_list %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/music/{{ c_user.profile.custom_url }}/">Музыка</a> </h6>
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/music/">Музыка</a>
+                        {% else %}
+                            <a href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
+                        {% endif %}
+                    </h6>
                 </div>
             </div>
         {% endif %}
