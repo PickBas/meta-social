@@ -18,6 +18,7 @@ from post.models import PostImages
 
 from .models import Community
 from .forms import EditCommunityForm, CommunityCreateForm, UpdateCommunityAvatarForm
+from user_profile.models import Profile
 
 
 class Communities:
@@ -40,10 +41,10 @@ class Communities:
 
             context['community'] = get_object_or_404(Community, id=community_id)
 
-            PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
+            post_image_form_set = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
             context['postform'] = PostForm()
-            context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+            context['formset'] = post_image_form_set(queryset=PostImages.objects.none())
 
             context['action_type'] = '/post/create/{}/'.format(community_id)
 
@@ -194,7 +195,15 @@ class Communities:
             """
             self.context = self.get_menu_context('community', 'Список сообществ')
 
-            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            requested = request.GET.get('username')
+
+            c_user = None
+            if requested:
+                c_user = get_object_or_404(User,
+                                           profile=Profile.objects.get(custom_url=requested))
+            else:
+                c_user = request.user
+
             self.context['c_user'] = c_user
             self.context['community_pages'] = 'subs'
 
@@ -212,7 +221,7 @@ class Communities:
             Searching communities by name and returns rendered responce
             """
 
-            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            c_user = request.user
 
             self.context['matching'] = True
             if not request.POST.get('query'):

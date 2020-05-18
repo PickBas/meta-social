@@ -10,7 +10,7 @@ from .views import Communities
 
 urlpatterns = [
     path('community/<int:community_id>/', login_required(Communities.CommunityView.as_view())),
-    path('community/list/<int:user_id>/', login_required(Communities.CommunityList.as_view())),
+    path('community/list/', login_required(Communities.CommunityList.as_view())),
     path('community/mylist/', login_required(Communities.my_communities)),
     path('community/create/', login_required(Communities.CommunityCreate.as_view())),
     path('community/<int:community_id>/join/', login_required(Communities.community_join)),

@@ -87,7 +87,13 @@
         {% if c_user.profile.communities.count %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title">Сообщества</h6>
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/community/list/">Сообщества</a>
+                        {% else %}
+                            <a href="/community/list/?username={{ c_user.profile.custom_url }}">Сообщества</a>
+                        {% endif %}
+                    </h6>
                 </div>
             </div>
         {% endif %}
