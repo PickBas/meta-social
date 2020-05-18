@@ -41,6 +41,8 @@ class ProfileViews:
             :param request: request
             :return: context
             """
+            print(kwargs['user_url'])
+
             if not User.objects.filter(profile=Profile.objects.get(custom_url=kwargs['user_url'])).exists():
                 raise Http404()
 
@@ -228,6 +230,7 @@ class Files:
         My files view
         """
         context = MetaSocialView.get_menu_context('files', 'Мои файлы')
-        all_images_from_posts = PostImages.objects.filter(from_user_url=user_url)
+        c_user = User.objects.get(profile=Profile.objects.get(custom_url=user_url))
+        all_images_from_posts = PostImages.objects.filter(from_user_id=c_user.id)
         context['images'] = all_images_from_posts
         return render(request, 'files/files.html', context)
