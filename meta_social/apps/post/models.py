@@ -30,6 +30,12 @@ class Post(models.Model):
 
     likes = models.ManyToManyField(Like, blank=True, related_name='likes')
 
+    rt = models.ManyToManyField(User, blank=True, related_name='rt')
+
+    is_reposted = models.BooleanField(default=False)
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='owner')
+
     class Meta:
         """
         Class storing information for admin interface
@@ -97,6 +103,13 @@ class Post(models.Model):
         if self.user:
             editors.append(self.user)
         return editors
+
+    def get_rt_count(self):
+        """
+        Returns amount of rts
+        :return: int
+        """
+        return len(self.rt.all())
 
 
 class PostImages(models.Model):

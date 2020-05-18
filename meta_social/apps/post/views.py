@@ -1,7 +1,6 @@
 """
 Meta social post views
 """
-
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
@@ -21,6 +20,7 @@ class PostViews:
         """
         PostView
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'post/full_post.html'
@@ -39,6 +39,7 @@ class PostViews:
         """
         User liked posts representation
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'profile/like_marks.html'
@@ -54,6 +55,7 @@ class PostViews:
         """
         Post editing representaion and functionality
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'post/post_edit.html'
@@ -64,19 +66,18 @@ class PostViews:
             Process post request. Changing position, deleting, changing text, changing images of post
             """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
-            PostImageFormSet = modelformset_factory(
+            post_image_form_set = modelformset_factory(
                 PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
             )
 
             postform = PostForm(request.POST)
-            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+            formset = post_image_form_set(request.POST, request.FILES, queryset=PostImages.objects.none())
 
             if request.method == 'POST':
                 if postform.is_valid() and formset.is_valid():
                     post_item.text = postform.cleaned_data['text']
                     post_item.save()
 
-                    
                     for form in formset.ordered_forms:
                         if form.cleaned_data['image'] is None:
                             form.cleaned_data['id'].order = form.cleaned_data['ORDER']
@@ -103,17 +104,16 @@ class PostViews:
             Processing get request
             """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
-            PostImageFormSet = modelformset_factory(
+            post_image_form_set = modelformset_factory(
                 PostImages, form=EditPostImageForm, extra=0, max_num=10, can_order=True
             )
-            
+
             self.context['postform'] = PostForm(instance=post_item)
             initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
-            self.context['formset'] = PostImageFormSet(initial=initial_images, queryset=post_item.get_images())
+            self.context['formset'] = post_image_form_set(initial=initial_images, queryset=post_item.get_images())
             self.context['images_less_ten'] = post_item.get_images().count() < 10
-            
-            return render(request, self.template_name, self.context)
 
+            return render(request, self.template_name, self.context)
 
     @staticmethod
     def send_comment(request, post_id):
@@ -141,18 +141,18 @@ class PostViews:
         :param request: request
         :return: HttpResponseRedirect
         """
-        PostImageFormSet = modelformset_factory(
+        post_image_form_set = modelformset_factory(
             PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
-            postForm = PostForm(request.POST)
-            formset = PostImageFormSet(
+            post_form = PostForm(request.POST)
+            formset = post_image_form_set(
                 request.POST, request.FILES, queryset=PostImages.objects.none()
             )
 
-            if postForm.is_valid() and formset.is_valid():
-                post_form = postForm.save(commit=False)
-                post_form.user = request.user
+            if post_form.is_valid() and formset.is_valid():
+                post_form = post_form.save(commit=False)
+                post_form.user = post_form.owner = request.user
                 post_form.save()
 
                 for form in formset.cleaned_data:
@@ -175,7 +175,6 @@ class PostViews:
             Post.objects.get(id=post_id).delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-
     @staticmethod
     def like_post(request, post_id):
         """
@@ -196,11 +195,11 @@ class PostViews:
                 return HttpResponse('liked')
 
         raise Http404()
-    
+
     @staticmethod
     def get_comments(request, post_id, all):
         """
-        Returns rendered responce of post comments
+        Returns rendered response of post comments
         """
         if request.method == 'POST' and all in [0, 1]:
             post_item = get_object_or_404(Post, id=post_id)
@@ -208,3 +207,24 @@ class PostViews:
             return render(request, 'post/comments.html', {'post': post_item, 'all': bool(all)})
 
         raise Http404()
+
+    @staticmethod
+    def rt(request, post_id):
+        """
+        Function for rt
+        :param post_id: post
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+
+        post = Post.objects.get(id=post_id)
+        new_post = Post.objects.create(user=request.user, text=post.text,
+                                       is_reposted=True, owner=post.owner)
+        post.rt.add(request.user)
+        new_post.save()
+
+        for img in post.get_images():
+            photo = PostImages(post=new_post, image=img.image, from_user_id=post.owner.id)
+            photo.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

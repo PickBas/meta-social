@@ -17,6 +17,7 @@ urlpatterns = [
     path('post/<int:post_id>/remove/', login_required(PostViews.post_remove)),
     path('post/<int:post_id>/send_comment/', login_required(PostViews.send_comment)),
     path('post/<int:post_id>/edit/', login_required(PostViews.PostEdit.as_view())),
+    path('post/<int:post_id>/rt/', login_required(PostViews.rt)),
 
     path('like/<int:post_id>/', login_required(PostViews.like_post)),
     path('post/<int:post_id>/get_comments/<int:all>/', login_required(PostViews.get_comments)),
