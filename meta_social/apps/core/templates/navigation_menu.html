@@ -18,7 +18,7 @@
 
     <a class="btn btn{% if page != 'friends' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left
     {% if user.profile.friendship_requests_count %}badge-right{% endif %}" {% if user.profile.friendship_requests_count %}data-count="{{ user.profile.friendship_requests_count }}"{% endif %}
-    href="/friends/{{ user.profile.custom_url }}/" second-href="/friends/requests/">
+    href="/friends/" second-href="/friends/requests/">
         <i class="fa fa-user mx-2" aria-hidden="true"></i>
         Друзья
     </a>
