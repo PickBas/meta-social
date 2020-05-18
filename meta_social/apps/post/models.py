@@ -63,7 +63,7 @@ class Post(models.Model):
         """
         if self.community:
             return '/community/' + str(self.community.id) + '/'
-        return '/accounts/profile/' + str(self.user.id) + '/'
+        return '/accounts/profile/' + str(self.user.profile.custom_url) + '/'
 
     def get_images(self):
         """

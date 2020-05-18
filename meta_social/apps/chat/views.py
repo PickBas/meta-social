@@ -14,6 +14,7 @@ from core.views import MetaSocialView
 
 from .forms import UpdateChatAvatarForm
 from .models import User, Chat, MessageImages, Image, BytesIO
+from user_profile.models import Profile
 
 
 class Conversations:
@@ -37,7 +38,7 @@ class Conversations:
             """
             self.context['pagename'] = 'Чаты'
 
-            c_user = User.objects.get(id=kwargs['user_id'])
+            c_user = User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
             self.context['c_user'] = c_user
 
             chats = c_user.profile.chats.all().order_by('-messages__date')
@@ -73,10 +74,8 @@ class Conversations:
         c_room = Chat.objects.get(id=room_id)
         if request.method == 'POST' and request.user == c_room.owner:
             c_room.delete()
-            return redirect('/chats/' + str(request.user.id))
+            return redirect('/chats/' + request.user.profile.custom_url)
         raise Http404()
-
-
 
     @staticmethod
     def make_admin(request, room_id, participant_id):
@@ -197,6 +196,7 @@ class Conversations:
         """
         Chat view class
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name_dialog = 'chat/message.html'
@@ -257,6 +257,7 @@ class Conversations:
         """
         Managing avatar of chat view
         """
+
         def __init__(self, **kwargs):
             self.template_name = 'chat/change_avatar.html'
             super().__init__(**kwargs)
@@ -308,7 +309,7 @@ class Conversations:
             context['chat'] = chat_item
 
             return render(request, self.template_name, context)
-    
+
     @staticmethod
     def send_files(request, room_id):
         """
@@ -327,7 +328,7 @@ class Conversations:
                 img_item.save()
 
                 message_item.images.add(img_item)
-            
+
             return HttpResponse(message_item.id)
 
         raise Http404()

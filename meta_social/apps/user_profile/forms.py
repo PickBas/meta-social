@@ -20,11 +20,12 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('job', 'study', 'biography', 'gender', 'country', 'birth', 'show_email')
+        fields = ('job', 'study', 'biography', 'gender', 'country', 'birth', 'custom_url', 'show_email')
         widgets = {
             'birth': forms.DateInput(attrs={'type': 'date'})
         }
         labels = {
+            'custom_url': 'Ссылка',
             'job': 'Работа',
             'study': 'Учеба',
             'biography': 'Биография',

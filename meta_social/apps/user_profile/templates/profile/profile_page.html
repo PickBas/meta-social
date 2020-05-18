@@ -35,11 +35,11 @@
             <div class="card-body">
                 {% if c_user == user %}
                     <hr class="mt-0">
-                    <a href="/accounts/profile/{{ c_user.id }}/edit/" class="btn btn-block btn-primary px-1 mx-0">Редактировать</a>
+                    <a href="/accounts/profile/{{ c_user.profile.custom_url }}/edit/" class="btn btn-block btn-primary px-1 mx-0">Редактировать</a>
                 {% else %}
                     <hr class="mt-0">
                     {% if not is_in_blacklist and not is_friend %}
-                        <form method="POST" action="/friends/send_request/{{ c_user.id }}/">
+                        <form method="POST" action="/friends/send_request/{{ c_user.profile.custom_url }}/">
                             {% csrf_token %}
                             <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
                         </form>
@@ -47,7 +47,7 @@
                         {% if is_in_blacklist %}
                             <p class="btn btn-block btn-primary">Вы в черном списке</p>
                         {% else %}
-			                <form action="/chats/{{ user.id }}/{{ c_user.id }}/" method="POST">
+			                <form action="/chats/{{ user.profile.custom_url }}/{{ c_user.profile.custom_url }}/" method="POST">
                                 {% csrf_token %}
                                 <button class="btn btn-block btn-primary px-1 mx-0" type="submit">Сообщение</button>
                             </form>
@@ -59,7 +59,7 @@
         {% if c_user.profile.friends.count %}
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/friends/{{ c_user.id }}/">Друзья</a> </h6>
+                    <h6 class="card-title"><a href="/friends/{{ c_user.profile.custom_url }}/">Друзья</a> </h6>
                     <ul class="list-group list-group-flush">
                         {% for friend in c_user.profile.friends.all|slice:":6"%}
                             <div style="display: flex; flex-wrap: wrap;">
@@ -89,7 +89,7 @@
         {% if c_user.profile.get_music_list %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/music/{{ c_user.id }}/">Музыка</a> </h6>
+                    <h6 class="card-title"><a href="/music/{{ c_user.profile.custom_url }}/">Музыка</a> </h6>
                 </div>
             </div>
         {% endif %}
