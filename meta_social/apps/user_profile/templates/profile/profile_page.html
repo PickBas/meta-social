@@ -89,9 +89,9 @@
                 <div class="card-body">
                     <h6 class="card-title">
                         {% if c_user == user %}
-                            <a href="/community/list/">Сообщества</a>
+                            <a href="/community/user/list/">Сообщества</a>
                         {% else %}
-                            <a href="/community/list/?username={{ c_user.profile.custom_url }}">Сообщества</a>
+                            <a href="/community/user/list/?username={{ c_user.profile.custom_url }}">Сообщества</a>
                         {% endif %}
                     </h6>
                 </div>

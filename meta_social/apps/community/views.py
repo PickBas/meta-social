@@ -25,28 +25,30 @@ class Communities:
     """
     Communities class
     """
+
     class CommunityView(MetaSocialView):
         """
         Community view
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/community_page.html'
 
-        def get(self, request, community_id):
+        def get(self, request, community_url):
             """
             Processing get request
             """
             context = self.get_menu_context('community', 'Сообщество')
 
-            context['community'] = get_object_or_404(Community, id=community_id)
+            context['community'] = get_object_or_404(Community, custom_url=community_url)
 
             post_image_form_set = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
             context['postform'] = PostForm()
             context['formset'] = post_image_form_set(queryset=PostImages.objects.none())
 
-            context['action_type'] = '/post/create/{}/'.format(community_id)
+            context['action_type'] = '/post/create/{}/'.format(community_url)
 
             return render(request, self.template_name, context)
 
@@ -54,6 +56,7 @@ class Communities:
         """
         Edit community information view
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'community/edit_community.html'
@@ -63,18 +66,18 @@ class Communities:
             """
             Changing community data (name, info, country)
             """
-            community = get_object_or_404(Community, id=kwargs['community_id'])
+            community = get_object_or_404(Community, custom_url=kwargs['community_url'])
             self.context['community'] = community
             form = EditCommunityForm(request.POST, instance=self.context['community'])
             if form.is_valid():
                 form.save()
-            return redirect('/community/{}/'.format(community.id))
+            return redirect('/community/{}/'.format(community.custom_url))
 
         def get(self, request, **kwargs):
             """
             Processing get request
             """
-            self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['community'] = get_object_or_404(Community, custom_url=kwargs['community_url'])
             self.context['form'] = EditCommunityForm(instance=self.context['community'])
 
             return render(request, self.template_name, self.context)
@@ -99,13 +102,14 @@ class Communities:
                     name=request.POST.get('name'),
                     info=request.POST.get('info'),
                     country=request.POST.get('country'),
-                    owner=request.user
+                    owner=request.user,
+                    custom_url=request.POST.get('name'),
                 )
                 community.save()
                 community.users.add(request.user)
                 request.user.profile.communities.add(community)
                 community.admins.add(request.user)
-                return redirect('/community/{}/'.format(community.id))
+                return redirect('/community/{}/'.format(community.custom_url))
 
         def get(self, request):
             """
@@ -120,6 +124,7 @@ class Communities:
         """
         Managing avatar of community view
         """
+
         def __init__(self, **kwargs):
             self.context = self.get_menu_context('community', 'Смена аватарки сообщества')
             self.template_name = 'community/change_avatar.html'
@@ -129,7 +134,7 @@ class Communities:
             """
             Crop and save avatar of community
             """
-            community = get_object_or_404(Community, id=kwargs['community_id'])
+            community = get_object_or_404(Community, custom_url=kwargs['community_url'])
             avatar_form = UpdateCommunityAvatarForm(request.POST, request.FILES, instance=community)
             crop_form = CropAvatarForm(request.POST)
             if crop_form.is_valid() and avatar_form.is_valid():
@@ -152,10 +157,10 @@ class Communities:
                 resized_image.save(io, 'JPEG', quality=60)
 
                 community.image.save('image_{}.jpg'.format(community.id), ContentFile(io.getvalue()),
-                                                save=False)
+                                     save=False)
                 community.save()
 
-                return redirect('/community/' + str(community.id))
+                return redirect('/community/' + str(community.custom_url))
 
         def get(self, request, **kwargs):
             """
@@ -166,7 +171,7 @@ class Communities:
 
             self.context['avatar_form'] = avatar_form
             self.context['crop_form'] = crop_form
-            self.context['community'] = get_object_or_404(Community, id=kwargs['community_id'])
+            self.context['community'] = get_object_or_404(Community, custom_url=kwargs['community_url'])
 
             return render(request, self.template_name, self.context)
 
@@ -183,6 +188,7 @@ class Communities:
         """
         Community list view
         """
+
         def __init__(self, **kwargs):
             self.context = {}
             self.template_name_get = 'community/community_list.html'
@@ -235,42 +241,43 @@ class Communities:
             return render(request, 'community/search.html', self.context)
 
     @staticmethod
-    def community_join(request, community_id):
+    def community_join(request, community_url):
         """
         Method for joining to community
         """
-        community = get_object_or_404(Community, id=community_id)
+        community = get_object_or_404(Community, custom_url=community_url)
         if request.user not in community.users.all():
             community.users.add(request.user)
             request.user.profile.communities.add(community)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
-    def community_leave(request, community_id):
+    def community_leave(request, community_url):
         """
         Mthod for leaving from community
         """
-        community = get_object_or_404(Community, id=community_id)
+        community = get_object_or_404(Community, custom_url=community_url)
         if request.user in community.users.all():
             community.users.remove(request.user)
             request.user.profile.communities.remove(community)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
-    def post_community_new(request, community_id):
+    def post_community_new(request, community_url):
         """
         Function for creating post
+        :param community_url: url
         :param request: request
         :return: HttpResponseRedirect
         """
 
-        community = get_object_or_404(Community, id=community_id)
+        community = get_object_or_404(Community, custom_url=community_url)
 
-        PostImageFormSet = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
+        post_image_form_set = modelformset_factory(PostImages, form=PostImageForm, extra=10, max_num=10)
 
         if request.method == "POST":
             postForm = PostForm(request.POST)
-            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImages.objects.none())
+            formset = post_image_form_set(request.POST, request.FILES, queryset=PostImages.objects.none())
 
             if postForm.is_valid() and formset.is_valid():
                 post_form = postForm.save(commit=False)

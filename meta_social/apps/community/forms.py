@@ -17,7 +17,7 @@ class EditCommunityForm(forms.ModelForm):
         Manage modelform
         """
         model = Community
-        fields = ('name', 'info', 'country',)
+        fields = ('name', 'info', 'country', 'custom_url')
         widgets = {
             'info': forms.Textarea()
         }
@@ -25,6 +25,7 @@ class EditCommunityForm(forms.ModelForm):
             'name': 'Название',
             'info': 'Информация',
             'country': 'Страна',
+            'custom_url': 'Ссылка',
         }
 
 
