@@ -4,10 +4,12 @@ Meta social music views
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 
 from core.views import MetaSocialView
 
 from .forms import UploadMusicForm
+from user_profile.models import PlayPosition
 
 
 class MusicViews:
@@ -28,11 +30,22 @@ class MusicViews:
             """
             context = self.get_menu_context('music', 'Музыка')
 
-            context['c_user'] = User.objects.get(id=kwargs['user_id'])
-            context['music_pages'] = 'my_list'
-            context['music_list'] = User.objects.get(id=kwargs['user_id']).profile.get_music_list()
+            c_user = User.objects.get(id=kwargs['user_id'])
+            context['c_user'] = c_user
+            context['music_list'] = c_user.profile.get_music_list()
 
             return render(request, self.template_name, context)
+
+        def post(self, request, **kwargs):
+            """
+            Replace order
+            """
+            str_arr = request.POST.get('music_order')
+            arr = list(map(int, str_arr.split(',')))
+            c_user = User.objects.get(id=kwargs['user_id'])
+            c_user.profile.change_playlist(arr)
+            return render(request, self.template_name, {})
+
 
     class MusicUpload(MetaSocialView):
         """
@@ -48,9 +61,11 @@ class MusicViews:
             """
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
-                music = form.save(commit=False)
-                music.user = request.user
-                music.save()
+                music = form.save()
+                playpos = PlayPosition(position=music,
+                                       plist=request.user.profile)
+                playpos.add_order()
+                playpos.save()
             
             return redirect('/music/{}/'.format(request.user.id))
 

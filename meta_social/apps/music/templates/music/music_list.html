@@ -8,20 +8,30 @@
     </div>
 
     <div class="card mt-3">
-        <div class="card-body text-left">
-            {% for music in music_list %}
-                <button class="btn btn-outline-success px-3 py-2" onclick="setMusic('{{ music.audio_file.url }}')">
-                    <i class="fa fa-play" aria-hidden="true"></i>
-                </button>
-                <span>{{ music.artist }} - {{ music.title }}</span>
-                <br class="mb-3">
-                {% if not forloop.last %}<hr>{% endif %}
+        <div class="card-body text-left" id="simpleList">
+            {% for pos in music_list %}
+                <div>
+                    <button class="btn btn-outline-success px-3 py-2" onclick="setMusic('{{ pos.audio_file.url }}')">
+                        <i class="fa fa-play" aria-hidden="true"></i>
+                    </button>
+                    <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
+                    <input type="hidden" id="music_{{ pos.position.id }}" value="{{ pos.order }}">
+                    <br class="mb-3">
+                </div>
             {% empty %}
                 <p class="mb-0">Список музыки пуст</p>
             {% endfor %}
         </div>
     </div>
+{% endblock %}
 
+{% block right %}
+    {% include 'music/right_menu.html' %}
+{% endblock %}
+
+{% block extra__js %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
     <script>
         function setMusic(link) {
             let audio_player = document.getElementById('audio-player');
@@ -29,9 +39,31 @@
             audio_player.autoplay = true;
         }
 
-    </script>
-{% endblock %}
+        /* Sortable.create(simpleList, { }); */
+        var sortable = new Sortable(
+            simpleList,
+            {
+                animation: 150,
+                onEnd: function (evt) {
+                    var matches = $('[id^=music_]')
+                    var res_elements = []
+                    for (const x of Array(matches.length).keys()){
+                        res_elements.push(Number(matches[x].value))
+                    }
 
-{% block right %}
-    {% include 'music/right_menu.html' %}
-{% endblock %}
+                    $.ajax({
+                        type: "POST",
+                        url: '/music/' + {{ c_user.id }} + '/',
+                        data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        'music_order': String(res_elements)
+                        },
+                        success: function (result) {
+                            
+                        }
+                    })		 
+                },
+            }
+        )
+    </script>
+{% endblock extra__js %}

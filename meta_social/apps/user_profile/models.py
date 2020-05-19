@@ -23,6 +23,15 @@ from friends.models import FriendshipRequest
 from music.models import Music
 
 
+class PlayPosition(models.Model):
+    position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
+    plist = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    order = models.IntegerField(blank=True, null=True)
+    
+    def add_order(self):
+        self.order = len(self.plist.playlist.all()) + 1
+
+
 class Profile(models.Model):
     """
     User profile model
@@ -58,6 +67,9 @@ class Profile(models.Model):
     liked_posts = models.ManyToManyField(Post, 'liked_posts')
     friends = models.ManyToManyField(User, related_name='friendlist')
     chats = models.ManyToManyField(Chat)
+    playlist = models.ManyToManyField(Music, related_name='playlist',
+                                      through='PlayPosition')
+
 
     def unread_chats_count(self):
         """
@@ -176,8 +188,26 @@ class Profile(models.Model):
         """
         Returns all music in user playlist
         """
-        return Music.objects.filter(user=self.user)
+        res = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        res.sort(key=lambda x: x.order, reverse=True)
+        return res
+    
+    def add_music(self, music):
+        self.playlist.add(music)
 
+    def change_playlist(self, new_order):
+        ymusics = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        ymusics.sort(key=lambda x: x.order)
+        if len(new_order) < len(ymusics):
+            pass                # TODO для постепенной загрузки infinite scroll
+        new_mlist = []
+        for i in new_order:
+            new_mlist.append(ymusics[i-1])
+        new_mlist.reverse()
+            
+        for i in range(len(new_order)):
+            new_mlist[i].order = i + 1
+            new_mlist[i].save()
 
 def save_image_from_url(profile, image_url):
     """
