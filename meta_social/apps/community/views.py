@@ -71,7 +71,8 @@ class Communities:
             form = EditCommunityForm(request.POST, instance=self.context['community'])
             if form.is_valid():
                 form.save()
-            return redirect('/community/{}/'.format(community.custom_url))
+                return redirect('/community/{}/'.format(community.custom_url))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         def get(self, request, **kwargs):
             """

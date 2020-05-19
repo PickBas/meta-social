@@ -7,7 +7,7 @@ from PIL import Image
 
 from django.core.files.base import ContentFile
 from django.shortcuts import render, HttpResponse, redirect
-from django.http import Http404
+from django.http import Http404,HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.utils import timezone
@@ -98,34 +98,6 @@ class ProfileViews:
             self.profile = None
             self.previous_birth = None
 
-        def post(self, request, **kwargs) -> redirect:
-            """
-            Processing post request
-            :param request: request
-            :param kwargs: attrs
-            :return:
-            """
-
-            self.previous_birth = Profile.objects.get(custom_url=kwargs['user_url']).birth
-            user_form = UserUpdateForm(
-                request.POST, instance=User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url'])))
-            self.profile = Profile.objects.get(custom_url=kwargs['user_url'])
-
-            self.profile.show_email = False if request.POST.get(
-                'show_email') is None else True
-
-            profile_form = ProfileUpdateForm(request.POST,
-                                             instance=self.profile)
-
-            if user_form.is_valid() and profile_form.is_valid():
-                user_form.save()
-                profile_form.save()
-
-                if self.profile.birth is None:
-                    self.profile.birth = self.previous_birth
-                    self.profile.save()
-
-                return redirect('/accounts/profile/' + str(kwargs['user_url']) + '/')
 
         def get(self, request, **kwargs) -> render:
             """
@@ -147,6 +119,42 @@ class ProfileViews:
                 )).profile.birth
 
             return render(request, self.template_name, context)
+
+        def post(self, request, **kwargs) -> redirect:
+            """
+            Processing post request
+            :param request: request
+            :param kwargs: attrs
+            :return:
+            """
+
+            self.previous_birth = Profile.objects.get(custom_url=kwargs['user_url']).birth
+
+            user_form = UserUpdateForm(
+                request.POST, instance=User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url'])))
+
+            self.profile = Profile.objects.get(custom_url=kwargs['user_url'])
+
+            self.profile.show_email = False if request.POST.get(
+                'show_email') is None else True
+
+            self.profile.custom_url = kwargs['user_url'] if request.POST.get('custom_url') is None else request.POST.get('custom_url')
+
+            profile_form = ProfileUpdateForm(request.POST,
+                                             instance=self.profile)
+
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+
+                if self.profile.birth is None:
+                    self.profile.birth = self.previous_birth
+                    self.profile.save()
+
+                return redirect('/accounts/profile/' + str(kwargs['user_url']) + '/')
+
+            return self.get(request, **kwargs)
+
 
     class AvatarManaging(MetaSocialView):
         """

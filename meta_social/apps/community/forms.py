@@ -12,6 +12,12 @@ class EditCommunityForm(forms.ModelForm):
     """
     Community editing form
     """
+    def __init__(self, *args, **kwargs):
+        super(EditCommunityForm, self).__init__(*args, **kwargs)
+
+        for key in self.fields:
+            self.fields[key].required = True
+
     class Meta:
         """
         Manage modelform
