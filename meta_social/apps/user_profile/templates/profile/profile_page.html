@@ -60,20 +60,16 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <h6 class="card-title"><a href="/friends/{{ c_user.id }}/">Друзья</a> </h6>
-                    <ul class="list-group list-group-flush">
+                    <div class="row px-2">
                         {% for friend in c_user.profile.friends.all|slice:":6"%}
-                            <div style="display: flex; flex-wrap: wrap;">
-                                <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
-                                    <a href="/accounts/profile/{{ friend.id }}/" title="{{ friend.profile.get_name }}" class="ml-2"
-                                        style="margin-left: 0;">
-                                        <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark "
-                                            style="margin-left: -5px;" width=35 height=35>
+                            <div class="col-4 px-0 mx-0 text-center">
+                                <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
+                                    <a href="/accounts/profile/{{ friend.id }}/">
+                                        {{ friend.profile.get_name }}
                                     </a>
-                                    <br>
-                                </li>
                             </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
             </div>
         {% endif %}
