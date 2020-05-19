@@ -33,6 +33,7 @@ class MusicViews:
             c_user = User.objects.get(id=kwargs['user_id'])
             context['c_user'] = c_user
             context['music_list'] = c_user.profile.get_music_list()
+            context['music_pages'] = 'my_list'
 
             return render(request, self.template_name, context)
 
