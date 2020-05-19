@@ -11,7 +11,7 @@
         <div class="card-body text-left" id="simpleList">
             {% for pos in music_list %}
                 <div>
-                    <button class="btn btn-outline-success px-3 py-2" onclick="setMusic('{{ pos.audio_file.url }}')">
+                    <button class="btn btn-outline-success px-3 py-2" onclick="setMusic('{{ pos.position.audio_file.url }}')">
                         <i class="fa fa-play" aria-hidden="true"></i>
                     </button>
                     <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
