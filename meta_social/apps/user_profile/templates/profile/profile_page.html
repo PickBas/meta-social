@@ -78,6 +78,16 @@
             <div class="card mt-3 mb-3">
                 <div class="card-body">
                     <h6 class="card-title">Сообщества</h6>
+                    <div class="row px-2">
+                        {% for community in c_user.profile.communities.all|slice:":6"%}
+                            <div class="col-4 px-0 mx-0 text-center">
+                                <img src="{{ community.image.url }}" class="rounded-circle border" width=40 height=40>
+                                    <a href="/community/{{ community.id }}/">
+                                        {{ community.name }}
+                                    </a>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% endif %}
