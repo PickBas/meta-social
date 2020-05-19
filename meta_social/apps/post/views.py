@@ -154,6 +154,7 @@ class PostViews:
                 post_form = post_form.save(commit=False)
                 post_form.user = post_form.owner = request.user
                 post_form.save()
+                request.user.profile.posts.add(post_form)
 
                 for form in formset.cleaned_data:
                     if form:
@@ -222,9 +223,11 @@ class PostViews:
                                        is_reposted=True, owner=post.owner)
         post.rt.add(request.user)
         new_post.save()
+        request.user.profile.posts.add(new_post)
 
-        for img in post.get_images():
-            photo = PostImages(post=new_post, image=img.image, from_user_id=post.owner.id)
-        photo.save()
+        if post.get_images():
+            for img in post.get_images():
+                photo = PostImages(post=new_post, image=img.image, from_user_id=post.owner.id)
+            photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

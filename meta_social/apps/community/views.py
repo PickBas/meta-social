@@ -268,6 +268,7 @@ class Communities:
                 post_form.community = community
                 post_form.owner = request.user
                 post_form.save()
+                community.posts.add(post_form)
 
                 for form in formset.cleaned_data:
                     if form:

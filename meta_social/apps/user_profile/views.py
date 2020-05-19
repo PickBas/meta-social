@@ -74,7 +74,7 @@ class ProfileViews:
             if not is_in_blacklist:
                 self.pagination_elemetns(
                     request,
-                    list(user_item.profile.posts()),
+                    list(reversed(user_item.profile.posts.all())),
                     context,
                     'c_user_posts'
                 )
