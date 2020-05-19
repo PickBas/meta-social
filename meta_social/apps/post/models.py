@@ -10,7 +10,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-
 class Like(models.Model):
     """
     Like model
@@ -35,6 +34,7 @@ class Post(models.Model):
     is_reposted = models.BooleanField(default=False)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='owner')
+    owner_community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')
 
     class Meta:
         """

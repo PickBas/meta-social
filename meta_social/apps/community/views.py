@@ -266,7 +266,7 @@ class Communities:
             if postForm.is_valid() and formset.is_valid():
                 post_form = postForm.save(commit=False)
                 post_form.community = community
-                post_form.owner = request.user
+                post_form.owner_community = community
                 post_form.save()
                 community.posts.add(post_form)
 

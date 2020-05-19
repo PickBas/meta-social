@@ -5,7 +5,13 @@
 
             <div class="name-date float-left ml-2 mb-0 pb-0">
                 <a href="{{ post.get_link }}">
-                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью {% if post.is_reposted %}(<a href="/accounts/profile/{{ post.owner.id }}/">{{ post.owner.profile.get_name }}</a>){% endif %}</small>
+                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью {% if post.is_reposted %}
+                                                                                                    {% if post.owner %}
+                                                                                                        (<a href="/accounts/profile/{{ post.owner.id }}/">{{ post.owner.profile.get_name }}</a>)
+                                                                                                    {% else %}
+                                                                                                        (<a href="/community/{{ post.owner_community.id }}/">{{ post.owner_community.name }}</a>)
+                                                                                                    {% endif %}
+                                                                                                {% endif %}</small>
                 </a>
                 <p style="margin-top: -5px;">
                     <small class="text-muted">{{ post.date }}</small>

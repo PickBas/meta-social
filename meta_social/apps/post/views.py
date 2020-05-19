@@ -219,15 +219,20 @@ class PostViews:
         """
 
         post = Post.objects.get(id=post_id)
-        new_post = Post.objects.create(user=request.user, text=post.text,
-                                       is_reposted=True, owner=post.owner)
+        new_post = Post.objects.create(user=request.user, text=post.text, is_reposted=True)
+
+        if post.owner:
+            new_post.owner = post.owner
+        elif post.owner_community:
+            new_post.owner_community = post.owner_community
+
         post.rt.add(request.user)
         new_post.save()
         request.user.profile.posts.add(new_post)
 
         if post.get_images():
             for img in post.get_images():
-                photo = PostImages(post=new_post, image=img.image, from_user_id=post.owner.id)
+                photo = PostImages(post=new_post, image=img.image, from_user_id=post.user)
             photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
