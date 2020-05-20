@@ -8,6 +8,9 @@ before_script:
   - pip install -r requirements.txt
   - pip install -r ci/pylint_requirements.txt
 
+test:
+  script:
+    - python meta_social/manage.py test
 
 pylint:
   script:
