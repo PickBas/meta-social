@@ -26,7 +26,7 @@
                 }
             </style>
             {% if user == c_user %}
-                <a href="/accounts/profile/change_avatar/">
+                <a href="/change_avatar/">
                     <img src="{{ c_user.profile.image.url }}" class="card-img-top rollover"></img>
                 </a>
             {% else %}
@@ -35,7 +35,7 @@
             <div class="card-body">
                 {% if c_user == user %}
                     <hr class="mt-0">
-                    <a href="/accounts/profile/{{ c_user.id }}/edit/" class="btn btn-block btn-primary px-1 mx-0">Редактировать</a>
+                    <a href="/accounts/profile/{{ c_user.profile.custom_url }}/edit/" class="btn btn-block btn-primary px-1 mx-0">Редактировать</a>
                 {% else %}
                     <hr class="mt-0">
                     {% if not is_in_blacklist and not is_friend %}
@@ -59,35 +59,38 @@
         {% if c_user.profile.friends.count %}
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/friends/{{ c_user.id }}/">Друзья</a> </h6>
-                    <div class="row px-2">
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/friends/">Друзья</a>
+                        {% else %}
+                             <a href="/friends/?username={{ c_user.profile.custom_url }}">Друзья</a>
+                        {% endif %}
+                    </h6>
+                    <ul class="list-group list-group-flush">
                         {% for friend in c_user.profile.friends.all|slice:":6"%}
-                            <div class="col-4 px-0 mx-0 text-center">
-                                <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
-                                    <a href="/accounts/profile/{{ friend.id }}/">
-                                        {{ friend.profile.get_name }}
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <li class="list-group-item" style="padding-left: 2.5px; padding-right: 2.5px;">
+                                    <a href="/accounts/profile/{{ friend.profile.custom_url }}/" title="{{ friend.profile.get_name }}" class="ml-2"
+                                        style="margin-left: 0;">
+                                        <img src="{{ friend.profile.image.url }}" class="rounded-circle border border-dark "
+                                            style="margin-left: -5px;" width=35 height=35>
                                     </a>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
         {% endif %}
 
         {% if c_user.profile.communities.count %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title">Сообщества</h6>
-                    <div class="row px-2">
-                        {% for community in c_user.profile.communities.all|slice:":6"%}
-                            <div class="col-4 px-0 mx-0 text-center">
-                                <img src="{{ community.image.url }}" class="rounded-circle border" width=40 height=40>
-                                    <a href="/community/{{ community.id }}/">
-                                        {{ community.name }}
-                                    </a>
-                            </div>
-                        {% endfor %}
-                    </div>
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/community/user/list/">Сообщества</a>
+                        {% else %}
+                            <a href="/community/user/list/?username={{ c_user.profile.custom_url }}">Сообщества</a>
+                        {% endif %}
+                    </h6>
                 </div>
             </div>
         {% endif %}
@@ -95,7 +98,13 @@
         {% if c_user.profile.get_music_list %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/music/{{ c_user.id }}/">Музыка</a> </h6>
+                    <h6 class="card-title">
+                        {% if c_user == user %}
+                            <a href="/music/">Музыка</a>
+                        {% else %}
+                            <a href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
+                        {% endif %}
+                    </h6>
                 </div>
             </div>
         {% endif %}

@@ -12,12 +12,18 @@ class EditCommunityForm(forms.ModelForm):
     """
     Community editing form
     """
+    def __init__(self, *args, **kwargs):
+        super(EditCommunityForm, self).__init__(*args, **kwargs)
+
+        for key in self.fields:
+            self.fields[key].required = True
+
     class Meta:
         """
         Manage modelform
         """
         model = Community
-        fields = ('name', 'info', 'country',)
+        fields = ('name', 'info', 'country', 'custom_url')
         widgets = {
             'info': forms.Textarea()
         }
@@ -25,6 +31,7 @@ class EditCommunityForm(forms.ModelForm):
             'name': 'Название',
             'info': 'Информация',
             'country': 'Страна',
+            'custom_url': 'Ссылка',
         }
 
 

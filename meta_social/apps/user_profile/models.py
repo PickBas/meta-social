@@ -44,6 +44,16 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
+    custom_url = models.CharField(max_length=50,
+                                  default='',
+                                  unique=True,
+                                  help_text='Required. 50 characters or fewer. Letters, digits and @/./+/-/_ only.',
+                                  validators=[User.username_validator],
+                                  error_messages={
+                                      'unique': 'A user with that username already exists.',
+                                      'invalid': 'Invalid url'
+                                  }, )
+
     base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
 
@@ -57,8 +67,8 @@ class Profile(models.Model):
     show_email = models.BooleanField(default=False)
 
     last_act = models.DateTimeField(
-        default=timezone.now, 
-        auto_now=False, 
+        default=timezone.now,
+        auto_now=False,
         auto_now_add=False
     )
 
@@ -80,7 +90,7 @@ class Profile(models.Model):
             messages = chat.get_unread_messages().exclude(author=self.user)
             if len(messages) > 0:
                 count += 1
-        
+
         return count
 
     def get_name(self):
@@ -228,6 +238,7 @@ def create_user_profile(sender, **kwargs) -> None:
     """
 
     profile = Profile(user=kwargs['user'])
+    profile.custom_url = profile.user.username
     provider = 'vk' if kwargs['user'].socialaccount_set.filter(
         provider='vk').exists() else 'facebook'
 

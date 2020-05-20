@@ -1,5 +1,5 @@
 <div id="left-nav">
-    <a class="btn btn{% if page != 'profile' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left mt-0" href="/accounts/profile/{{ user.id }}/">
+    <a class="btn btn{% if page != 'profile' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left mt-0" href="/accounts/profile/{{ user.profile.custom_url }}/">
         <i class="fa fa-home mx-2" aria-hidden="true"></i>
         Моя страница
     </a>
@@ -11,34 +11,34 @@
 
     <a class="btn btn{% if page != 'messages' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left
     {% if user.profile.unread_chats_count %}badge-right{% endif %}" {% if user.profile.unread_chats_count %}data-count="{{ user.profile.unread_chats_count }}"{% endif %}
-    href="/chats/{{ user.id }}/" second-href="/chats/{{ user.id }}/">
+    href="/chats/{{ user.profile.custom_url }}/" second-href="/chats/{{ user.profile.custom_url }}/">
         <i class="fa fa-comments mx-2" aria-hidden="true"></i>
         Сообщения
     </a>
 
     <a class="btn btn{% if page != 'friends' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left
     {% if user.profile.friendship_requests_count %}badge-right{% endif %}" {% if user.profile.friendship_requests_count %}data-count="{{ user.profile.friendship_requests_count }}"{% endif %}
-    href="/friends/{{ user.id }}/" second-href="/friends/requests/">
+    href="/friends/" second-href="/friends/requests/">
         <i class="fa fa-user mx-2" aria-hidden="true"></i>
         Друзья
     </a>
 
-    <a class="btn btn{% if page != 'community' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/community/list/{{ user.id }}/">
+    <a class="btn btn{% if page != 'community' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/community/user/list/">
         <i class="fa fa-users mx-2" aria-hidden="true"></i>
         Сообщества
     </a>
 
-    <a class="btn btn{% if page != 'music' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/music/{{ user.id }}/">
+    <a class="btn btn{% if page != 'music' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/music/">
         <i class="fa fa-music mx-2" aria-hidden="true"></i>
         Музыка
     </a>
 
-    <a class="btn btn{% if page != 'like_marks' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/accounts/profile/like_marks/">
+    <a class="btn btn{% if page != 'like_marks' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/like_marks/">
         <i class="fa fa-paperclip mx-2" aria-hidden="true"></i>
         Закладки
     </a>
 
-    <a class="btn btn{% if page != 'files' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/files/{{ user.id }}">
+    <a class="btn btn{% if page != 'files' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left" href="/files/{{ user.profile.custom_url }}">
         <i class="fa fa-file mx-2" aria-hidden="true"></i>
         Мои файлы
     </a>

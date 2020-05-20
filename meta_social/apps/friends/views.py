@@ -11,6 +11,7 @@ from django.http import Http404
 from core.views import MetaSocialView
 
 from .models import FriendshipRequest
+from user_profile.models import Profile
 
 
 class FriendsViews:
@@ -48,13 +49,16 @@ class FriendsViews:
             """
             Processing get request
             """
-            c_user = User.objects.get(id=kwargs['user_id'])
-            self.context['c_user'] = c_user
+            requested = request.GET.get('username')
+            print(requested)
+            self.context['c_user'] = request.user
+            if requested:
+                self.context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested))
             self.context['friends_pages'] = 'my_list'
 
             self.pagination_elemetns(
                 request,
-                c_user.profile.friends.all(),
+                self.context['c_user'].profile.friends.all(),
                 self.context,
                 'friendlist'
             )
@@ -65,7 +69,7 @@ class FriendsViews:
             """
             Processing post request
             """
-            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            self.context['c_user'] = request.user
             return FriendsViews.get_render(request, self.context)
 
     class FriendsRequests(MetaSocialView):
@@ -108,7 +112,7 @@ class FriendsViews:
             """
             context = self.get_menu_context('friends', 'Черный список')
 
-            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            c_user = request.user
             context['c_user'] = c_user
             context['friends_pages'] = 'blacklist'
 

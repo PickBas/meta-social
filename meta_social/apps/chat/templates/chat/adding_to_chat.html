@@ -11,7 +11,7 @@
                 {% for friend in user.profile.friends.all %}
                     <li class="list-group-item">
                         <img src="{{ friend.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.id }}/">{{ friend.profile.get_name }}</a>
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
                     </li>
                 {% endfor %}
             </ul>

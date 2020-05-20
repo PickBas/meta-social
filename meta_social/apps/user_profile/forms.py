@@ -17,14 +17,17 @@ class ProfileUpdateForm(forms.ModelForm):
 
         for key in self.fields:
             self.fields[key].required = False
+        self.fields['custom_url'].required = True
+
 
     class Meta:
         model = Profile
-        fields = ('job', 'study', 'biography', 'gender', 'country', 'birth', 'show_email')
+        fields = ('job', 'study', 'biography', 'gender', 'country', 'birth', 'custom_url', 'show_email')
         widgets = {
-            'birth': forms.DateInput(attrs={'type': 'date'})
+            'birth': forms.DateInput(attrs={'type': 'date'}),
         }
         labels = {
+            'custom_url': 'Ссылка',
             'job': 'Работа',
             'study': 'Учеба',
             'biography': 'Биография',

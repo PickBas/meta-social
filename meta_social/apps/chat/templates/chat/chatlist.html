@@ -19,16 +19,24 @@
 
 {% if chats %}
     {% for chat in chats %}
-        <div class="btn btn-lg btn-flat pl-3 pr-1 py-2 mx-0 my-0" 
-            onclick="window.location.href = '/chat/go_to_chat/{{ chat.id }}/';" 
+        <div class="btn btn-lg btn-flat pl-3 pr-1 py-2 mx-0 my-0"
+            onclick="window.location.href = '/chat/go_to_chat/{{ chat.id }}/';"
             style="box-shadow: none; text-transform: none; width: {% if not chat.is_dialog and user != chat.owner %}90%{% else %}100%{% endif %}; {% if not forloop.last %}border-bottom: 1px solid #cfd8dc{% endif %};">
-            <img src="{% if chat.is_dialog %}{% if chat.participants.all.1 != c_user %}{{ chat.participants.all.1.profile.image.url }}{% else %}{{ chat.participants.all.0.profile.image.url }}{% endif %}{% else %}{{ chat.image.url }}{% endif %}" class="rounded-circle border float-left" width=40 height=40>
+            <img src="  {% if chat.is_dialog %}
+                            {% for participant in chat.participants.all %}
+                                {% if participant != c_user %}
+                                    {{ participant.profile.image.url }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ chat.image.url }}
+                        {% endif %}" class="rounded-circle border float-left" width=40 height=40>
             {% if chat.is_dialog %}
-                {% if chat.participants.all.1 != c_user %}
-                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.1.id }}/">{{ chat.participants.all.1.profile.get_name }}</a>
-                {% else %}
-                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ chat.participants.all.0.id }}/">{{ chat.participants.all.0.profile.get_name }}</a>
-                {% endif %}
+                {% for participant in chat.participants.all %}
+                    {% if participant != c_user %}
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.profile.custom_url }}/">{{ participant.profile.get_name }}</a>
+                    {% endif %}
+                {% endfor %}
             {% else %}
                 <a class="float-left ml-2" style="text-decoration: none;" href="/chat/go_to_chat/{{ chat.id }}/" id="chat-name-link">{{ chat.chat_name }}</a>
             {% endif %}

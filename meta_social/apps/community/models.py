@@ -19,6 +19,16 @@ class Community(models.Model):
     name = models.CharField(max_length=100, null=True)
     info = models.CharField(max_length=1000, null=True)
 
+    custom_url = models.CharField(max_length=50,
+                                  default='',
+                                  unique=True,
+                                  help_text='Required. 50 characters or fewer. Letters, digits and @/./+/-/_ only.',
+                                  validators=[User.username_validator],
+                                  error_messages={
+                                      'unique': 'A user with that username already exists.',
+                                      'invalid': 'Invalid url'
+                                  }, )
+
     base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
 
