@@ -172,9 +172,11 @@ class PostViews:
         :param post_id: id of a post want to be deleted
         :return: HttpResponseRedirect
         """
+        print('\n\n', post_id, '\n\n')
+
         if request.method == "POST":
             Post.objects.get(id=post_id).delete()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
 
     @staticmethod
     def like_post(request, post_id):

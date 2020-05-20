@@ -41,8 +41,6 @@ class ProfileViews:
             :param request: request
             :return: context
             """
-            print(kwargs['user_url'])
-
             if not User.objects.filter(profile=Profile.objects.get(custom_url=kwargs['user_url'])).exists():
                 raise Http404()
 
