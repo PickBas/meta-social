@@ -11,6 +11,7 @@ before_script:
 test:
   script:
     - python meta_social/manage.py test $(ls meta_social/apps)
+    - pip cache dir
   only:
     - devel
 
