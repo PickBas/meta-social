@@ -10,7 +10,7 @@ before_script:
 
 test:
   script:
-    - python meta_social/manage.py test
+    - python meta_social/manage.py test $(ls meta_social/apps)
 
 pylint:
   script:
