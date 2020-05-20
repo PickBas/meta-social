@@ -9,7 +9,7 @@ from .views import Conversations
 
 
 urlpatterns = [
-    path('chats/<str:user_url>/', login_required(Conversations.ChatList.as_view())),
+    path('chats/', login_required(Conversations.ChatList.as_view())),
     path('chat/create/', login_required(Conversations.create_chat)),
     path('chat/<int:room_id>/remove/', login_required(Conversations.remove_chat)),
     path('chat/quit/<int:room_id>/', login_required(Conversations.quit_room)),

@@ -68,6 +68,65 @@
   }
 },
 {
+  "model": "chat.message",
+  "pk": 1,
+  "fields": {
+    "author": 2,
+    "message": "",
+    "date": "2020-05-20T13:49:56.195Z",
+    "is_readed": false,
+    "images": []
+  }
+},
+{
+  "model": "chat.chat",
+  "pk": 1,
+  "fields": {
+    "chat_name": "asd",
+    "is_dialog": false,
+    "owner": 2,
+    "base_image": "avatars/users/0.png",
+    "image": "avatars/users/0.png",
+    "participants": [
+      2
+    ],
+    "messages": [
+      1
+    ],
+    "administrators": []
+  }
+},
+{
+  "model": "community.community",
+  "pk": 1,
+  "fields": {
+    "owner": 2,
+    "name": "asd",
+    "info": "asd",
+    "custom_url": "asd",
+    "base_image": "avatars/users/0.png",
+    "image": "avatars/users/0.png",
+    "country": "AF",
+    "users": [
+      2
+    ],
+    "admins": [
+      2
+    ]
+  }
+},
+{
+  "model": "post.post",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "community": null,
+    "text": "asd",
+    "date": "2020-05-20T13:47:49.073Z",
+    "likes": []
+  }
+},
+{
   "model": "user_profile.profile",
   "pk": 1,
   "fields": {
@@ -105,12 +164,16 @@
     "country": "",
     "birth": null,
     "show_email": false,
-    "last_act": "2020-05-20T13:38:35.257Z",
+    "last_act": "2020-05-20T13:50:21.064Z",
     "blacklist": [],
-    "communities": [],
+    "communities": [
+      1
+    ],
     "liked_posts": [],
     "friends": [],
-    "chats": []
+    "chats": [
+      1
+    ]
   }
 },
 {

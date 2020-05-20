@@ -11,7 +11,7 @@
 
     <a class="btn btn{% if page != 'messages' %}-outline{% endif %}-primary waves-effect mx-0 w-100 px-0 py-2 text-left
     {% if user.profile.unread_chats_count %}badge-right{% endif %}" {% if user.profile.unread_chats_count %}data-count="{{ user.profile.unread_chats_count }}"{% endif %}
-    href="/chats/{{ user.profile.custom_url }}/" second-href="/chats/{{ user.profile.custom_url }}/">
+    href="/chats/" second-href="/chats/">
         <i class="fa fa-comments mx-2" aria-hidden="true"></i>
         Сообщения
     </a>

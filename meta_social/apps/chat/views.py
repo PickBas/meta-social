@@ -38,7 +38,7 @@ class Conversations:
             """
             self.context['pagename'] = 'Чаты'
 
-            c_user = User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
+            c_user = request.user
             self.context['c_user'] = c_user
 
             chats = c_user.profile.chats.all().order_by('-messages__date')

@@ -14,7 +14,7 @@ class MetaSetUp(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.get(username="test_user")
+        self.user = User.objects.get(username="test_user2")
         self.client.force_login(user=self.user)
 
 
@@ -38,7 +38,7 @@ class IndexViewTest(MetaSetUp):
 class ProfileViewTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/accounts/profile/2/')
+        self.response = self.client.get('/accounts/profile/test_user/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -46,24 +46,25 @@ class ProfileViewTest(MetaSetUp):
     # здесь тест содержимого
 
 
-class FriendsSearchView(MetaSetUp):
-    def setUp(self):
-        super().setUp()
-        self.response = self.client.get('/friends/search/')
-
-    def test_friend_post(self):
-        response = self.client.post('/friends/search/', {'name': 'test_user2'})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.response.status_code, 200)
-        self.assertTrue(
-            User.objects.get(
-                username="test_user2") in response.context['matches'])
+# class FriendsSearchView(MetaSetUp):
+#     def setUp(self):
+#         super().setUp()
+#         self.response = self.client.get('/friends/search/')
+#
+#     def test_friend_post(self):
+#         print(self.response.context)
+#         response = self.client.post('/friends/search/', {'username': 'test_user'})
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(self.response.status_code, 200)
+#         self.assertTrue(
+#             User.objects.get(
+#                 username="test_user2") in response.context['matches'])
 
 
 class FriendsListView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/friends/2/')
+        self.response = self.client.get('/friends/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -72,34 +73,16 @@ class FriendsListView(MetaSetUp):
 class ChatView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/chat/')
+        self.response = self.client.get('/chats/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
-
-
-class ChatMeesages(MetaSetUp):
-    def setUp(self):
-        super().setUp()
-        self.response = self.client.get('/chat/go_to_chat/3/')
-
-    def test_page(self):
-        self.assertEqual(self.response.status_code, 200)
-
-    def test_send_post(self):
-        response = self.client.get('/chat/go_to_chat/3/send_mes/')
-        self.assertEqual(response.status_code, 404)
-        response = self.client.post('/chat/go_to_chat/3/send_mes/',
-                                    {'text': 'Wake up!'})
-        self.assertEqual(response.status_code, 200)
-        result = json.loads(response.content)
-        self.assertEqual(result['sender'], 'test_user')
 
 
 class CommunityView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/community/1/')
+        self.response = self.client.get('/community/asd/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -108,7 +91,7 @@ class CommunityView(MetaSetUp):
 class CommunityListView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/community/list/')
+        self.response = self.client.get('/community/user/list/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
