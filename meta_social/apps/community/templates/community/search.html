@@ -11,14 +11,12 @@
     {% endif %}
 {% else %}
     {% if c_user_communities %}
-        <div class="infinite-container">
-            {% for community in c_user_communities %}
-                <li class="list-group-item infinite-item">
-                    <img src="{{ community.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                    <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
-                </li>
-            {% endfor %}
-        </div>
+        {% for community in c_user_communities %}
+            <li class="list-group-item infinite-item">
+                <img src="{{ community.image.url }}" class="rounded-circle border float-left" width=40 height=40>
+                <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
+            </li>
+        {% endfor %}
         {% if c_user_communities.has_next %}
             <a class="infinite-more-link" href="?page={{ c_user_communities.next_page_number }}">More</a>
         {% endif %}
