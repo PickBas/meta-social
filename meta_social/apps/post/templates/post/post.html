@@ -5,7 +5,13 @@
 
             <div class="name-date float-left ml-2 mb-0 pb-0">
                 <a href="{{ post.get_link }}">
-                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью</small>
+                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью {% if post.is_reposted %}
+                                                                                                    {% if post.owner %}
+                                                                                                        (<a href="/accounts/profile/{{ post.owner.id }}/">{{ post.owner.profile.get_name }}</a>)
+                                                                                                    {% else %}
+                                                                                                        (<a href="/community/{{ post.owner_community.id }}/">{{ post.owner_community.name }}</a>)
+                                                                                                    {% endif %}
+                                                                                                {% endif %}</small>
                 </a>
                 <p style="margin-top: -5px;">
                     <small class="text-muted">{{ post.date }}</small>
@@ -113,10 +119,12 @@
                 <span class="comment-counter">{{ post.amount_of_comments }}</span>
                 <i class="far fa-comment"></i>
             </a>
-            <a href="#" class="text-muted mb-0 ml-2">
-                <span class="repost-counter">0</span>
-                <i class="fa fa-bullhorn" aria-hidden="true"></i>
-            </a>
+            {% if c_user != user %}
+                <a href="/post/{{ post.id }}/rt/" class="text-muted mb-0 ml-2">
+                    <span class="repost-counter">{{ post.get_rt_count }}</span>
+                    <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                </a>
+            {% endif %}
         </div>
 
         <div class="post-send-comment border-top mt-1 mb-0 pb-0">

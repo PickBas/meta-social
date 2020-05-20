@@ -31,7 +31,7 @@
             </div>
         {% endif %}
 
-        {% for post in community.posts %}
+        {% for post in community.get_posts %}
             <div class="infinite-item">
                 {% include 'post/post.html' %}
             </div>

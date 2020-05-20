@@ -29,20 +29,10 @@ class Community(models.Model):
                                       'invalid': 'Invalid url'
                                   }, )
 
+    posts = models.ManyToManyField(Post, 'posts_com')
     base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
-
     country = CountryField(null=True)
 
-    def posts(self):
-        """
-        Get community's posts
-        """
-        return Post.objects.filter(community=self)[::-1]
-
-    def amount_of_posts(self) -> int:
-        """
-        Get amount of posts
-        :return: int
-        """
-        return len(self.posts())
+    def get_posts(self):
+        return reversed(self.posts.all())

@@ -72,6 +72,7 @@ class Profile(models.Model):
         auto_now_add=False
     )
 
+    posts = models.ManyToManyField(Post, 'posts')
     blacklist = models.ManyToManyField(User, 'blacklist')
     communities = models.ManyToManyField(Community)
     liked_posts = models.ManyToManyField(Post, 'liked_posts')
@@ -131,19 +132,6 @@ class Profile(models.Model):
         """
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
 
-    def posts(self):
-        """
-        Getting user's posts
-        """
-        return reversed(Post.objects.filter(user=self.user))
-
-    def amount_of_posts(self) -> int:
-        """
-        Get amount of posts
-        :return: int
-        """
-        return len(self.posts())
-
     def friendship_inbox_requests(self):
         """
         Returns incoming friendship request objects
@@ -188,9 +176,9 @@ class Profile(models.Model):
         """
         posts = []
         for friend in self.friends.all():
-            posts += list(friend.profile.posts())
+            posts += list(friend.profile.posts.all())
         for community in self.communities.all():
-            posts += community.posts()
+            posts += community.posts.all()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
