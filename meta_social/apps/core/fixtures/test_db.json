@@ -3,8 +3,8 @@
   "model": "auth.user",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$180000$qfrnx7WyBKrX$diBaAcZflgpH5mK361xCST6QM+oHGTM+q/QdZolCY+0=",
-    "last_login": "2020-05-20T12:33:27.658Z",
+    "password": "pbkdf2_sha256$180000$3tPEDE7BFwoQ$93YKOvPoMl0ezV8pcuE8w6MMfKH2/ScKGApcq02YyOg=",
+    "last_login": "2020-05-20T13:38:15.418Z",
     "is_superuser": false,
     "username": "test_user",
     "first_name": "",
@@ -12,7 +12,7 @@
     "email": "test_user@testuser.com",
     "is_staff": false,
     "is_active": true,
-    "date_joined": "2020-05-20T12:33:27.513Z",
+    "date_joined": "2020-05-20T13:38:15.215Z",
     "groups": [],
     "user_permissions": []
   }
@@ -21,8 +21,8 @@
   "model": "auth.user",
   "pk": 2,
   "fields": {
-    "password": "pbkdf2_sha256$180000$VpIvUNWGZKuP$yBS0tZTtw358iVoeVlN3c3RK5goqbpf4ZJLQmMqkfM8=",
-    "last_login": "2020-05-20T12:34:26.623Z",
+    "password": "pbkdf2_sha256$180000$BdZ3xTJdD7hs$ENtgt7lYkHQ0gVgryjoMUmMXfH1hJLnZYK/z+FL/CXs=",
+    "last_login": "2020-05-20T13:38:32.867Z",
     "is_superuser": false,
     "username": "test_user2",
     "first_name": "",
@@ -30,25 +30,41 @@
     "email": "test_user2@testuser.com",
     "is_staff": false,
     "is_active": true,
-    "date_joined": "2020-05-20T12:34:26.481Z",
+    "date_joined": "2020-05-20T13:38:32.633Z",
     "groups": [],
     "user_permissions": []
   }
 },
 {
   "model": "sessions.session",
-  "pk": "w5ypxl6b1ev86sivgcvd2z4n0f94hixm",
+  "pk": "m9lo5owiip503p85syyp6b64lo8zusww",
   "fields": {
-    "session_data": "Y2U5M2JmNGJkODVhMTlhOWFjZTljN2M0NWQ0YmE2NzUxNTVlODU5Yzp7ImFjY291bnRfdmVyaWZpZWRfZW1haWwiOm51bGwsImFjY291bnRfdXNlciI6IjIiLCJfYXV0aF91c2VyX2lkIjoiMiIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImFsbGF1dGguYWNjb3VudC5hdXRoX2JhY2tlbmRzLkF1dGhlbnRpY2F0aW9uQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImI3ZGRkYzZkNTA1MTY0OWEyYTVjODg0YzFjN2Y1ZWFiNmM4NjdhMTkifQ==",
-    "expire_date": "2020-06-03T12:34:26.631Z"
+    "session_data": "Y2Y4OWEyN2IxNTJhZGExZjc5ODA1YTlhOTg1YmQ1YmMzMzg0ZjJlMDp7ImFjY291bnRfdmVyaWZpZWRfZW1haWwiOm51bGwsImFjY291bnRfdXNlciI6IjIiLCJfYXV0aF91c2VyX2lkIjoiMiIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImFsbGF1dGguYWNjb3VudC5hdXRoX2JhY2tlbmRzLkF1dGhlbnRpY2F0aW9uQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6IjhjNzEyNTM5NTZjMzY1NDg4ZDViN2E1Y2E1NTY5MGMxZGMyYzdmZTEiLCJfbWVzc2FnZXMiOiJbW1wiX19qc29uX21lc3NhZ2VcIiwwLDIwLFwiXFx1MDQxZlxcdTA0M2VcXHUwNDM0XFx1MDQ0MlxcdTA0MzJcXHUwNDM1XFx1MDQ0MFxcdTA0MzZcXHUwNDM0XFx1MDQzNVxcdTA0M2RcXHUwNDM4XFx1MDQzNSBlLW1haWwgXFx1MDQzMFxcdTA0MzRcXHUwNDQwXFx1MDQzNVxcdTA0NDFcXHUwNDMwIFxcdTA0M2VcXHUwNDQyXFx1MDQzZlxcdTA0NDBcXHUwNDMwXFx1MDQzMlxcdTA0M2JcXHUwNDM1XFx1MDQzZFxcdTA0M2UgXFx1MDQzZFxcdTA0MzAgdGVzdF91c2VyMkB0ZXN0dXNlci5jb20uXCJdLFtcIl9fanNvbl9tZXNzYWdlXCIsMCwyNSxcIlxcdTA0MTJcXHUwNDRiIFxcdTA0MzJcXHUwNDNlXFx1MDQ0OFxcdTA0M2JcXHUwNDM4IFxcdTA0M2FcXHUwNDMwXFx1MDQzYSB0ZXN0X3VzZXIyLlwiXV0ifQ==",
+    "expire_date": "2020-06-03T13:38:32.885Z"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 2,
+  "fields": {
+    "domain": "http://localhost:8000/",
+    "name": "http://localhost:8000/"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 3,
+  "fields": {
+    "domain": "http://127.0.0.1:8000/",
+    "name": "http://127.0.0.1:8000/"
   }
 },
 {
   "model": "sites.site",
   "pk": 4,
   "fields": {
-    "domain": "example.com",
-    "name": "example.com"
+    "domain": "http://social.savink.in/",
+    "name": "http://social.savink.in/"
   }
 },
 {
@@ -56,6 +72,7 @@
   "pk": 1,
   "fields": {
     "user": 1,
+    "custom_url": "test_user",
     "base_image": "avatars/users/0.png",
     "image": "avatars/users/0.png",
     "job": null,
@@ -65,7 +82,7 @@
     "country": "",
     "birth": null,
     "show_email": false,
-    "last_act": "2020-05-20T12:33:32.119Z",
+    "last_act": "2020-05-20T13:38:18.200Z",
     "blacklist": [],
     "communities": [],
     "liked_posts": [],
@@ -78,6 +95,7 @@
   "pk": 2,
   "fields": {
     "user": 2,
+    "custom_url": "test_user2",
     "base_image": "avatars/users/0.png",
     "image": "avatars/users/0.png",
     "job": null,
@@ -87,7 +105,7 @@
     "country": "",
     "birth": null,
     "show_email": false,
-    "last_act": "2020-05-20T12:34:29.243Z",
+    "last_act": "2020-05-20T13:38:35.257Z",
     "blacklist": [],
     "communities": [],
     "liked_posts": [],
@@ -113,6 +131,38 @@
     "email": "test_user2@testuser.com",
     "verified": false,
     "primary": true
+  }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 1,
+  "fields": {
+    "provider": "vk",
+    "name": "VK",
+    "client_id": "7317110",
+    "secret": "ST3oRjWFifOgxxFUl5sH",
+    "key": "",
+    "sites": [
+      3,
+      2,
+      4
+    ]
+  }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 2,
+  "fields": {
+    "provider": "facebook",
+    "name": "Facebook",
+    "client_id": "2555976281192292",
+    "secret": "b82697d96b942c6f0aa253668c15eb6d",
+    "key": "",
+    "sites": [
+      3,
+      2,
+      4
+    ]
   }
 }
 ]
