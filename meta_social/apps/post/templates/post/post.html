@@ -7,9 +7,9 @@
                 <a href="{{ post.get_link }}">
                     {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью {% if post.is_reposted %}
                                                                                                     {% if post.owner %}
-                                                                                                        (<a href="/accounts/profile/{{ post.owner.id }}/">{{ post.owner.profile.get_name }}</a>)
+                                                                                                        (<a href="/accounts/profile/{{ post.owner.profile.custom_url }}/">{{ post.owner.profile.get_name }}</a>)
                                                                                                     {% else %}
-                                                                                                        (<a href="/community/{{ post.owner_community.id }}/">{{ post.owner_community.name }}</a>)
+                                                                                                        (<a href="/community/{{ post.owner_community.custom_url }}/">{{ post.owner_community.name }}</a>)
                                                                                                     {% endif %}
                                                                                                 {% endif %}</small>
                 </a>
