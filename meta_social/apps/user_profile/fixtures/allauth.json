@@ -19,8 +19,8 @@
   "model": "sites.site",
   "pk": 4,
   "fields": {
-    "domain": "http://social.savink.in/",
-    "name": "http://social.savink.in/"
+    "domain": "http://metasocial.savink.in/",
+    "name": "http://metasocial.savink.in/"
   }
 },
 {

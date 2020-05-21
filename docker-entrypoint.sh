@@ -22,4 +22,4 @@ echo "======Разворачиваем фикстуры======"
 python manage.py loaddata allauth.json
 
 echo "======Стартуем сервер======"
-python manage.py runserver 0.0.0.0:80
+daphne -e ssl:443:privateKey=/code/config/privkey.pem:certKey=/code/config/cert.pem:extraCertChain=/code/config/chain.pem  -b 0.0.0.0 -p 80 meta_social.asgi:application
