@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run pylint
-pylint $(python3 ./pylint_runner.py) --load-plugins pylint_django | tee pylint.txt
+pylint $(python ./pylint_runner.py) --load-plugins pylint_django | tee pylint.txt
 
 # get badge
 mkdir public
