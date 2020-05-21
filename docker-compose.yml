@@ -30,3 +30,14 @@ services:
     ports:
       - "6379:6379"
     restart: always
+  
+  smtp:
+    image: namshi/smtp
+    restart: always
+    ports:
+      - '25:25'
+    volumes:
+      - ./:/code
+    environment: 
+      - KEY_PATH=/code/config/privkey.pem
+      - CERTIFICATE_PATH=/code/config/certkey.pem

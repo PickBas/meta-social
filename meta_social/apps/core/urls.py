@@ -12,4 +12,5 @@ urlpatterns = [
     path('', login_required(Index.as_view()), name='home'),
     path('ajax/update_nav/', login_required(Index.update_nav)),
     path('ajax/search/', login_required(GlobalSearch.as_view())),
+    path('send_email/', login_required(Index.send_email))
 ]

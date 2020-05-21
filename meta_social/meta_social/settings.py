@@ -236,12 +236,12 @@ FIXTURE_DIRS = [
 
 # Email settings
 if START_WITH_DOCKER:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    # EMAIL_HOST = 'smtp'
-    # EMAIL_PORT = '25'
-    # EMAIL_USE_TLS = True
-    # EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, 'config/ssl_keys/privkey.pem')
-    # EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, 'config/ssl_keys/fullchain.pem')
-    # DEFAULT_FROM_EMAIL = 'noreply@social.savink.in'
+    # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_HOST = 'smtp'
+    EMAIL_PORT = '25'
+    EMAIL_USE_TLS = True
+    EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, 'config/privkey.pem')
+    EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, 'config/fullchain.pem')
+    DEFAULT_FROM_EMAIL = 'noreply@social.savink.in'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -4,12 +4,13 @@ Meta social core views module
 
 from simple_search import search_filter
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import modelformset_factory
 from django.http import Http404
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 from post.forms import PostForm, PostImageForm
 from post.models import PostImages
@@ -119,6 +120,17 @@ class Index(MetaSocialView):
             return render(request, 'navigation_menu.html', context)
 
         raise Http404()
+
+    @staticmethod
+    def send_email(request):
+        send_mail(
+            'Subject',
+            'Message',
+            'noreply@metasocial.savink.in',
+            [request.user.email]
+        )
+
+        return redirect('/')
 
 
 class GlobalSearch(View):
