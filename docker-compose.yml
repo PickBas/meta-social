@@ -39,5 +39,5 @@ services:
     volumes:
       - ./:/code
     environment: 
-      - KEY_PATH=/root/meta-social/config/privkey.pem
-      - CERTIFICATE_PATH=/root/meta-social/config/certkey.pem
+      - KEY_PATH=/code/config/privkey.pem
+      - CERTIFICATE_PATH=/code/config/cert.pem
