@@ -124,14 +124,9 @@ class Index(MetaSocialView):
 
     @staticmethod
     def send_email(request):
-        print(
-            settings.EMAIL_SSL_KEYFILE,
-            settings.EMAIL_SSL_CERTFILE
-        )
-
         send_mail(
-            'Subject',
-            'Message',
+            'Subject.\n',
+            'Message.\n',
             'noreply@metasocial.savink.in',
             [request.user.email]
         )
