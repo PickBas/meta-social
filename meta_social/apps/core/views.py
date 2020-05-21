@@ -122,17 +122,6 @@ class Index(MetaSocialView):
 
         raise Http404()
 
-    @staticmethod
-    def send_email(request):
-        send_mail(
-            'Subject.\n',
-            'Message.\n',
-            'noreply@metasocial.savink.in',
-            [request.user.email]
-        )
-
-        return redirect('/')
-
 
 class GlobalSearch(View):
     """
