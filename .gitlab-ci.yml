@@ -16,6 +16,6 @@ test:
 
 pylint:
   script:
-    - ci/pylint_runner.sh
+    - pylint $(ls meta_social/*/*/ -d */) --load-plugins pylint_django
   only:
     - devel
