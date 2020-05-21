@@ -1,3 +1,6 @@
 pylint
 pylint-django
 pylint-json2html
+colorama
+argparse
+configparser
