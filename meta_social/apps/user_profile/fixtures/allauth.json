@@ -54,5 +54,21 @@
       4
     ]
   }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 3,
+  "fields": {
+    "provider": "yandex",
+    "name": "Yandex",
+    "client_id": "1ff42eb87f8e4467807e3d8a9932424e",
+    "secret": "8d552db3599c4126ad977c3ed51498b5",
+    "key": "",
+    "sites": [
+      3,
+      2,
+      4
+    ]
+  }
 }
 ]

@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.yandex',
 ]
 
 MIDDLEWARE = [
