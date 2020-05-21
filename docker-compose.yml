@@ -6,6 +6,7 @@ services:
       context: .
     ports:
       - 80:80
+      - 443:443
     command: ./docker-entrypoint.sh
     depends_on:
       - db
