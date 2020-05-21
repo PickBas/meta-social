@@ -1,9 +1,11 @@
 #!/bin/bash
 
+export START_WITH_DOCKER="True"
+
 cd meta_social || exit
 echo "======Собираем статику======"
 echo "Загрузка в s3 облако, это займет много времени"
-python manage.py collectstatic --noinput
+#python manage.py collectstatic --noinput
 
 
 echo "======Таки ждем, пока постгра поднимется======"
