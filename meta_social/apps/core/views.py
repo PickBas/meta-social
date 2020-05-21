@@ -11,6 +11,7 @@ from django.forms import modelformset_factory
 from django.http import Http404
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.conf import settings
 
 from post.forms import PostForm, PostImageForm
 from post.models import PostImages
@@ -123,6 +124,11 @@ class Index(MetaSocialView):
 
     @staticmethod
     def send_email(request):
+        print(
+            settings.EMAIL_SSL_KEYFILE,
+            settings.EMAIL_SSL_CERTFILE
+        )
+
         send_mail(
             'Subject',
             'Message',
