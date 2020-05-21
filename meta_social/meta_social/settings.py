@@ -33,7 +33,7 @@ SECRET_KEY = '#bhq1g66br=mwyxcvxxc+1yu=1fq@wcv--ys&&7=233@0^zv5!'
 DEBUG = not START_WITH_DOCKER
 
 ALLOWED_HOSTS = [
-    'social.savink.in',
+    'metasocial.savink.in',
     '127.0.0.1',
     'localhost',
 ]
