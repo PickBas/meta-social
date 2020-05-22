@@ -17,7 +17,6 @@ daphne==2.5.0
 defusedxml==0.6.0
 Django==3.0.6
 git+git://github.com/pennersr/django-allauth.git
-django-channels==0.7.0
 django-countries==6.1.2
 django-crispy-forms==1.9.1
 django-s3-storage==0.13.0
