@@ -125,7 +125,12 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis' if START_WITH_DOCKER else '127.0.0.1', 6379)],
+            'hosts': [('redis' if START_WITH_DOCKER else '127.0.0.1', 6379)],
+            'channel_capacity': {
+                'http.request': 200,
+                'websocket.send*': 1000,
+            },
+            'expiry': 15
         },
     },
 }
