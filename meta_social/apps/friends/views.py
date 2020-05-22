@@ -50,7 +50,6 @@ class FriendsViews:
             Processing get request
             """
             requested = request.GET.get('username')
-            print(requested)
             self.context['c_user'] = request.user
             if requested:
                 self.context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested))

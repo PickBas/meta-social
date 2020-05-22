@@ -59,16 +59,20 @@
         {% if c_user.profile.friends.count %}
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title"><a href="/friends/{{ c_user.id }}/">Друзья</a> </h6>
+                    {% if user != c_user %}
+                        <h6 class="card-title"><a href="/friends/?username={{ c_user.profile.custom_url }}">Друзья</a> </h6>
+                    {% else %}
+                        <h6 class="card-title"><a href="/friends/">Друзья</a> </h6>
+                    {% endif %}
                     <div class="row px-2">
-                        {% for friend in c_user.profile.friends.all|slice:":6"%}
-                            <div class="col-4 px-0 mx-0 text-center">
-                                <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
-                                    <a href="/accounts/profile/{{ friend.id }}/">
-                                        {{ friend.profile.get_name }}
-                                    </a>
-                            </div>
-                        {% endfor %}
+                    {% for friend in c_user.profile.friends.all|slice:":6"%}
+                        <div class="col-4 px-0 mx-0 text-center">
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
+                                <a href="/accounts/profile/{{ friend.profile.custom_url }}/">
+                                    {{ friend.profile.get_name }}
+                                </a>
+                        </div>
+                    {% endfor %}
                     </div>
                 </div>
             </div>
@@ -77,12 +81,16 @@
         {% if c_user.profile.communities.count %}
             <div class="card mt-3 mb-3">
                 <div class="card-body">
-                    <h6 class="card-title">Сообщества</h6>
+                    {% if user != c_user %}
+                        <h6 class="card-title"><a href="/community/user/list/?username={{ c_user.profile.custom_url }}">Сообщества</a> </h6>
+                    {% else %}
+                        <h6 class="card-title"><a href="/community/user/list/">Сообщества</a> </h6>
+                    {% endif %}
                     <div class="row px-2">
                         {% for community in c_user.profile.communities.all|slice:":6"%}
                             <div class="col-4 px-0 mx-0 text-center">
                                 <img src="{{ community.image.url }}" class="rounded-circle border" width=40 height=40>
-                                    <a href="/community/{{ community.id }}/">
+                                    <a href="/community/{{ community.custom_url }}/">
                                         {{ community.name }}
                                     </a>
                             </div>
