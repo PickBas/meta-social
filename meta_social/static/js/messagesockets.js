@@ -7,7 +7,7 @@ let scrolled_by_user = false
 const chatSocket = new WebSocket(
     'wss://'
     + window.location.host
-    + '/ws/chat/'
+    + '/wss/chat/'
     + roomName
     + '/'
 );
