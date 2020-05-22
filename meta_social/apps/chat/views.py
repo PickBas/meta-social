@@ -74,7 +74,7 @@ class Conversations:
         c_room = Chat.objects.get(id=room_id)
         if request.method == 'POST' and request.user == c_room.owner:
             c_room.delete()
-            return redirect('/chats/' + request.user.profile.custom_url)
+            return redirect('/chats/')
         raise Http404()
 
     @staticmethod
