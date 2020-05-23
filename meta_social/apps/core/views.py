@@ -4,14 +4,12 @@ Meta social core views module
 
 from simple_search import search_filter
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import modelformset_factory
 from django.http import Http404
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.conf import settings
 
 from post.forms import PostForm, PostImageForm
 from post.models import PostImages

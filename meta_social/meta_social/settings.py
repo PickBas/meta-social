@@ -250,3 +250,8 @@ if START_WITH_DOCKER:
     DEFAULT_FROM_EMAIL = 'noreply@metasocial.savink.in'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
