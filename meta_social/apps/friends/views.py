@@ -9,9 +9,9 @@ from django.contrib.auth.models import User
 from django.http import Http404
 
 from core.views import MetaSocialView
+from user_profile.models import Profile
 
 from .models import FriendshipRequest
-from user_profile.models import Profile
 
 
 class FriendsViews:
@@ -145,6 +145,8 @@ class FriendsViews:
                     item.save()
 
                     return FriendsViews.get_render(request, {'c_user': request.user})
+            
+            raise Http404()
 
         def get(self, request, **kwargs):
             """
@@ -187,6 +189,8 @@ class FriendsViews:
                 request_item.delete()
 
                 return FriendsViews.get_render(request, {'c_user': request.user})
+            
+            raise Http404()
 
         def get(self, request, **kwargs):
             """

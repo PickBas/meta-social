@@ -4,13 +4,11 @@ Meta social music views
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
 
 from core.views import MetaSocialView
+from user_profile.models import PlayPosition, Profile
 
 from .forms import UploadMusicForm
-from user_profile.models import Profile
-from user_profile.models import PlayPosition
 
 
 class MusicViews:
@@ -25,7 +23,7 @@ class MusicViews:
             super().__init__(**kwargs)
             self.template_name = 'music/music_list.html'
 
-        def get(self, request, **kwargs):
+        def get(self, request):
             """
             Processing get request
             """

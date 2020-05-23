@@ -15,10 +15,10 @@ from core.views import MetaSocialView
 from core.forms import CropAvatarForm
 from post.forms import PostImageForm, PostForm
 from post.models import PostImages
+from user_profile.models import Profile
 
 from .models import Community
 from .forms import EditCommunityForm, CommunityCreateForm, UpdateCommunityAvatarForm
-from user_profile.models import Profile
 
 
 class Communities:
