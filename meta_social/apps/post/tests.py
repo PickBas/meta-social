@@ -58,5 +58,42 @@ class PostCreate(MetaSetUp):
         response = self.client.get('/post/{}/'.format(p.id))
         self.assertEqual(response.status_code, 200)
         self.client.post('/post/{}/remove/'.format(p.id))
-        self.assertFalse(Post.objects.filter(user=self.user,
-                                             text=form_data['text']))
+        self.assertFalse(
+            Post.objects.filter(user=self.user, text=form_data['text']))
+
+
+class PostEdit(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+
+    def test_editpost_simple(self):
+        self.assertTrue(True)
+        form_data = {'text': "edit post complete"}
+        formset_data = {
+            'form-TOTAL_FORMS': '0',
+            'form-INITIAL_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1',
+        }
+        form = PostForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.client.post('/post/{}/edit/'.format(1), {
+            **form_data,
+            **formset_data
+        })
+        p = Post.objects.get(user=self.user, text=form_data['text'])
+        self.assertEqual(p.id, 1)
+        response = self.client.get('/post/{}/'.format(p.id))
+        self.assertEqual(response.status_code, 200)
+
+
+class PostLikes(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+
+    def test_like_page(self):
+        self.client.post('/like/1/')
+        response = self.client.get('/accounts/profile/like_marks/')
+        # т.к. там все посты вынимаются из user.profile то проверить
+        # то и нечего подтверждение виду
+        self.assertTemplateUsed(response, 'profile/like_marks.html')

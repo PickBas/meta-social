@@ -10,7 +10,7 @@ import json
 
 
 class MetaSetUp(TestCase):
-    fixtures = ["test_db.json"]
+    fixtures = ["test_friends_music_db.json"]
 
     def setUp(self):
         self.client = Client()
@@ -33,6 +33,24 @@ class IndexViewTest(MetaSetUp):
         response = unauth_client.get(reverse("home"), follow=True)
         last_url, status = response.redirect_chain[-1]
         self.assertIn(reverse("account_login"), last_url)
+
+
+class GlobalSearchTest(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+
+    def test_search(self):
+        resp = self.client.post('/ajax/search/', {
+            'query': 'test',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.context['users']), 2)
+        self.assertEqual(len(resp.context['communities']), 0)
+        self.assertTemplateUsed(resp, 'search_list.html')
+        resp = self.client.post('/ajax/search/', {
+            'query': 'Dream',
+        })
+        self.assertEqual(len(resp.context['music']), 3)
 
 
 # Админка не обладает данными об аккаунтах в
