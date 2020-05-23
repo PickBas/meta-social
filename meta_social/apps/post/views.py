@@ -7,7 +7,6 @@ from django.forms import modelformset_factory
 
 from core.views import MetaSocialView
 
-from .tasks import test
 from .models import Post, PostImages, Comment
 from .forms import EditPostImageForm, PostImageForm, PostForm
 
@@ -50,7 +49,6 @@ class PostViews:
             """
             Processing get request
             """
-            test.delay('123')
             return render(request, self.template_name, self.context)
 
     class PostEdit(MetaSocialView):
