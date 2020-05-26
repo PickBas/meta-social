@@ -27,13 +27,13 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <p class="text-danger mb-0">TODO: Впихнуть сюда рекомендуемые сообщества</p>
-            <p>Mожно добавить такое поле при регистрации и создании сообщества</p>
-            <select class="w-100">
-                <option>Ваше хобби/Тема сообщества</option>
-                <option>Программирование</option>
-            </select>
-            <p class="mt-3 mb-0">И на основе его делать рекомендации</p>
+            <p class="mb-0">Рекомендуемые сообщества</p>
+            {% for community in user.profile.get_recommended_communities %}
+                <div class="mt-1">
+                    <img src="{{ community.image.url }}" class="rounded-circle border" width="40" height="40">
+                    <a href="/community/{{ community.custom_url }}/" class="text-truncate">{{ community.name }}</a>
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock right %}
