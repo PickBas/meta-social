@@ -20,20 +20,24 @@
         cd meta_social
         python manage.py makemigrations
         python manage.py migrate
-        python manage.py loaddata db.json
+        python manage.py loaddata allauth.json
+
+3. Запуск проекта
+
+    #### Используя docker:
+
+        docker-compose up --build
+    
+    #### Без docker:
+
+        python manage.py runserver
+        celery -A meta_social worker -l info
 
 ## Как создать админа?
 
 Из-за кастомного профиля админ создается криво, так что делаем так и не паримся
 
     python manage.py createsuperuser_ms
-
-## Что делать если django не видит миграции?
-
-Удаляем **db.sqlite3** и папку **migrations**, затем вводим
-
-    python manage.py makemigrations meta_social_app
-    python manage.py migrate
 
 
 # Данные о соц. сетях
@@ -61,6 +65,13 @@
     # 2
     login: vzsdnhqifk_1582663185@tfbnw.net
     password: verystrongpa55word
+
+## Yandex
+
+Приложение
+
+    id: 1ff42eb87f8e4467807e3d8a9932424e
+    key: 8d552db3599c4126ad977c3ed51498b5
 
 # Для работы чата
 

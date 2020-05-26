@@ -5,55 +5,18 @@
 
             <div class="name-date float-left ml-2 mb-0 pb-0">
                 <a href="{{ post.get_link }}">
-                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью</small>
+                    {{ post.get_owner_name }} <small class="text-muted">поделился(-ась) записью {% if post.is_reposted %}
+                                                                                                    {% if post.owner %}
+                                                                                                        (<a href="/accounts/profile/{{ post.owner.profile.custom_url }}/">{{ post.owner.profile.get_name }}</a>)
+                                                                                                    {% else %}
+                                                                                                        (<a href="/community/{{ post.owner_community.custom_url }}/">{{ post.owner_community.name }}</a>)
+                                                                                                    {% endif %}
+                                                                                                {% endif %}</small>
                 </a>
                 <p style="margin-top: -5px;">
                     <small class="text-muted">{{ post.date }}</small>
                 </p>
             </div>
-
-            {% if user in post.get_editors %}
-                <div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editPostModalLabel">Редактировать пост</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <textarea class="form-control" style="min-width: 100%"
-                                    id="updated-post-text">{{ post.text }}</textarea>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal"
-                                    onclick="edit_post(event, '/post/{{ post.id }}/edit/')">Сохранить</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal fade" id="removingPostModal" tabindex="-1" role="dialog"
-                    aria-labelledby="removingPostModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="removingPostModalLabel">Удалить пост?</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
-                                <button type="button" class="btn btn-primary"
-                                    onclick="remove_post(event, '/post/{{ post.id }}/remove/')" data-dismiss="modal">Да</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
 
             <div class="post-edit float-right">
                 <button class="btn btn-outline-primary btn-sm px-1 py-0 my-0 mr-0 rounded-pill" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -63,7 +26,7 @@
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="/post/{{ post.id }}/">Перейти к посту</a>
                     {% if user in post.get_editors %}
-                        <a class="dropdown-item" data-toggle="modal" data-target="#removingPostModal">Удалить</a>
+                        <a class="dropdown-item" onclick="remove_post(event, '/post/{{ post.id }}/remove/')">Удалить</a>
                         <a class="dropdown-item" href="/post/{{ post.id }}/edit/">Редактировать</a>
                     {% endif %}
                 </div>
@@ -113,10 +76,12 @@
                 <span class="comment-counter">{{ post.amount_of_comments }}</span>
                 <i class="far fa-comment"></i>
             </a>
-            <a href="#" class="text-muted mb-0 ml-2">
-                <span class="repost-counter">0</span>
-                <i class="fa fa-bullhorn" aria-hidden="true"></i>
-            </a>
+            {% if c_user != user %}
+                <a href="/post/{{ post.id }}/rt/" class="text-muted mb-0 ml-2">
+                    <span class="repost-counter">{{ post.get_rt_count }}</span>
+                    <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                </a>
+            {% endif %}
         </div>
 
         <div class="post-send-comment border-top mt-1 mb-0 pb-0">

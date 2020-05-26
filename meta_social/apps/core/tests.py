@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
-import json
 
 # class AdminTest(TestCase):
 #     pass
@@ -48,9 +47,74 @@ class GlobalSearchTest(MetaSetUp):
         self.assertEqual(len(resp.context['communities']), 0)
         self.assertTemplateUsed(resp, 'search_list.html')
         resp = self.client.post('/ajax/search/', {
-            'query': 'Dream',
+            'query': 'Dreams',
         })
         self.assertEqual(len(resp.context['music']), 3)
+
+    def test_page(self):
+        self.response = self.client.get('/accounts/profile/test_user/')
+        self.assertEqual(self.response.status_code, 200)
+
+    # здесь тест содержимого
+
+
+# class FriendsSearchView(MetaSetUp):
+#     def setUp(self):
+#         super().setUp()
+#         self.response = self.client.get('/friends/search/')
+#
+#     def test_friend_post(self):
+#         print(self.response.context)
+#         response = self.client.post('/friends/search/', {'username': 'test_user'})
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(self.response.status_code, 200)
+#         self.assertTrue(
+#             User.objects.get(
+#                 username="test_user2") in response.context['matches'])
+
+
+class FriendsListView(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+        self.response = self.client.get('/friends/')
+
+    def test_page(self):
+        self.assertEqual(self.response.status_code, 200)
+
+
+class ChatView(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+        self.response = self.client.get('/chats/')
+
+    def test_page(self):
+        self.assertEqual(self.response.status_code, 200)
+
+
+# class CommunityView(MetaSetUp):
+#     def setUp(self):
+#         super().setUp()
+#         self.response = self.client.get('/community/asd/')
+
+#     def test_page(self):
+#         self.assertEqual(self.response.status_code, 200)
+
+# class CommunityListView(MetaSetUp):
+#     def setUp(self):
+#         super().setUp()
+#         self.response = self.client.get('/community/user/list/')
+
+#     def test_page(self):
+#         self.assertEqual(self.response.status_code, 200)
+
+
+class PostView(MetaSetUp):
+    def setUp(self):
+        super().setUp()
+        self.response = self.client.get('/post/1/')
+
+    def test_page(self):
+        self.assertEqual(self.response.status_code, 200)
 
 
 # Админка не обладает данными об аккаунтах в

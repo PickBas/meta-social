@@ -3,7 +3,7 @@
         {% for match in c_matches %}
             <li class="list-group-item">
                 <img src="{{ match.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                <a href="/community/{{ match.id }}/" class="float-left ml-2">{{ match.name }}</a>
+                <a href="/community/{{ match.custom_url }}/" class="float-left ml-2">{{ match.name }}</a>
             </li>
         {% endfor %}
     {% else %}
@@ -14,7 +14,7 @@
         {% for community in c_user_communities %}
             <li class="list-group-item infinite-item">
                 <img src="{{ community.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                <a href="/community/{{ community.id }}/" class="float-left ml-2">{{ community.name }}</a>
+                <a href="/community/{{ community.custom_url }}/" class="float-left ml-2">{{ community.name }}</a>
             </li>
         {% endfor %}
         {% if c_user_communities.has_next %}

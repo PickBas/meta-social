@@ -9,9 +9,9 @@ from .views import FriendsViews
 
 
 urlpatterns = [
-    path('friends/<int:user_id>/', login_required(FriendsViews.FriendsList.as_view())),
+    path('friends/', login_required(FriendsViews.FriendsList.as_view())),
     path('friends/requests/', login_required(FriendsViews.FriendsRequests.as_view())),
-    path('friends/<int:user_id>/blacklist/', login_required(FriendsViews.FriendsBlacklist.as_view())),
+    path('friends/blacklist/', login_required(FriendsViews.FriendsBlacklist.as_view())),
 
     path('friends/send_request/<int:user_id>/', login_required(FriendsViews.SendFriendshipRequest.as_view())),
     path('friends/accept_request/<int:user_id>/', login_required(FriendsViews.AcceptRequest.as_view())),

@@ -44,6 +44,16 @@ class Profile(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
+    custom_url = models.CharField(max_length=50,
+                                  default='',
+                                  unique=True,
+                                  help_text='Required. 50 characters or fewer. Letters, digits and @/./+/-/_ only.',
+                                  validators=[User.username_validator],
+                                  error_messages={
+                                      'unique': 'A user with that username already exists.',
+                                      'invalid': 'Invalid url'
+                                  }, )
+
     base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
 
@@ -57,11 +67,12 @@ class Profile(models.Model):
     show_email = models.BooleanField(default=False)
 
     last_act = models.DateTimeField(
-        default=timezone.now, 
-        auto_now=False, 
+        default=timezone.now,
+        auto_now=False,
         auto_now_add=False
     )
 
+    posts = models.ManyToManyField(Post, 'posts')
     blacklist = models.ManyToManyField(User, 'blacklist')
     communities = models.ManyToManyField(Community)
     liked_posts = models.ManyToManyField(Post, 'liked_posts')
@@ -80,7 +91,7 @@ class Profile(models.Model):
             messages = chat.get_unread_messages().exclude(author=self.user)
             if len(messages) > 0:
                 count += 1
-        
+
         return count
 
     def get_name(self):
@@ -120,19 +131,6 @@ class Profile(models.Model):
         :param provider:
         """
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
-
-    def posts(self):
-        """
-        Getting user's posts
-        """
-        return reversed(Post.objects.filter(user=self.user))
-
-    def amount_of_posts(self) -> int:
-        """
-        Get amount of posts
-        :return: int
-        """
-        return len(self.posts())
 
     def friendship_inbox_requests(self):
         """
@@ -178,9 +176,9 @@ class Profile(models.Model):
         """
         posts = []
         for friend in self.friends.all():
-            posts += list(friend.profile.posts())
+            posts += list(friend.profile.posts.all())
         for community in self.communities.all():
-            posts += community.posts()
+            posts += community.posts.all()
         posts = sorted(posts, key=lambda x: x.date, reverse=True)
         return posts
 
@@ -228,6 +226,7 @@ def create_user_profile(sender, **kwargs) -> None:
     """
 
     profile = Profile(user=kwargs['user'])
+    profile.custom_url = profile.user.username
     provider = 'vk' if kwargs['user'].socialaccount_set.filter(
         provider='vk').exists() else 'facebook'
 

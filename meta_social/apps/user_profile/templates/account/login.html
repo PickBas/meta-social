@@ -19,13 +19,16 @@
         <button type="submit" class="btn btn-primary btn-block">
             Войти
         </button>
-        <a class="button secondaryAction" href="{% url 'account_reset_password' %}" style="position: absolute; top: 44.5%; right: 25px;">
+        <a class="button secondaryAction" href="{% url 'account_reset_password' %}" style="position: absolute; top: 40.5%; right: 25px;">
             {% trans "Forgot Password?" %}
         </a>
 
         <div class="separator mt-3 text-muted mb-3">Или</div>
 
-        <a class="btn btn-block text-white" style="background-color: #4C75A3;" href="{% provider_login_url "vk" %}">
+        <a class="btn btn-block text-white" style="background-color: #CA150E;" href="{% provider_login_url "yandex" %}">
+            <h6 style="display: inline;" class="mr-2"><b>Я</b></h6><span>Яндекс</span>
+        </a>
+        <a class="btn btn-block text-white mt-2" style="background-color: #4C75A3;" href="{% provider_login_url "vk" %}">
             <i class="fab fa-vk pr-1"></i> ВКонтакте
         </a>
         <a class="btn btn-block text-white mt-2 mb-2" style="background-color: #3B5998;" href="{% provider_login_url "facebook" %}">

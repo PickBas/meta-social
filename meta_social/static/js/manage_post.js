@@ -51,7 +51,7 @@ function remove_post(e, link) {
             csrfmiddlewaretoken: getCookie('csrftoken')
         },
         success: function () {
-            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+            e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
                 .remove();
         }
     })

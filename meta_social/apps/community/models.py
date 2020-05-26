@@ -19,20 +19,20 @@ class Community(models.Model):
     name = models.CharField(max_length=100, null=True)
     info = models.CharField(max_length=1000, null=True)
 
+    custom_url = models.CharField(max_length=50,
+                                  default='',
+                                  unique=True,
+                                  help_text='Required. 50 characters or fewer. Letters, digits and @/./+/-/_ only.',
+                                  validators=[User.username_validator],
+                                  error_messages={
+                                      'unique': 'A user with that username already exists.',
+                                      'invalid': 'Invalid url'
+                                  }, )
+
+    posts = models.ManyToManyField(Post, 'posts_com')
     base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
-
     country = CountryField(null=True)
 
-    def posts(self):
-        """
-        Get community's posts
-        """
-        return Post.objects.filter(community=self)[::-1]
-
-    def amount_of_posts(self) -> int:
-        """
-        Get amount of posts
-        :return: int
-        """
-        return len(self.posts())
+    def get_posts(self):
+        return reversed(self.posts.all())

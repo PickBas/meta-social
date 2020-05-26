@@ -15,21 +15,21 @@ class MetaSetUp(TestCase):
 class FriendsListView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/friends/{}/'.format(self.user.id))
+        self.response = self.client.get('/friends/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'friends/friends_list.html')
 
-        response = self.client.post('/friends/{}/'.format(self.user.id))
+        response = self.client.get('/friends/',
+                                   {'username': self.user.username)
         self.assertEqual(response.status_code, 200)
 
 
 class BlacklistTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/friends/{}/blacklist/'.format(
-            self.user.id))
+        self.response = self.client.get('/friends/blacklist/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)

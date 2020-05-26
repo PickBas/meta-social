@@ -7,7 +7,7 @@ from PIL import Image
 
 from django.core.files.base import ContentFile
 from django.shortcuts import render, HttpResponse, redirect
-from django.http import Http404
+from django.http import Http404,HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.utils import timezone
@@ -30,6 +30,7 @@ class ProfileViews:
         """
         Profile page view
         """
+
         def __init__(self, **kwargs):
             self.template_name = 'profile/profile_page.html'
             super().__init__(**kwargs)
@@ -38,18 +39,17 @@ class ProfileViews:
             """
             User profile view.
             :param request: request
-            :param user_id: id
             :return: context
             """
-            if not User.objects.filter(id=kwargs['user_id']).exists():
+            if not User.objects.filter(profile=Profile.objects.get(custom_url=kwargs['user_url'])).exists():
                 raise Http404()
 
             context = self.get_menu_context('profile', 'Профиль')
-            context['profile'] = Profile.objects.get(user=kwargs['user_id'])
-            user_item = User.objects.get(id=kwargs['user_id'])
+            context['profile'] = Profile.objects.get(custom_url=kwargs['user_url'])
+            user_item = User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
             context['c_user'] = user_item
 
-            PostImageFormSet = modelformset_factory(
+            post_image_form_set = modelformset_factory(
                 PostImages, form=PostImageForm, extra=10, max_num=10
             )
 
@@ -69,12 +69,14 @@ class ProfileViews:
             context['pass_add_to_friends'] = pass_add_to_friends
 
             context['postform'] = PostForm()
-            context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
+            context['formset'] = post_image_form_set(queryset=PostImages.objects.none())
+
+            user_item.username
 
             if not is_in_blacklist:
                 self.pagination_elemetns(
                     request,
-                    list(user_item.profile.posts()),
+                    list(reversed(user_item.profile.posts.all())),
                     context,
                     'c_user_posts'
                 )
@@ -94,6 +96,28 @@ class ProfileViews:
             self.profile = None
             self.previous_birth = None
 
+
+        def get(self, request, **kwargs) -> render:
+            """
+            Processing get request
+            :param request: request
+            :param kwargs: attrs
+            :return: render
+            """
+            context = self.get_menu_context('profile', 'Редактирование профиля')
+            context['profile'] = Profile.objects.get(custom_url=kwargs['user_url'])
+            context['uedit'] = User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
+            context['user_form'] = UserUpdateForm(
+                instance=User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
+            )
+            context['profile_form'] = ProfileUpdateForm(
+                instance=Profile.objects.get(custom_url=kwargs['user_url']))
+            self.previous_birth = User.objects.get(profile=Profile.objects.get(
+                custom_url=kwargs['user_url']
+                )).profile.birth
+
+            return render(request, self.template_name, context)
+
         def post(self, request, **kwargs) -> redirect:
             """
             Processing post request
@@ -102,14 +126,17 @@ class ProfileViews:
             :return:
             """
 
-            self.previous_birth = User.objects.get(
-                id=kwargs['user_id']).profile.birth
+            self.previous_birth = Profile.objects.get(custom_url=kwargs['user_url']).birth
+
             user_form = UserUpdateForm(
-                request.POST, instance=User.objects.get(id=kwargs['user_id']))
-            self.profile = Profile.objects.get(user=kwargs['user_id'])
+                request.POST, instance=User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url'])))
+
+            self.profile = Profile.objects.get(custom_url=kwargs['user_url'])
 
             self.profile.show_email = False if request.POST.get(
                 'show_email') is None else True
+
+            self.profile.custom_url = kwargs['user_url'] if request.POST.get('custom_url') is None else request.POST.get('custom_url')
 
             profile_form = ProfileUpdateForm(request.POST,
                                              instance=self.profile)
@@ -122,32 +149,16 @@ class ProfileViews:
                     self.profile.birth = self.previous_birth
                     self.profile.save()
 
-                return redirect('/accounts/profile/' + str(kwargs['user_id']))
+                return redirect('/accounts/profile/' + str(kwargs['user_url']) + '/')
 
-        def get(self, request, **kwargs) -> render:
-            """
-            Processing get request
-            :param request: request
-            :param kwargs: attrs
-            :return: render
-            """
-            context = self.get_menu_context('profile', 'Редактирование профиля')
-            context['profile'] = Profile.objects.get(user=kwargs['user_id'])
-            context['uedit'] = User.objects.get(id=kwargs['user_id'])
-            context['user_form'] = UserUpdateForm(
-                instance=User.objects.get(id=kwargs['user_id'])
-            )
-            context['profile_form'] = ProfileUpdateForm(
-                instance=Profile.objects.get(user=kwargs['user_id']))
-            self.previous_birth = User.objects.get(
-                id=kwargs['user_id']).profile.birth
+            return self.get(request, **kwargs)
 
-            return render(request, self.template_name, context)
 
     class AvatarManaging(MetaSocialView):
         """
         Profile avatar manage view
         """
+
         def __init__(self, **kwargs):
             self.context = self.get_menu_context('profile', 'Смена аватарки')
             self.template_name = 'profile/change_avatar.html'
@@ -187,7 +198,7 @@ class ProfileViews:
                                                     save=False)
                     request.user.profile.save()
 
-                return redirect('/accounts/profile/' + str(request.user.id))
+                return redirect('/accounts/profile/' + str(request.user.profile.custom_url) + '/')
 
         def get(self, request):
             """
@@ -218,12 +229,14 @@ class Files:
     """
     Representation of all uploaded files
     """
+
     @staticmethod
-    def all_files(request, user_id):
+    def all_files(request, user_url):
         """
         My files view
         """
         context = MetaSocialView.get_menu_context('files', 'Мои файлы')
-        all_images_from_posts = PostImages.objects.filter(from_user_id=user_id)
+        c_user = User.objects.get(profile=Profile.objects.get(custom_url=user_url))
+        all_images_from_posts = PostImages.objects.filter(from_user_id=c_user.id)
         context['images'] = all_images_from_posts
         return render(request, 'files/files.html', context)

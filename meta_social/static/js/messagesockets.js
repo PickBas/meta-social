@@ -5,7 +5,7 @@ $(function() {
 
 let scrolled_by_user = false
 const chatSocket = new WebSocket(
-    'ws://'
+    'wss://'
     + window.location.host
     + '/ws/chat/'
     + roomName

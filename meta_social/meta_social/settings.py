@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os, sys
+import os
+import sys
 
 # Simple changing DB and redis
-START_WITH_DOCKER = True
+START_WITH_DOCKER = os.getenv('START_WITH_DOCKER', False) == 'True'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,8 +32,14 @@ SECRET_KEY = '#bhq1g66br=mwyxcvxxc+1yu=1fq@wcv--ys&&7=233@0^zv5!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not START_WITH_DOCKER
 
+if START_WITH_DOCKER:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 ALLOWED_HOSTS = [
-    'social.savink.in',
+    'metasocial.savink.in',
     '127.0.0.1',
     'localhost',
 ]
@@ -65,6 +72,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.yandex',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +126,11 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('redis' if START_WITH_DOCKER else '127.0.0.1', 6379)],
+            'channel_capacity': {
+                'http.request': 200,
+                'websocket.send*': 1000,
+            },
+            'expiry': 15
         },
     },
 }
@@ -228,12 +241,20 @@ FIXTURE_DIRS = [
 
 # Email settings
 if START_WITH_DOCKER:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    # EMAIL_HOST = 'smtp'
-    # EMAIL_PORT = '25'
-    # EMAIL_USE_TLS = True
-    # EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, 'config/ssl_keys/privkey.pem')
-    # EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, 'config/ssl_keys/fullchain.pem')
-    # DEFAULT_FROM_EMAIL = 'noreply@social.savink.in'
+    EMAIL_HOST = 'smtp'
+    EMAIL_PORT = '25'
+    EMAIL_USE_TLS = True
+    EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, '../config/privkey.pem')
+    EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, '../config/cert.pem')
+    DEFAULT_FROM_EMAIL = 'noreply@metasocial.savink.in'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Celery settings
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+if START_WITH_DOCKER:
+    CELERY_BROKER_URL = 'redis://redis:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+else:
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'

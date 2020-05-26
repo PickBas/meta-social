@@ -34,7 +34,7 @@
                             <div>
                                 <li class="list-group-item">
                                     <img src="{{ participant.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
-                                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.id }}/">{{ participant.profile.get_name }}</a>
+                                    <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ participant.profile.custom_url }}/">{{ participant.profile.get_name }}</a>
                                     {% if participant in c_room.administrators.all %}
                                         <small class="text-muted float-left">(admin)</small>
                                     {% endif %}
@@ -70,7 +70,7 @@
                                         <form method="POST" action="/chat/{{ c_room.id }}/rmadmin/{{ participant.id }}/" id="id-form-makeadmin">
                                             {% csrf_token %}
                                             <button type="button"
-                                                        class="btn btn-outline-dark float-right mr-2"
+                                                        class="btn btn-outline-dark float-right mr-2 btn-sm px-3 my-0"
                                                         data-placement="top"
                                                         title="Отобрать права администратора"
                                                         style="display: inline-block;"

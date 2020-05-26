@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from chat.models import Chat
-import json
 
 
 class MetaSetUp(TestCase):
@@ -16,7 +15,7 @@ class MetaSetUp(TestCase):
 class ChatView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/chats/1/')
+        self.response = self.client.get('/chats/')
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)

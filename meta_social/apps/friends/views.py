@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 
 from core.views import MetaSocialView
+from user_profile.models import Profile
 
 from .models import FriendshipRequest
 
@@ -48,13 +49,15 @@ class FriendsViews:
             """
             Processing get request
             """
-            c_user = User.objects.get(id=kwargs['user_id'])
-            self.context['c_user'] = c_user
+            requested = request.GET.get('username')
+            self.context['c_user'] = request.user
+            if requested:
+                self.context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested))
             self.context['friends_pages'] = 'my_list'
 
             self.pagination_elemetns(
                 request,
-                c_user.profile.friends.all(),
+                self.context['c_user'].profile.friends.all(),
                 self.context,
                 'friendlist'
             )
@@ -65,7 +68,7 @@ class FriendsViews:
             """
             Processing post request
             """
-            self.context['c_user'] = User.objects.get(id=kwargs['user_id'])
+            self.context['c_user'] = request.user
             return FriendsViews.get_render(request, self.context)
 
     class FriendsRequests(MetaSocialView):
@@ -108,7 +111,7 @@ class FriendsViews:
             """
             context = self.get_menu_context('friends', 'Черный список')
 
-            c_user = get_object_or_404(User, id=kwargs['user_id'])
+            c_user = request.user
             context['c_user'] = c_user
             context['friends_pages'] = 'blacklist'
 
@@ -142,6 +145,8 @@ class FriendsViews:
                     item.save()
 
                     return FriendsViews.get_render(request, {'c_user': request.user})
+            
+            raise Http404()
 
         def get(self, request, **kwargs):
             """
@@ -184,6 +189,8 @@ class FriendsViews:
                 request_item.delete()
 
                 return FriendsViews.get_render(request, {'c_user': request.user})
+            
+            raise Http404()
 
         def get(self, request, **kwargs):
             """

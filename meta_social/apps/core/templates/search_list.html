@@ -5,7 +5,7 @@
             {% for match in users %}
                 <li class="list-group-item">
                     <img src="{{ match.profile.image.url }}" class="rounded-circle" width="20" height="20">
-                    <a href="/accounts/profile/{{ match.id }}/">{{ match.username }}</a>
+                    <a href="/accounts/profile/{{ match.profile.custom_url }}/">{{ match.username }}</a>
                 </li>
             {% endfor %}
         {% endif %}
@@ -15,7 +15,7 @@
             {% for match in communities %}
                 <li class="list-group-item">
                     <img src="{{ match.image.url }}" class="rounded-circle" width="20" height="20">
-                    <a href="/community/{{ match.id }}/">{{ match.name }}</a>
+                    <a href="/community/{{ match.custom_url }}/">{{ match.name }}</a>
                 </li>
             {% endfor %}
         {% endif %}

@@ -14,7 +14,7 @@ class MetaSetUp(TestCase):
 class MusicView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/music/{}/'.format(self.user.id))
+        self.response = self.client.get('/music/')
 
     def test_open_page(self):
         self.assertEqual(self.response.status_code, 200)

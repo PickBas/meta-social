@@ -10,7 +10,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-
 class Like(models.Model):
     """
     Like model
@@ -29,6 +28,13 @@ class Post(models.Model):
     date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
 
     likes = models.ManyToManyField(Like, blank=True, related_name='likes')
+
+    rt = models.ManyToManyField(User, blank=True, related_name='rt')
+
+    is_reposted = models.BooleanField(default=False)
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='owner')
+    owner_community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')
 
     class Meta:
         """
@@ -63,7 +69,7 @@ class Post(models.Model):
         """
         if self.community:
             return '/community/' + str(self.community.id) + '/'
-        return '/accounts/profile/' + str(self.user.id) + '/'
+        return '/accounts/profile/' + str(self.user.profile.custom_url) + '/'
 
     def get_images(self):
         """
@@ -97,6 +103,13 @@ class Post(models.Model):
         if self.user:
             editors.append(self.user)
         return editors
+
+    def get_rt_count(self):
+        """
+        Returns amount of rts
+        :return: int
+        """
+        return len(self.rt.all())
 
 
 class PostImages(models.Model):

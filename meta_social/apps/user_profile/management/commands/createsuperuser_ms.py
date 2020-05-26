@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 email = ''
 
         user_item = User.objects.create_superuser(username, email, password)
-        Profile.objects.create(user=user_item)
+        Profile.objects.create(user=user_item, custom_url=user_item.username)
         EmailAddress.objects.create(
             verified=0,
             primary=1,
