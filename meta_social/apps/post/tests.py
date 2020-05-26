@@ -53,7 +53,8 @@ class PostCreate(MetaSetUp):
         }
         form = PostForm(data=form_data)
         self.assertTrue(form.is_valid())
-        self.client.post('/post/create/', {**form_data, **formset_data})
+        resp = self.client.post('/post/create/', {**form_data, **formset_data})
+        self.assertEqual(resp.status_code, 302)
         p = Post.objects.get(user=self.user, text=form_data['text'])
         response = self.client.get('/post/{}/'.format(p.id))
         self.assertEqual(response.status_code, 200)
@@ -93,7 +94,7 @@ class PostLikes(MetaSetUp):
 
     def test_like_page(self):
         self.client.post('/like/1/')
-        response = self.client.get('/accounts/profile/like_marks/')
+        response = self.client.get('/like_marks/')
         # т.к. там все посты вынимаются из user.profile то проверить
         # то и нечего подтверждение виду
         self.assertTemplateUsed(response, 'profile/like_marks.html')

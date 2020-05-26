@@ -16,7 +16,8 @@ class MetaSetUp(TestCase):
 class ProfileViewTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/accounts/profile/2/')
+        self.response = self.client.get(
+            '/accounts/profile/{}/'.format(self.user.username))
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -25,30 +26,14 @@ class ProfileViewTest(MetaSetUp):
 class ProfileEditTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.url = '/accounts/profile/{}/edit/'.format(self.user.id)
+        self.url = '/accounts/profile/{}/edit/'.format(
+            self.user.username)
         self.response = self.client.get(self.url)
 
     def test_get_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'profile/edit_profile.html')
         self.assertEqual(self.response.context['profile'], self.user.profile)
-
-    def test_edit_profile(self):
-        f_user_update_data = {'first_name': 'test', 'last_name': 'usertest'}
-        f_profile_data = {
-            'job': 'Есть',
-            'study': 'Всю жизнь',
-            'biography': 'Трудно найти, легко потерять, тяжело прокормить',
-            'gender': 'M',  # LGBTQ+ ???
-        }
-        resp = self.client.post(self.url, {
-            **f_user_update_data,
-            **f_profile_data,
-        })
-        self.assertEqual(resp.status_code, 302)
-        upuser = User.objects.get(id=self.user.id)
-        self.assertEqual(upuser.profile.job, f_profile_data['job'])
-        self.assertEqual(upuser.last_name, f_user_update_data['last_name'])
 
     def test_forms(self):
         f_user_update_data = {'first_name': 'test', 'last_name': 'usertest'}
@@ -59,15 +44,34 @@ class ProfileEditTest(MetaSetUp):
             'study': 'Всю жизнь',
             'biography': 'Трудно найти, легко потерять, тяжело прокормить',
             'gender': 'M',
+            'custom_url': self.user.profile.custom_url,
         }
         prfl = ProfileUpdateForm(f_profile_data, instance=self.user.profile)
         self.assertTrue(prfl.is_valid())
+
+    def test_edit_profile(self):
+        f_user_update_data = {'first_name': 'test', 'last_name': 'usertest'}
+        f_profile_data = {
+            'job': 'Есть',
+            'study': 'Всю жизнь',
+            'biography': 'Трудно найти, легко потерять, тяжело прокормить',
+            'gender': 'M',  # LGBTQ+ ???
+            'custom_url': self.user.profile.custom_url,
+        }
+        resp = self.client.post(self.url, {
+            **f_user_update_data,
+            **f_profile_data,
+        })
+        self.assertEqual(resp.status_code, 302)
+        upuser = User.objects.get(id=self.user.id)
+        self.assertEqual(upuser.profile.job, f_profile_data['job'])
+        self.assertEqual(upuser.last_name, f_user_update_data['last_name'])
 
 
 class AvatarManagingTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/accounts/profile/change_avatar/')
+        self.response = self.client.get('/change_avatar/')
 
     def test_get_page(self):
         self.assertEqual(self.response.status_code, 200)

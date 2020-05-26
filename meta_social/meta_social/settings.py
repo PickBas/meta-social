@@ -14,7 +14,7 @@ import os
 import sys
 
 # Simple changing DB and redis
-START_WITH_DOCKER = os.getenv('START_WITH_DOCKER', False) == 'True'
+START_WITH_DOCKER = 'True'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,16 +32,17 @@ SECRET_KEY = '#bhq1g66br=mwyxcvxxc+1yu=1fq@wcv--ys&&7=233@0^zv5!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not START_WITH_DOCKER
 
-if START_WITH_DOCKER:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+# if START_WITH_DOCKER:
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     'metasocial.savink.in',
     '127.0.0.1',
     'localhost',
+    '0.0.0.0',
 ]
 
 # Application definition
@@ -252,6 +253,7 @@ else:
 
 # Celery settings
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_TASK_ALWAYS_EAGER = True
 if START_WITH_DOCKER:
     CELERY_BROKER_URL = 'redis://redis:6379/0'
     CELERY_RESULT_BACKEND = 'redis://redis:6379/0'

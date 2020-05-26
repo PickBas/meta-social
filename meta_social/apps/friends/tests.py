@@ -22,7 +22,7 @@ class FriendsListView(MetaSetUp):
         self.assertTemplateUsed(self.response, 'friends/friends_list.html')
 
         response = self.client.get('/friends/',
-                                   {'username': self.user.username)
+                                   {'username': self.user.username})
         self.assertEqual(response.status_code, 200)
 
 
