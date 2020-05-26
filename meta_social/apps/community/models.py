@@ -4,7 +4,6 @@ Meta social community models
 
 from django.db import models
 from django.contrib.auth.models import User
-from django_countries.fields import CountryField
 
 from post.models import Post
 
@@ -32,7 +31,6 @@ class Community(models.Model):
     posts = models.ManyToManyField(Post, 'posts_com')
     base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
     image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
-    country = CountryField(null=True)
 
     def get_posts(self):
         return reversed(self.posts.all())

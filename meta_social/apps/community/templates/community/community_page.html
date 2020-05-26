@@ -15,7 +15,7 @@
 <div class="row text-left">
 
     <div class="col">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title float-left">{{ community.name }}</h5>
                 <br>
@@ -26,7 +26,7 @@
         </div>
 
         {% if user in community.admins.all %}
-            <div class="mt-3 mb-3">
+            <div class="mb-3">
                 {% include 'post/post_menu.html' %}
             </div>
         {% endif %}
@@ -78,14 +78,41 @@
             {% endif %}
         </div>
     </div>
-    <div class="card mt-3 mb-3">
-        <div class="card-body">
-            <h6 class="card-title">Истории</h6>
+    {% if community.users.count %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <a href="#" data-toggle="modal" data-target="#community_subscribers"><h6 class="card-title">Подписчики</h6></a>
+                <div class="row px-2">
+                {% for friend in community.users.all|slice:":6"%}
+                    <div class="col-4 px-0 mx-0 text-center">
+                        <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">
+                                {{ friend.profile.get_name }}
+                            </a>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card mt-3 mb-3">
-        <div class="card-body">
-            <h6 class="card-title">Подписаны</h6>
+    {% endif %}
+    <!-- Modal -->
+    <div class="modal fade" id="community_subscribers" tabindex="-1" role="dialog" aria-labelledby="community_subscribers"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Подписчики</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="community_subscribers_list" class="modal-body">
+                    {% include 'community/community_subscribers_list.html' %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -98,5 +125,6 @@
 <script src="{% static 'js/manage_post.js' %}"></script>
 <script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
 <script src="{% static 'js/infinite.min.js' %}"></script>
+<script src="{% static 'js/manage_community.js' %}"></script>
 
 {% endblock extra__js %}
