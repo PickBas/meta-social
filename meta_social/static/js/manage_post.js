@@ -14,6 +14,19 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function addMusicToPlaylist(link) {
+    $.ajax({
+        type: "POST",
+        url: link,
+        data: {
+            csrfmiddlewaretoken: getCookie('csrftoken')
+        },
+        success: function () {
+            
+        }
+    })
+}
+
 function likePost(e, post_id) {
     $.ajax({
         type: "POST",
@@ -55,7 +68,6 @@ function remove_post(e, link) {
                 .remove();
         }
     })
-
 }
 
 function edit_post(e, link) {

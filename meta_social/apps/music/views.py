@@ -7,10 +7,10 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 
 from core.views import MetaSocialView
-
 from .forms import UploadMusicForm
 from user_profile.models import Profile
 from user_profile.models import PlayPosition
+from music.models import Music
 
 
 class MusicViews:
@@ -80,3 +80,19 @@ class MusicViews:
             context['form'] = UploadMusicForm()
 
             return render(request, self.template_name, context)
+
+    @staticmethod
+    def add_music(request, music_id):
+        music_item = get_object_or_404(Music, id=music_id)
+
+        if music_item in request.user.profile.playlist.all():
+            return HttpResponse('Success')
+
+        playpos = PlayPosition(
+            position=music_item,
+            plist=request.user.profile
+        )
+        playpos.add_order()
+        playpos.save()
+
+        return HttpResponse('Success')

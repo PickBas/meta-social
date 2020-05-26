@@ -285,6 +285,11 @@ class Communities:
                 post_form.community = community
                 post_form.owner_community = community
                 post_form.save()
+
+                for music_id in [int(i) for i in request.POST.get('music').split()]:
+                    music_item = get_object_or_404(Music, id=music_id)
+                    post_form.music.add(music_item)
+                
                 community.posts.add(post_form)
 
                 for form in formset.cleaned_data:

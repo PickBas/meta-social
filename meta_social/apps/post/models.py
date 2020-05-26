@@ -10,6 +10,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from music.models import Music
+
+
 class Like(models.Model):
     """
     Like model
@@ -35,6 +38,8 @@ class Post(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='owner')
     owner_community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')
+
+    music = models.ManyToManyField(Music)
 
     class Meta:
         """

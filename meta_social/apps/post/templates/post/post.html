@@ -37,14 +37,19 @@
 
         <p style="white-space: pre-wrap">{{ post.text }}</p>
 
-        {% comment %}
-            <div class="post-music">
-            
+        {% if post.music.count %}
+            <div class="post-music mb-2">
+                {% for music in post.music.all %}
+                    <div>
+                        <button class="btn btn-sm btn-outline-success ml-0" onclick="addMusicToPlaylist('/music/{{ music.id }}/add/')">+</button>
+                        <span>{{ music.artist }} - {{ music.title }}</span>
+                    </div>
+                {% endfor %}
             </div>
-        {% endcomment %}
+        {% endif %}
 
         {% if post.get_images %}
-            <div class="post-images masonry-grid">
+            <div class="post-images masonry-grid mt-2">
                 {% for post_img in post.get_images %}
                     {% if forloop.first %}
                         <a data-fancybox="photo" href="{{ post_img.image.url }}" class="masonry-grid-item masonry-grid-item--width2 mx-1 {% if post.get_images.count == 1 %}w-100{% endif %}">

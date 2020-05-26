@@ -13,6 +13,7 @@ class PostForm(forms.ModelForm):
     Form for creation post
     """
     text = forms.CharField(max_length=500)
+    music = forms.CharField(required=False, widget=forms.TextInput(attrs={'style': 'display: none;'}))
 
     class Meta:
         model = Post
@@ -21,6 +22,7 @@ class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.fields['text'].label = ''
+        self.fields['music'].label = ''
         self.fields['text'].widget = forms.Textarea()
         self.fields['text'].widget.attrs['width'] = '100%'
         self.fields['text'].widget.attrs['class'] = 'form-control md-textarea'
