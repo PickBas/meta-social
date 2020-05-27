@@ -100,19 +100,26 @@
             </div>
         {% endif %}
 
-        {% if c_user.profile.get_music_list %}
-            <div class="card mt-3 mb-3">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        {% if c_user == user %}
-                            <a href="/music/">Музыка</a>
-                        {% else %}
-                            <a href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
-                        {% endif %}
-                    </h6>
-                </div>
-            </div>
-        {% endif %}
+{% if c_user.profile.get_music_list %}
+    <div class="card mt-3 mb-3">
+        <div class="card-body">
+            <h6 class="card-title">
+                {% if c_user == user %}
+                    <a class="pb-2" href="/music/">Музыка</a>
+                {% else %}
+                    <a class="pb-2" href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
+                {% endif %}
+                {% for music in c_user.profile.get_music_list %}
+                    <div class="{% if forloop.first %}mt-3{% endif %}">
+                        <button class="float-left btn btn-sm btn-outline-success ml-0 my-0 px-2 py-2" onclick="addMusicToPlaylist('/music.position.artist/{{ music.position.artist.id }}/add/')">+</button>
+                        <p class="mt-2 float-left text-truncate" style="width:130px">{{ music.position.title }} - {{ music.position.artist }}</p>
+                    </div>
+                {% endfor %}
+            </h6>
+        </div>
+    </div>
+{% endif %}
+
     </div>
     <div class="col-lg-9 col-md-12 mb-3 px-0 mx-lg-0 mx-md-3 mx-3">
         <div class="card">
