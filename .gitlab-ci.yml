@@ -13,10 +13,10 @@ test:
     - ci/tests_runner.sh
   only:
     - devel
-    - feature/pylint_score
 
 pylint:
   script:
     - ci/pylint_runner.sh
   only:
     - devel
+    - feature/pylint_score

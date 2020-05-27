@@ -18,7 +18,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('text',)
-    
+
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.fields['text'].label = ''
@@ -39,12 +39,11 @@ class PostImageForm(forms.ModelForm):
 
     class Meta:
         model = PostImages
-        fields = ('image', )
-    
+        fields = ('image',)
+
     def __init__(self, *args, **kwargs):
         super(PostImageForm, self).__init__(*args, **kwargs)
         self.fields['image'].label = ''
-
 
 
 class EditPostImageForm(forms.ModelForm):
@@ -55,7 +54,7 @@ class EditPostImageForm(forms.ModelForm):
 
     class Meta:
         model = PostImages
-        fields = ('image', )
+        fields = ('image',)
 
     def __init__(self, *args, **kwargs):
         super(EditPostImageForm, self).__init__(*args, **kwargs)
