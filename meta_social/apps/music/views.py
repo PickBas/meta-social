@@ -51,7 +51,7 @@ class MusicViews:
             context['matching'] = True
             if not request.POST.get('query'):
                 context['matching'] = False
-                context['c_user_music'] = c_user.profile.get_music_list()
+                context['music_list'] = c_user.profile.get_music_list()
                 return render(request, 'music/search.html', context)
             query = request.POST.get('query')
             search_fields = ['title', 'artist']
