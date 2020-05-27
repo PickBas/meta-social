@@ -57,7 +57,14 @@ class PostView(MetaSetUp):
         """
         txt = 'Say My Name'
         self.client.post('/post/1/send_comment/', {'text': txt})
-        self.assertTrue(Comment.objects.get(user=self.user, text=txt))
+        cmnt = Comment.objects.get(user=self.user, text=txt)
+        self.assertTrue(cmnt)
+
+        resp = self.client.get('/post/1/get_comments/{}/'.format(404))
+        self.assertEqual(resp.status_code, 404)
+        resp = self.client.post('/post/1/get_comments/{}/'.format(1))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'post/comments.html')
 
 
 class PostCreate(MetaSetUp):
@@ -146,3 +153,34 @@ class PostLikes(MetaSetUp):
         # т.к. там все посты вынимаются из user.profile то проверить
         # то и нечего подтверждение виду
         self.assertTemplateUsed(response, 'profile/like_marks.html')
+
+
+class PostRetwit(TestCase):
+    fixtures = ["test_friends_music_db.json"]
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.get(username="test_user")
+        self.client.force_login(user=self.user)
+
+        self.c2 = Client()
+        self.u2 = User.objects.get(username="test_user2")
+        self.c2.force_login(user=self.u2)
+
+    def test_retwit_userpost(self):
+        form_data = {'text': "something bad?"}
+        formset_data = {
+            'form-TOTAL_FORMS': '0',
+            'form-INITIAL_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1',
+        }
+        resp = self.client.post('/post/create/', {**form_data, **formset_data})
+        p = Post.objects.get(user=self.user, text=form_data['text'])
+        self.assertNotIn(p, self.u2.profile.posts.all())
+        resp = self.c2.post('/post/{}/rt/'.format(p.id))
+        self.assertEqual(resp.status_code, 302)
+
+        p3 = Post.objects.get(owner=self.user, user=self.u2)
+        self.assertIn(p3, self.u2.profile.posts.all())
+        self.assertIn(self.u2, p.rt.all())
