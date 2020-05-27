@@ -1,0 +1,56 @@
+{% if matching %}
+    {% if c_matches %}
+        <div class="card mt-3">
+            <div class="card-body text-left" id="simpleList">
+                {% for match in c_matches %}
+                    <div>
+                        <input type="hidden" name="info" music-name="{{ match.artist }} - {{ match.title }}" value="{{ match.audio_file.url }}">
+                        <button class="btn btn-outline-success px-3 py-2" onclick="setMusicBtn(event)" music-id="{{ match.id }}">
+                            <i class="fa fa-play" aria-hidden="true"></i>
+                        </button>
+                        <span>{{ match.artist }} - {{ match.title }}</span>
+                        <input type="hidden" id="music_{{ match.id }}" value="{{ match.order }}">
+                        {% if match not in user.profile.playlist.all %}
+                        <a type="button" class="btn float-right btn-outline-success px-3 py-2" data-toggle="tooltip" data-placement="top"
+                           title="Добавить в плейлист" href="/music/{{ match.id }}/add_from_search/">
+                            <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
+                        </a>
+                        {% else %}
+                            <a type="button" class="btn float-right btn-outline-danger px-3 py-2" data-toggle="tooltip" data-placement="top"
+                               title="Удалить" href="/music/{{ match.id }}/remove/">
+                                <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+                            </a>
+                        {% endif %}
+                        <br class="mb-3">
+                    </div>
+                {% empty %}
+                    <p class="mb-0">Список музыки пуст</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    {% if user.profile.playlist.all %}
+         <div class="card mt-3">
+            <div class="card-body text-left" id="simpleList">
+                {% for pos in music_list %}
+                    <div>
+                        <input type="hidden" name="info" music-name="{{ pos.position.artist }} - {{ pos.position.title }}" value="{{ pos.position.audio_file.url }}">
+                        <button class="btn btn-outline-success px-3 py-2" onclick="setMusicBtn(event)" music-id="{{ pos.position.id }}">
+                            <i class="fa fa-play" aria-hidden="true"></i>
+                        </button>
+                        <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
+                        <input type="hidden" id="music_{{ pos.position.id }}" value="{{ pos.order }}">
+                        <a type="button" class="btn float-right btn-outline-danger px-3 py-1" data-toggle="tooltip" data-placement="top"
+                           title="Удалить" href="/music/{{ pos.position.id  }}/remove/">
+                            <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+                        </a>
+                        <br class="mb-3">
+                    </div>
+                {% empty %}
+                    <p class="mb-0">Список музыки пуст</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}

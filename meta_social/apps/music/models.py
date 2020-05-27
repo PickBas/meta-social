@@ -4,13 +4,15 @@ Meta social music models
 
 from django.db import models
 from django.contrib.auth.models import User
-#from user_profile.models import Profile
+
+
+# from user_profile.models import Profile
 
 class Music(models.Model):
     """
     Music model
     """
-    #user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
     audio_file = models.FileField(upload_to='music')
 

@@ -3,9 +3,11 @@ Meta social music views
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from core.views import MetaSocialView
+from simple_search import search_filter
+
 from .forms import UploadMusicForm
 from user_profile.models import Profile
 from user_profile.models import PlayPosition
@@ -42,11 +44,20 @@ class MusicViews:
             """
             Replace order
             """
-            str_arr = request.POST.get('music_order')
-            arr = list(map(int, str_arr.split(',')))
-            c_user = get_object_or_404(Profile, custom_url=custom_url).user
-            c_user.profile.change_playlist(arr)
-            return HttpResponse('Success')
+
+            c_user = request.user
+
+            context = self.get_menu_context('music', 'Музыка')
+            context['matching'] = True
+            if not request.POST.get('query'):
+                context['matching'] = False
+                context['music_list'] = c_user.profile.get_music_list()
+                return render(request, 'music/search.html', context)
+            query = request.POST.get('query')
+            search_fields = ['title', 'artist']
+            context['c_matches'] = Music.objects.filter(search_filter(search_fields, query))
+
+            return render(request, 'music/search.html', context)
 
     class MusicUpload(MetaSocialView):
         """
@@ -97,3 +108,26 @@ class MusicViews:
         playpos.save()
 
         return HttpResponse('Success')
+
+    @staticmethod
+    def add_music_from_search(request, music_id):
+        music_item = get_object_or_404(Music, id=music_id)
+
+        if music_item in request.user.profile.playlist.all():
+            return HttpResponse('Success')
+
+        playpos = PlayPosition(
+            position=music_item,
+            plist=request.user.profile
+        )
+
+        playpos.add_order()
+        playpos.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def remove(request, music_id):
+        music_item = get_object_or_404(Music, id=music_id)
+        request.user.profile.playlist.remove(music_item)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
