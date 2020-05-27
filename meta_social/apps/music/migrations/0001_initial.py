@@ -17,11 +17,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Music',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False,
+                                        verbose_name='ID')),
                 ('audio_file', models.FileField(upload_to='music')),
-                ('artist', models.CharField(default='Автор', max_length=100, verbose_name='Автор')),
-                ('title', models.CharField(default='Название', max_length=100, verbose_name='Название')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('artist', models.CharField(default='Автор', max_length=100,
+                                            verbose_name='Автор')),
+                ('title', models.CharField(default='Название', max_length=100,
+                                           verbose_name='Название')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                           to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Музыка',

@@ -3,8 +3,7 @@ Meta social music views
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 
 from core.views import MetaSocialView
 from .forms import UploadMusicForm
@@ -17,10 +16,12 @@ class MusicViews:
     """
     Class containing music functionality and representation
     """
+
     class MusicList(MetaSocialView):
         """
         Music list representaion
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'music/music_list.html'
@@ -47,11 +48,11 @@ class MusicViews:
             c_user.profile.change_playlist(arr)
             return HttpResponse('Success')
 
-
     class MusicUpload(MetaSocialView):
         """
         Music upload and representation
         """
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.template_name = 'music/music_upload.html'

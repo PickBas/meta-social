@@ -18,6 +18,7 @@ class FriendsViews:
     """
     Class containing friends functionality and representation
     """
+
     @staticmethod
     def get_render(request, context):
         """
@@ -40,6 +41,7 @@ class FriendsViews:
         """
         Friends list view
         """
+
         def __init__(self, **kwargs):
             self.template_name = 'friends/friends_list.html'
             self.context = self.get_menu_context('friends', 'Список друзей')
@@ -75,6 +77,7 @@ class FriendsViews:
         """
         Requests view
         """
+
         def __init__(self, **kwargs):
             self.template_name = 'friends/requests.html'
             super().__init__(**kwargs)
@@ -98,14 +101,14 @@ class FriendsViews:
         """
         Blacklist view
         """
+
         def __init__(self, **kwargs):
             self.template_name = 'friends/blacklist.html'
             super().__init__(**kwargs)
 
-        def get(self, request, **kwargs) -> render:
+        def get(self, request) -> render:
             """
             Friends_blacklist view
-            :param user_id: user in blacklist od
             :param request: request
             :return: render
             """
@@ -121,6 +124,7 @@ class FriendsViews:
         """
         Class for sending friendship request
         """
+
         def __init__(self, **kwargs):
             self.user_item = None
             super().__init__(**kwargs)
@@ -135,8 +139,10 @@ class FriendsViews:
 
             self.user_item = get_object_or_404(User, id=kwargs['user_id'])
 
-            if not FriendshipRequest.objects.filter(from_user=self.user_item, to_user=request.user).exists():
-                if not FriendshipRequest.objects.filter(from_user=request.user, to_user=self.user_item).exists():
+            if not FriendshipRequest.objects.filter(from_user=self.user_item,
+                                                    to_user=request.user).exists():
+                if not FriendshipRequest.objects.filter(from_user=request.user,
+                                                        to_user=self.user_item).exists():
                     item = FriendshipRequest(
                         from_user=request.user,
                         to_user=self.user_item,
@@ -145,7 +151,7 @@ class FriendsViews:
                     item.save()
 
                     return FriendsViews.get_render(request, {'c_user': request.user})
-            
+
             raise Http404()
 
         def get(self, request, **kwargs):
@@ -158,6 +164,7 @@ class FriendsViews:
         """
         Class for accepting friendship request
         """
+
         def __init__(self, **kwargs):
             self.user_item = None
             super().__init__(**kwargs)
@@ -189,7 +196,7 @@ class FriendsViews:
                 request_item.delete()
 
                 return FriendsViews.get_render(request, {'c_user': request.user})
-            
+
             raise Http404()
 
         def get(self, request, **kwargs):

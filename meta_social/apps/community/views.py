@@ -196,7 +196,7 @@ class Communities:
             self.template_name_post = 'community/search.html'
             super().__init__(**kwargs)
 
-        def get(self, request, **kwargs):
+        def get(self, request):
             """
             Processing get request
             """
@@ -223,7 +223,7 @@ class Communities:
 
             return render(request, 'community/community_list.html', self.context)
 
-        def post(self, request, **kwargs):
+        def post(self, request):
             """
             Searching communities by name and returns rendered responce
             """
@@ -290,7 +290,7 @@ class Communities:
                     for music_id in [int(i) for i in request.POST.get('music').split()]:
                         music_item = get_object_or_404(Music, id=music_id)
                         post_form.music.add(music_item)
-                
+
                 community.posts.add(post_form)
 
                 for form in formset.cleaned_data:

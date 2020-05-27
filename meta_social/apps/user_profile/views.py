@@ -7,7 +7,7 @@ from PIL import Image
 
 from django.core.files.base import ContentFile
 from django.shortcuts import render, HttpResponse, redirect
-from django.http import Http404,HttpResponseRedirect
+from django.http import Http404
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.utils import timezone
@@ -96,7 +96,6 @@ class ProfileViews:
             self.profile = None
             self.previous_birth = None
 
-
         def get(self, request, **kwargs) -> render:
             """
             Processing get request
@@ -114,7 +113,7 @@ class ProfileViews:
                 instance=Profile.objects.get(custom_url=kwargs['user_url']))
             self.previous_birth = User.objects.get(profile=Profile.objects.get(
                 custom_url=kwargs['user_url']
-                )).profile.birth
+            )).profile.birth
 
             return render(request, self.template_name, context)
 
@@ -129,14 +128,17 @@ class ProfileViews:
             self.previous_birth = Profile.objects.get(custom_url=kwargs['user_url']).birth
 
             user_form = UserUpdateForm(
-                request.POST, instance=User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url'])))
+                request.POST,
+                instance=User.objects.get(profile=
+                                          Profile.objects.get(custom_url=kwargs['user_url'])))
 
             self.profile = Profile.objects.get(custom_url=kwargs['user_url'])
 
             self.profile.show_email = False if request.POST.get(
                 'show_email') is None else True
 
-            self.profile.custom_url = kwargs['user_url'] if request.POST.get('custom_url') is None else request.POST.get('custom_url')
+            self.profile.custom_url = kwargs['user_url'] if request.POST.get(
+                'custom_url') is None else request.POST.get('custom_url')
 
             profile_form = ProfileUpdateForm(request.POST,
                                              instance=self.profile)
@@ -152,7 +154,6 @@ class ProfileViews:
                 return redirect('/accounts/profile/' + str(kwargs['user_url']) + '/')
 
             return self.get(request, **kwargs)
-
 
     class AvatarManaging(MetaSocialView):
         """
@@ -189,12 +190,14 @@ class ProfileViews:
 
                 try:
                     resized_image.save(io, 'JPEG', quality=100)
-                    request.user.profile.image.save('image_{}.jpg'.format(request.user.id), ContentFile(io.getvalue()),
+                    request.user.profile.image.save('image_{}.jpg'.format(request.user.id),
+                                                    ContentFile(io.getvalue()),
                                                     save=False)
                     request.user.profile.save()
                 except OSError:
                     resized_image.save(io, 'PNG', quality=100)
-                    request.user.profile.image.save('image_{}.png'.format(request.user.id), ContentFile(io.getvalue()),
+                    request.user.profile.image.save('image_{}.png'.format(request.user.id),
+                                                    ContentFile(io.getvalue()),
                                                     save=False)
                     request.user.profile.save()
 
