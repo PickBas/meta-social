@@ -50,5 +50,5 @@ services:
       - db
       - redis
     environment:
-      - START_WITH_DOCKER="True"
+      - START_WITH_DOCKER=True
     container_name: celery
