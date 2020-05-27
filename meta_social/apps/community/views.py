@@ -103,7 +103,6 @@ class Communities:
                 community = Community(
                     name=request.POST.get('name'),
                     info=request.POST.get('info'),
-                    country=request.POST.get('country'),
                     owner=request.user,
                     custom_url=request.POST.get('name'),
                 )
