@@ -102,6 +102,8 @@ class Post(models.Model):
         editors = []
         if self.user:
             editors.append(self.user)
+        if self.community:
+            editors += self.community.admins.all()
         return editors
 
     def get_rt_count(self):

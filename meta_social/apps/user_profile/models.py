@@ -194,7 +194,7 @@ class Profile(models.Model):
         self.playlist.add(music)
 
     def change_playlist(self, new_order):
-        ymusics = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        ymusics = [PlayPosition.objects.get(position=m, plist=self) for m in self.playlist.all()]
         ymusics.sort(key=lambda x: x.order)
         if len(new_order) < len(ymusics):
             pass                # TODO для постепенной загрузки infinite scroll
@@ -206,6 +206,12 @@ class Profile(models.Model):
         for i in range(len(new_order)):
             new_mlist[i].order = i + 1
             new_mlist[i].save()
+
+    def get_recommended_communities(self):
+        communities = list(Community.objects.all())
+        communities.sort(key=lambda c: c.users.count())
+        return communities[:6]
+
 
 def save_image_from_url(profile, image_url):
     """

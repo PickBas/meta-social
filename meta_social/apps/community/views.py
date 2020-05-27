@@ -4,6 +4,7 @@ Meta social community views
 
 from io import BytesIO
 from PIL import Image
+from django.http import Http404
 from simple_search import search_filter
 
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponseRedirect
@@ -294,3 +295,57 @@ class Communities:
                         photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def get_subscribers_list(request, community_url):
+        """
+        Function for getting users in community
+        :param community_url: url
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+
+        community = get_object_or_404(Community, custom_url=community_url)
+        if request.method == 'POST':
+            return render(request, 'community/community_subscribers_list.html', {
+                'community': community
+            })
+        raise Http404()
+
+    @staticmethod
+    def remove_admin_permissions(request, community_url, user_url):
+        """
+        Function for remove admin permission from user
+        :param user_url: url
+        :param community_url: url
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+
+        community = get_object_or_404(Community, custom_url=community_url)
+        user = get_object_or_404(Profile, custom_url=user_url).user
+        if request.method == 'POST' and user != community.owner:
+            community.admins.remove(user)
+            return render(request, 'community/community_subscribers_list.html', {
+                'community': community
+            })
+        raise Http404()
+
+    @staticmethod
+    def give_admin_permissions(request, community_url, user_url):
+        """
+        Function for give admin permission from user
+        :param user_url: url
+        :param community_url: url
+        :param request: request
+        :return: HttpResponseRedirect
+        """
+
+        community = get_object_or_404(Community, custom_url=community_url)
+        user = get_object_or_404(Profile, custom_url=user_url).user
+        if request.method == 'POST' and user != community.owner:
+            community.admins.add(user)
+            return render(request, 'community/community_subscribers_list.html', {
+                'community': community
+            })
+        raise Http404()

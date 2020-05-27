@@ -2,11 +2,10 @@
 Meta social community urls
 """
 
-from django.urls import path
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
 from .views import Communities
-
 
 urlpatterns = [
     path('community/<str:community_url>/', login_required(Communities.CommunityView.as_view())),
@@ -17,4 +16,8 @@ urlpatterns = [
     path('community/<str:community_url>/leave/', login_required(Communities.community_leave)),
     path('community/<str:community_url>/change_avatar/', login_required(Communities.AvatarManaging.as_view())),
     path('community/<str:community_url>/edit/', login_required(Communities.EditCommunity.as_view())),
+    path('community/<str:community_url>/remove_admin_permission/<str:user_url>/',
+         login_required(Communities.remove_admin_permissions)),
+    path('community/<str:community_url>/give_admin_permission/<str:user_url>/',
+         login_required(Communities.give_admin_permissions)),
 ]
