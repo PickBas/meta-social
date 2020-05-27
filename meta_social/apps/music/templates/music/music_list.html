@@ -139,6 +139,10 @@
     </style>
 
     <div class="card card-body py-2 px-2">
+        <input type="text" class="form-control w-100" placeholder="Поиск" id="music-search-input">
+    </div>
+
+    <div class="card card-body py-2 px-2">
         <div id="player">
             <div id="song-title" class="w-100 text-center text-nowrap"></div>
             <div id="buttons">
@@ -155,24 +159,9 @@
             </div>
         </div>
     </div>
-
-    <div class="card mt-3">
-        <div class="card-body text-left" id="simpleList">
-            {% for pos in music_list %}
-                <div>
-                    <input type="hidden" name="info" music-name="{{ pos.position.artist }} - {{ pos.position.title }}" value="{{ pos.position.audio_file.url }}">
-                    <button class="btn btn-outline-success px-3 py-2" onclick="setMusicBtn(event)" music-id="{{ pos.position.id }}">
-                        <i class="fa fa-play" aria-hidden="true"></i>
-                    </button>
-                    <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
-                    <input type="hidden" id="music_{{ pos.position.id }}" value="{{ pos.order }}">
-                    <br class="mb-3">
-                </div>
-            {% empty %}
-                <p class="mb-0">Список музыки пуст</p>
-            {% endfor %}
-        </div>
-    </div>
+    <ul class="list-group list-group-flush infinite-container" id="music-list">
+                {% include 'music/search.html' %}
+    </ul>
 {% endblock %}
 
 {% block right %}
@@ -314,4 +303,5 @@
             }
         )
     </script>
+    <script src="{% static 'js/music_search.js' %}"></script>
 {% endblock extra__js %}

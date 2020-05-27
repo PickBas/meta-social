@@ -44,11 +44,20 @@ class MusicViews:
             """
             Replace order
             """
-            str_arr = request.POST.get('music_order')
-            arr = list(map(int, str_arr.split(',')))
-            c_user = get_object_or_404(Profile, custom_url=custom_url).user
-            c_user.profile.change_playlist(arr)
-            return HttpResponse('Success')
+
+            c_user = request.user
+
+            context = self.get_menu_context('music', 'Музыка')
+            context['matching'] = True
+            if not request.POST.get('query'):
+                context['matching'] = False
+                context['c_user_music'] = c_user.profile.get_music_list()
+                return render(request, 'music/search.html', context)
+            query = request.POST.get('query')
+            search_fields = ['title', 'artist']
+            context['c_matches'] = Music.objects.filter(search_filter(search_fields, query))
+
+            return render(request, 'music/search.html', context)
 
     class MusicUpload(MetaSocialView):
         """
@@ -116,35 +125,3 @@ class MusicViews:
         playpos.save()
 
         return HttpResponse('Success')
-
-    class MusicSearch(MetaSocialView):
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-            self.template_name = 'music/search_page.html'
-            self.template_name_post = 'music/search.html'
-
-        def get(self, request):
-            """
-            Processing get request
-            """
-            context = self.get_menu_context('music', 'Музыка')
-            context['music_pages'] = 'search'
-            return render(request, self.template_name, context)
-
-        def post(self, request):
-            """
-            Searching music by name and returns rendered responce
-            """
-            context = self.get_menu_context('music', 'Музыка')
-            c_user = request.user
-
-            context['matching'] = True
-            if not request.POST.get('query'):
-                context['matching'] = False
-                context['c_user_music'] = c_user.profile.get_music_list()
-                return render(request, 'music/search.html', context)
-            query = request.POST.get('query')
-            search_fields = ['title', 'artist']
-            context['c_matches'] = Music.objects.filter(search_filter(search_fields, query))
-
-            return render(request, 'music/search.html', context)
