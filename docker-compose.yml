@@ -49,4 +49,6 @@ services:
     depends_on:
       - db
       - redis
+    environment:
+      - START_WITH_DOCKER="True"
     container_name: celery

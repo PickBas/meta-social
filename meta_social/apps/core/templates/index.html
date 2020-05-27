@@ -26,12 +26,12 @@
         </div>
     </div>
     <div class="card">
-        <div class="card-body">
+        <div class="card-body px-2">
             <p class="mb-0">Рекомендуемые сообщества</p>
             {% for community in user.profile.get_recommended_communities %}
                 <div class="mt-1">
                     <img src="{{ community.image.url }}" class="rounded-circle border" width="40" height="40">
-                    <a href="/community/{{ community.custom_url }}/" class="text-truncate">{{ community.name }}</a>
+                    <a href="/community/{{ community.custom_url }}/" class="text-truncate" style="max-width: 115px;">{{ community.name }}</a>
                 </div>
             {% endfor %}
         </div>
