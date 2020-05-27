@@ -26,17 +26,20 @@
         </div>
     </div>
     <div class="card">
-        <div class="card-body px-2">
-            <p class="mb-0">Рекомендации</p>
+        <div class="card-body px-2 py-2">
+            <p class="mb-0 ml-1">Рекомендации</p>
             {% for community in user.profile.get_recommended_communities %}
-                <div class="mt-1 mb-1">
-                    <img src="{{ community.image.url }}" class="rounded-circle border float-left" width="40" height="40">
+                <div class="mt-1">
+                    <img src="{{ community.image.url }}" class="rounded-circle border float-left mr-1" width="40" height="40"> 
                     <a href="/community/{{ community.custom_url }}/" class="w-75">
                         <p style="width: 130px;" class="text-truncate ml-1">
                             {{ community.name }}
                         </p>
                     </a>
                 </div>
+                {% if not forloop.last %}
+                    <hr class="mb-1 mt-2">
+                {% endif %}
             {% endfor %}
         </div>
     </div>
