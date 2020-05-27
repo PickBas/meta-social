@@ -23,7 +23,7 @@ class Post(models.Model):
     Post model
     """
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
-    community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True)
+    community = models.ForeignKey(to='community.models.Community', on_delete=models.CASCADE, null=True)
     text = models.TextField()
     date = models.DateTimeField(auto_now=True, verbose_name='Дата создания')
 
@@ -34,7 +34,7 @@ class Post(models.Model):
     is_reposted = models.BooleanField(default=False)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='owner')
-    owner_community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')
+    owner_community = models.ForeignKey(to='community.models.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')
 
     class Meta:
         """
