@@ -16,8 +16,8 @@ class MetaSetUp(TestCase):
 class ProfileViewTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get(
-            '/accounts/profile/{}/'.format(self.user.username))
+        self.response = self.client.get('/accounts/profile/{}/'.format(
+            self.user.username))
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -26,8 +26,7 @@ class ProfileViewTest(MetaSetUp):
 class ProfileEditTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.url = '/accounts/profile/{}/edit/'.format(
-            self.user.username)
+        self.url = '/accounts/profile/{}/edit/'.format(self.user.username)
         self.response = self.client.get(self.url)
 
     def test_get_page(self):
@@ -66,6 +65,18 @@ class ProfileEditTest(MetaSetUp):
         upuser = User.objects.get(id=self.user.id)
         self.assertEqual(upuser.profile.job, f_profile_data['job'])
         self.assertEqual(upuser.last_name, f_user_update_data['last_name'])
+
+    def test_online(self):
+        url = '/ajax/set_online/'
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 404)
+
+        resp = self.client.post(url)
+        print(self.user.profile.last_act)
+        # такое ощущение что это не
+        # данные, а ссылка
+        # TODO: Здесь нужен нормальный тест
+        self.assertContains(resp, 'Success', status_code=200)
 
 
 class AvatarManagingTest(MetaSetUp):
