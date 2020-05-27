@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
 
 from core.views import MetaSocialView
+from music.models import Music
 
 from .models import Post, PostImages, Comment
 from .forms import EditPostImageForm, PostImageForm, PostForm
@@ -154,6 +155,12 @@ class PostViews:
                 post_form = post_form.save(commit=False)
                 post_form.user = post_form.owner = request.user
                 post_form.save()
+
+                if request.POST.get('music'):
+                    for music_id in [int(i) for i in request.POST.get('music').split()]:
+                        music_item = get_object_or_404(Music, id=music_id)
+                        post_form.music.add(music_item)
+
                 request.user.profile.posts.add(post_form)
 
                 for form in formset.cleaned_data:

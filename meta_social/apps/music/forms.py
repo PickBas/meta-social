@@ -16,3 +16,6 @@ class UploadMusicForm(forms.ModelForm):
         labels = {
             'audio_file': 'Аудио файл',
         }
+        widgets = {
+            'audio_file': forms.FileInput(attrs={'accept': 'audio/*'})
+        }

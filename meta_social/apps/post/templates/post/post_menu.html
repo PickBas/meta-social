@@ -74,9 +74,13 @@
 
             <div class="md-form input-group">
                 <div class="input-group-prepend">
-                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" onclick="triggerInput()" style="font-size: 12pt;">
+                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-paperclip" aria-hidden="true"></i>
                     </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" onclick="triggerInput()">Изображения</a>
+                        <a class="dropdown-item" data-toggle="modal" data-target="#musicSelectModal">Музыка</a>
+                    </div>
                 </div>
                 {{ postform }}
                 <div class="input-group-append">
@@ -99,7 +103,108 @@
     </div>
 </div>
 
+<div class="modal modal fade" id="musicSelectModal" tabindex="-1" role="dialog" aria-labelledby="musicSelectModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите музыку:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="select-music-list">
+                {% for pos in user.profile.get_music_list %}
+                    <div>
+                        <button class="btn btn-sm btn-primary" onclick="addMusic(event, {{ pos.position.id }}, '{{ pos.position.artist }} - {{ pos.position.title }}')">+</button>
+                        <span style="max-width: 400px;" class="text-truncate">{{ pos.position.artist }} - {{ pos.position.title }}</span>
+                    </div>
+                {% empty %}
+                    У вас нет музыки
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function removeMusic(e) {
+        let div = document.createElement('div')
+
+        let btn = document.createElement('button')
+        btn.classList.add('btn')
+        btn.classList.add('btn-sm')
+        btn.classList.add('btn-primary')
+        btn.innerHTML = '+'
+        btn.onclick = function () {
+            addMusic(event, $(e.target).attr('music-id'), $(e.target).attr('music-name'))
+        }
+
+        let span = document.createElement('span')
+        span.classList.add('text-truncate')
+        $(span).attr('width', '400px')
+        span.innerHTML = $(e.target).attr('music-name')
+
+        div.appendChild(btn)
+        div.appendChild(span)
+
+        $('#select-music-list')[0].appendChild(div)
+        
+        let vals = $('#id_music')[0].value.split(' ')
+        for (let i=0; i < vals.length; i++) {
+            if (vals[i] == $(e.target).attr('music-id')) {
+                vals.splice(i, 1)
+            }
+        }
+
+        let new_val = ''
+        for (let i=0; i < vals.length; i++) {
+            new_val += vals[i]
+        }
+
+        $('#id_music').val(new_val)
+
+        e.target.parentNode.remove()
+    }
+
+    function getMusicCount() {
+        return $('#id_music')[0].value.split(' ').length
+    }
+
+    function addMusic(e, id, name) {
+        if (getMusicCount() == 10) {
+            alert('Максимум 10 песен')
+            return
+        }
+
+        $('#id_music')[0].value += id + ' '
+
+        let imgDiv = document.createElement('div')
+        imgDiv.classList.add('img-div')
+        imgDiv.classList.add('border')
+
+        let nameP = document.createElement('p')
+        nameP.classList.add('text-truncate')
+        nameP.innerHTML = name
+
+        let rmBtn = document.createElement('span')
+        rmBtn.classList.add('post-image-badge');
+        rmBtn.classList.add('text-center');
+        rmBtn.onclick = removeMusic;
+        rmBtn.innerHTML = 'X';
+        $(rmBtn).attr('music-name', name)
+        $(rmBtn).attr('music-id', id)
+
+        imgDiv.appendChild(nameP)
+        imgDiv.appendChild(rmBtn)
+
+        document.getElementById('gallery').appendChild(imgDiv)
+
+        e.target.parentNode.remove()
+    }
+
     autosize(document.getElementById("id_text"));
 
     function triggerInput() {
