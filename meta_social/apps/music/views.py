@@ -3,7 +3,7 @@ Meta social music views
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from core.views import MetaSocialView
 from simple_search import search_filter
@@ -124,4 +124,4 @@ class MusicViews:
         playpos.add_order()
         playpos.save()
 
-        return HttpResponse('Success')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
