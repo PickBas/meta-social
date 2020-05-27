@@ -34,7 +34,6 @@
         <nav class="navbar navbar-expand-lg navbar-dark primary-color">
             <div class="container px-0">
                 <a class="navbar-brand" href="/">
-                    <img src="{% static 'img/big_logo.png' %}" width="40" height="40" class="mx-0">
                     Meta Social
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -67,10 +66,15 @@
                             <a class="dropdown-item" href="/accounts/logout/">Выйти</a>
                         </div>
                     </li>
+                    <li class="nav-item">
+                        <button class="btn btn-info rounded-pill mb-0 py-1 px-3" style="margin-top: 9px;" data-toggle="modal" data-target="#user-documentation">?</button>
+                    </li>
                 </ul>
             </div>
         </nav>
     {% endif %}
+
+    {% include 'user_documentation.html' %}
 
     {% block main %}
     {% endblock main %}
