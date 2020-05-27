@@ -14,7 +14,7 @@ import os
 import sys
 
 # Simple changing DB and redis
-START_WITH_DOCKER = True
+START_WITH_DOCKER = False
 
 if START_WITH_DOCKER:
     SECURE_SSL_REDIRECT = True
