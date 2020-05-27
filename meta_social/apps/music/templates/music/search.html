@@ -1,0 +1,20 @@
+{% if matching %}
+    {% if c_matches %}
+        {% for match in c_matches %}
+            <li class="list-group-item">
+                <div>
+                    <span>{{ match.artist }} - {{ match.title }}</span>
+                    {% if match not in user.profile.playlist.all %}
+                        <a type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2 mr-2" data-toggle="tooltip" data-placement="top"
+                                    title="Добавить в друзья" href="/music/{{ match.id }}/add_from_search/">
+                                    <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
+                        </a>
+                    {% endif %}
+                </div>
+
+            </li>
+        {% endfor %}
+    {% else %}
+        Ничего не найдено.
+    {% endif %}
+{% endif %}

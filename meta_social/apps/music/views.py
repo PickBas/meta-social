@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
 from core.views import MetaSocialView
+from simple_search import search_filter
+
 from .forms import UploadMusicForm
 from user_profile.models import Profile
 from user_profile.models import PlayPosition
@@ -97,3 +99,52 @@ class MusicViews:
         playpos.save()
 
         return HttpResponse('Success')
+
+    @staticmethod
+    def add_music_from_search(request, music_id):
+        music_item = get_object_or_404(Music, id=music_id)
+
+        if music_item in request.user.profile.playlist.all():
+            return HttpResponse('Success')
+
+        playpos = PlayPosition(
+            position=music_item,
+            plist=request.user.profile
+        )
+
+        playpos.add_order()
+        playpos.save()
+
+        return HttpResponse('Success')
+
+    class MusicSearch(MetaSocialView):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.template_name = 'music/search_page.html'
+            self.template_name_post = 'music/search.html'
+
+        def get(self, request):
+            """
+            Processing get request
+            """
+            context = self.get_menu_context('music', 'Музыка')
+            context['music_pages'] = 'search'
+            return render(request, self.template_name, context)
+
+        def post(self, request):
+            """
+            Searching music by name and returns rendered responce
+            """
+            context = self.get_menu_context('music', 'Музыка')
+            c_user = request.user
+
+            context['matching'] = True
+            if not request.POST.get('query'):
+                context['matching'] = False
+                context['c_user_music'] = c_user.profile.get_music_list()
+                return render(request, 'music/search.html', context)
+            query = request.POST.get('query')
+            search_fields = ['title', 'artist']
+            context['c_matches'] = Music.objects.filter(search_filter(search_fields, query))
+
+            return render(request, 'music/search.html', context)
