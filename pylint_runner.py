@@ -119,7 +119,7 @@ class Runner:
 
     def _print_line(self, line):
         """ Print output only with verbose flag. """
-        if self.verbose and line != 'pylint_runner.py':
+        if self.verbose and line != 'pylint_runner.py' and 'test_settings' not in line:
             print(line)
 
     def get_files_from_dir(self, current_dir):
