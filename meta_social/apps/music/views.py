@@ -125,3 +125,9 @@ class MusicViews:
         playpos.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    @staticmethod
+    def remove(request, music_id):
+        music_item = get_object_or_404(Music, id=music_id)
+        request.user.profile.playlist.remove(music_item)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
