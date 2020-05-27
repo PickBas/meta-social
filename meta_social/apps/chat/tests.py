@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
-from chat.models import Chat
+from chat.models import Chat, Message
+
+from channels.testing import ApplicationCommunicator
+from channels.testing import WebsocketCommunicator
+from chat.consumers import ChatConsumer
 
 
 class MetaSetUp(TestCase):
@@ -51,12 +55,15 @@ class RoomConversationTest(TestCase):
         self.c3.force_login(user=self.u3)
 
     def test_chat_move(self):
-        move_url = '/chats/{}/{}/'.format(self.u.id, self.u2.id)
+        move_url = '/chats/{}/{}/'.format(self.u.id, self.u3.id)
         resp = self.client.post(move_url)
         self.assertEqual(resp.status_code, 302)
-        name = self.u.username + ' ' + self.u2.username
-        chats = Chat.objects.get(chat_name=name)
-        self.assertTrue(chats)
+        name = self.u.username + ' ' + self.u3.username
+        nchat = Chat.objects.get(chat_name=name)
+        self.assertTrue(nchat)
+        new_url = '/chat/go_to_chat/{}/'.format(nchat.id)
+        resp = self.client.get(new_url)
+        self.assertEqual(resp.status_code, 200)
 
     def test_flow(self):
         data_create = {'text': 'simple chat'}
@@ -146,6 +153,43 @@ class RoomConversationTest(TestCase):
         resp = self.client.post(remove_url)
         self.assertFalse(
             self.u.profile.chats.filter(chat_name=data_create['text']))
+
+
+class RoomViews(MetaSetUp):
+    fixtures = ["test_friends_music_db.json"]
+
+    def setUp(self):
+        self.client = Client()
+        self.u = User.objects.get(username="test_user")
+        self.client.force_login(user=self.u)
+
+        self.c3 = Client()
+        self.u3 = User.objects.get(username="test_user3")
+        self.c3.force_login(user=self.u3)
+
+    def test_goto_chat(self):
+        chats = Chat.objects.all()
+        self.assertTrue(chats)
+
+        nchat = Chat.objects.get(id=1)
+        self.assertTrue(nchat)
+        new_url = '/chat/go_to_chat/{}/'.format(nchat.id)
+
+        resp = self.c3.get(new_url)
+        self.assertContains(resp, 'Access denied', status_code=200)
+
+        resp = self.client.get(new_url)
+        self.assertEqual(resp.status_code, 200)
+
+        message_data = {
+            'message': 'Say My Name',
+            'author': self.u.id,
+            'chat_id': nchat.id,
+        }
+
+        self.assertFalse(
+            Message.objects.filter(message=message_data['message']))
+        # TODO: Здесь тестируются вебсокеты
 
 
 # remove_url = 'chat/{}/remove/'.format(cur_cht.id)  # remove_chat
