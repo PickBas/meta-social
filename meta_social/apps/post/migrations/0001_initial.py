@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -29,9 +28,11 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.TextField()),
                 ('date', models.DateTimeField(auto_now=True, verbose_name='Дата создания')),
-                ('community', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='community.Community')),
+                ('community',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='community.Community')),
                 ('likes', models.ManyToManyField(blank=True, related_name='likes', to='post.Like')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE,
+                                           to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Посты',
@@ -44,7 +45,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('image', models.ImageField(blank=True, null=True, upload_to='post/images/')),
                 ('order', models.IntegerField(default=0)),
-                ('from_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('from_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE,
+                                                to=settings.AUTH_USER_MODEL)),
                 ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='post.Post')),
             ],
         ),

@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('community', '0004_auto_20200520_1448'),
@@ -22,12 +21,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='post',
             name='owner',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owner', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owner',
+                                    to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='post',
             name='owner_community',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owner_community', to='community.Community'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='owner_community', to='community.Community'),
         ),
         migrations.AddField(
             model_name='post',

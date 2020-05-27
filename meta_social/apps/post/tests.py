@@ -1,3 +1,6 @@
+"""
+Post test.py module
+"""
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from post.forms import PostForm
@@ -5,23 +8,41 @@ from post.models import Post, Comment
 
 
 class MetaSetUp(TestCase):
+    """
+    MetaSetUp class
+    """
     fixtures = ["test_db.json"]
 
     def setUp(self):
+        """
+        Setup
+        """
         self.client = Client()
         self.user = User.objects.get(username="test_user")
         self.client.force_login(user=self.user)
 
 
 class PostView(MetaSetUp):
+    """
+    PostView Test
+    """
     def setUp(self):
+        """
+        setUp
+        """
         super().setUp()
         self.response = self.client.get('/post/1/')
 
     def test_page(self):
+        """
+        test_page
+        """
         self.assertEqual(self.response.status_code, 200)
 
     def test_like(self):
+        """
+        Like test
+        """
         self.client.post('/like/1/')
         post = Post.objects.get(id=1)
         # like
@@ -31,13 +52,22 @@ class PostView(MetaSetUp):
         self.assertFalse(post.likes.filter(user=self.user))
 
     def test_comment(self):
+        """
+        test_comment
+        """
         txt = 'Say My Name'
         self.client.post('/post/1/send_comment/', {'text': txt})
         self.assertTrue(Comment.objects.get(user=self.user, text=txt))
 
 
 class PostCreate(MetaSetUp):
+    """
+    PostCreate class
+    """
     def setUp(self):
+        """
+        SetUp
+        """
         super().setUp()
 
     def test_postform(self):
@@ -64,10 +94,19 @@ class PostCreate(MetaSetUp):
 
 
 class PostEdit(MetaSetUp):
+    """
+    PostEdit class
+    """
     def setUp(self):
+        """
+        SetUp
+        """
         super().setUp()
 
     def test_editpost_simple(self):
+        """
+        test_editpost_simple
+        """
         self.assertTrue(True)
         form_data = {'text': "edit post complete"}
         formset_data = {
@@ -89,10 +128,19 @@ class PostEdit(MetaSetUp):
 
 
 class PostLikes(MetaSetUp):
+    """
+    PostLikes class
+    """
     def setUp(self):
+        """
+        SetUp
+        """
         super().setUp()
 
     def test_like_page(self):
+        """
+        test_like_page
+        """
         self.client.post('/like/1/')
         response = self.client.get('/like_marks/')
         # т.к. там все посты вынимаются из user.profile то проверить

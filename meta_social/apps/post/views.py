@@ -64,7 +64,8 @@ class PostViews:
 
         def post(self, request, **kwargs):
             """
-            Process post request. Changing position, deleting, changing text, changing images of post
+            Process post request.
+                Changing position, deleting, changing text, changing images of post
             """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             post_image_form_set = modelformset_factory(
@@ -72,7 +73,8 @@ class PostViews:
             )
 
             postform = PostForm(request.POST)
-            formset = post_image_form_set(request.POST, request.FILES, queryset=PostImages.objects.none())
+            formset = post_image_form_set(request.POST, request.FILES,
+                                          queryset=PostImages.objects.none())
 
             if request.method == 'POST':
                 if postform.is_valid() and formset.is_valid():
@@ -83,7 +85,7 @@ class PostViews:
                         if form.cleaned_data['image'] is None:
                             form.cleaned_data['id'].order = form.cleaned_data['ORDER']
                             form.cleaned_data['id'].save()
-                        elif form.cleaned_data['image'] == False:
+                        elif not form.cleaned_data['image']:
                             if form.cleaned_data['id']:
                                 form.cleaned_data['id'].delete()
                         else:
@@ -111,7 +113,8 @@ class PostViews:
 
             self.context['postform'] = PostForm(instance=post_item)
             initial_images = [{'image': i.image} for i in post_item.get_images() if i.image]
-            self.context['formset'] = post_image_form_set(initial=initial_images, queryset=post_item.get_images())
+            self.context['formset'] = post_image_form_set(initial=initial_images,
+                                                          queryset=post_item.get_images())
             self.context['images_less_ten'] = post_item.get_images().count() < 10
 
             return render(request, self.template_name, self.context)
@@ -166,7 +169,8 @@ class PostViews:
                 for form in formset.cleaned_data:
                     if form:
                         image = form['image']
-                        photo = PostImages(post=post_form, image=image, from_user_id=request.user.id)
+                        photo = PostImages(post=post_form, image=image,
+                                           from_user_id=request.user.id)
                         photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -196,11 +200,11 @@ class PostViews:
                 post_item.likes.all().filter(user=request.user).delete()
 
                 return HttpResponse('unliked')
-            else:
-                post_item.likes.create(user=request.user)
-                request.user.profile.liked_posts.add(post_item)
 
-                return HttpResponse('liked')
+            post_item.likes.create(user=request.user)
+            request.user.profile.liked_posts.add(post_item)
+
+            return HttpResponse('liked')
 
         raise Http404()
 
