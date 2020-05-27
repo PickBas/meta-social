@@ -104,11 +104,7 @@
             <div class="card mt-3 mb-3">
                 <div class="card-body">
                     <h6 class="card-title">
-                        {% if c_user == user %}
-                            <a href="/music/">Музыка</a>
-                        {% else %}
-                            <a href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
-                        {% endif %}
+                        <a href="/accounts/profile/{{ c_user.profile.custom_url }}/music/">Музыка</a>
                     </h6>
                 </div>
             </div>
