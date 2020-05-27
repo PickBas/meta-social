@@ -10,7 +10,7 @@ before_script:
 
 test:
   script:
-    - python meta_social/manage.py test $(ls meta_social/apps)
+    - ci/tests_runner.sh
   only:
     - devel
 
