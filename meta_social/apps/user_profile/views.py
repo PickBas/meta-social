@@ -151,7 +151,7 @@ class ProfileViews:
                     self.profile.birth = self.previous_birth
                     self.profile.save()
 
-                return redirect('/accounts/profile/' + str(kwargs['user_url']) + '/')
+                return redirect('/accounts/profile/' + str(self.profile.custom_url) + '/')
 
             return self.get(request, **kwargs)
 
