@@ -177,7 +177,7 @@
 
         $(function () {
             audio_player.volume = 0.75
-            setMusicById(current_position)
+            setMusicById(current_position, true)
         })
 
         $('#progress-range').on('change input', function (e) {
@@ -242,40 +242,24 @@
             audio_player.pause()
         }
 
-        function btnPlayPauseClass() {
-            if (is_paused) {
-                $('#play-pause').removeClass('fa-play')
-                $('#play-pause').addClass('fa-pause')
-                is_paused = false
-                return
-            }
-            $('#play-pause').removeClass('fa-pause')
-            $('#play-pause').addClass('fa-play')
-            is_paused = true
-        }
-
-        function setMusicById(id) {
+        function setMusicById(id, first_time=false) {
             if (id > $('#simpleList').children().length) {
                 return false
             }
             audio_player.pause()
+            is_paused = true
 
             let $info = $('#simpleList').children().eq(id).find('input[name="info"]')
             $('#song-title').html($info.attr('music-name'))
             audio_player.src = $info.val()
             current_position = id
 
-            if (!is_paused) {
-                audio_player.play()
-                is_paused = true
-                btnPlayPauseClass()
+            if (!first_time) {
+                btnPlayPause()
             }
         }
 
         function setMusicBtn(e) {
-            audio_player.pause()
-
-            // Set position
             let $item = $(e.target.parentNode)
             for (let i=0; i <= $('#simpleList').children().length; i++) {
                 if ($('#simpleList').children().eq(i).is($item)) {
@@ -283,15 +267,7 @@
                 }
             }
 
-            // Set name and link into player
-            let $info = $item.children('input[name="info"]')
-            $('#song-title').html($info.attr('music-name'))
-            audio_player.src = $info.attr('value')
-            $(audio_player).on('loadeddata', function () {
-                audio_player.play()
-                is_paused = true
-                btnPlayPauseClass()
-            })
+            setMusicById(current_position)
         }
 
         var sortable = new Sortable(
