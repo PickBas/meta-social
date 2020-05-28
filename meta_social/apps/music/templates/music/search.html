@@ -11,12 +11,12 @@
                         <span>{{ match.artist }} - {{ match.title }}</span>
                         <input type="hidden" id="music_{{ match.id }}" value="{{ match.order }}">
                         {% if match not in user.profile.playlist.all %}
-                        <a type="button" class="btn float-right btn-outline-success px-3 py-2" data-toggle="tooltip" data-placement="top"
+                        <a type="button" class="btn float-right btn-outline-success px-2 py-1" data-toggle="tooltip" data-placement="top"
                            title="Добавить в плейлист" href="/music/{{ match.id }}/add_from_search/">
                             <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
                         </a>
                         {% else %}
-                            <a type="button" class="btn float-right btn-outline-danger px-3 py-2" data-toggle="tooltip" data-placement="top"
+                            <a type="button" class="btn float-right btn-outline-danger px-2 py-1" data-toggle="tooltip" data-placement="top"
                                title="Удалить" href="/music/{{ match.id }}/remove/">
                                 <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
                             </a>
@@ -41,7 +41,7 @@
                         </button>
                         <span>{{ pos.position.artist }} - {{ pos.position.title }}</span>
                         <input type="hidden" id="music_{{ pos.position.id }}" value="{{ pos.order }}">
-                        <a type="button" class="btn float-right btn-outline-danger px-3 py-1" data-toggle="tooltip" data-placement="top"
+                        <a type="button" class="btn float-right btn-outline-danger px-2 py-1" data-toggle="tooltip" data-placement="top"
                            title="Удалить" href="/music/{{ pos.position.id  }}/remove/">
                             <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
                         </a>

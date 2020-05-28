@@ -243,7 +243,7 @@ class PostViews:
 
         if post.get_images():
             for img in post.get_images():
-                photo = PostImages(post=new_post, image=img.image, from_user_id=post.user)
+                photo = PostImages(post=new_post, image=img.image, from_user_id=post.user.id)
             photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
