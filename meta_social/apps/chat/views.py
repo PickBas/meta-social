@@ -51,18 +51,19 @@ class Conversations:
         Method for creating chat. Returns rendered responce of chatlist
         """
         if request.method == 'POST':
-            context = {}
-            new_chat = Chat.objects.create()
-            new_chat.participants.add(request.user)
-            new_chat.chat_name = request.POST.get('text')
-            new_chat.owner = request.user
-            new_chat.save()
-            c_user = User.objects.get(id=request.user.id)
-            c_user.profile.chats.add(new_chat)
-            c_user.save()
-            context['c_user'] = c_user
-            chats = c_user.profile.chats.all().order_by('-messages__date')
-            context['chats'] = list(dict.fromkeys(chats))
+            if request.POST.get('text'):
+                context = {}
+                new_chat = Chat.objects.create()
+                new_chat.participants.add(request.user)
+                new_chat.chat_name = request.POST.get('text')
+                new_chat.owner = request.user
+                new_chat.save()
+                c_user = User.objects.get(id=request.user.id)
+                c_user.profile.chats.add(new_chat)
+                c_user.save()
+                context['c_user'] = c_user
+                chats = c_user.profile.chats.all().order_by('-messages__date')
+                context['chats'] = list(dict.fromkeys(chats))
             return render(request, 'chat/chatlist.html', context)
         raise Http404()
 
