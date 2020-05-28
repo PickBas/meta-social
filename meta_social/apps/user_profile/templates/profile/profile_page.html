@@ -104,11 +104,7 @@
             <div class="card mt-3 mb-3">
                 <div class="card-body">
                     <h6 class="card-title">
-                        {% if c_user == user %}
-                            <a class="pb-2" href="/music/">Музыка</a>
-                        {% else %}
-                            <a class="pb-2" href="/music/?username={{ c_user.profile.custom_url }}">Музыка</a>
-                        {% endif %}
+                        <a class="pb-2" href="/accounts/profile/{{ c_user.profile.custom_url }}/music/">Музыка</a>
                         {% for music in c_user.profile.get_music_list %}
                             <div class="{% if forloop.first %}mt-3{% endif %}">
                                 <button class="float-left btn btn-sm btn-outline-success ml-0 my-0 px-2 py-2" onclick="addMusicToPlaylist('/music.position.artist/{{ music.position.artist.id }}/add/')">+</button>
