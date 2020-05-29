@@ -28,14 +28,20 @@ class Conversations:
         Chat list view
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs) -> None:
+            """
+            ChatList ctor
+            :param kwargs: kwargs
+            """
             super().__init__(**kwargs)
             self.template_name = 'chat/chat.html'
             self.context = self.get_menu_context('messages', 'Чаты')
 
-        def get(self, request):
+        def get(self, request) -> render:
             """
             Processing get request
+            :param request: request
+            :return: render
             """
             self.context['pagename'] = 'Чаты'
 
@@ -47,9 +53,12 @@ class Conversations:
             return render(request, self.template_name, self.context)
 
     @staticmethod
-    def create_chat(request):
+    def create_chat(request) -> render:
         """
-        Method for creating chat. Returns rendered responce of chatlist
+        Method for creating chat. Returns rendered response of chatlist.
+        :raises: Http404
+        :param request: request
+        :return: render
         """
         if request.method == 'POST':
             if request.POST.get('text'):
@@ -69,9 +78,13 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def remove_chat(request, room_id):
+    def remove_chat(request, room_id: int) -> redirect:
         """
         Method for deleting chat. Redirects to chatlist
+        :raises: Http404
+        :param request: request
+        :param room_id: id of room's
+        :return: redirect
         """
         c_room = Chat.objects.get(id=room_id)
         if request.method == 'POST' and request.user == c_room.owner:
@@ -80,9 +93,14 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def make_admin(request, room_id, participant_id):
+    def make_admin(request, room_id: int, participant_id: int) -> HttpResponseRedirect:
         """
-        Method for giving admin permissions in chat
+        Method for giving admin permissions in chat.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :param participant_id: participant's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             make_admin_task.delay(room_id, participant_id)
@@ -90,9 +108,14 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def rm_admin(request, room_id, participant_id):
+    def rm_admin(request, room_id: int, participant_id: int) -> HttpResponseRedirect:
         """
-        Method for removing admin permissions in chat
+        Method for removing admin permissions in chat.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :param participant_id: participant's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             rm_admin_task.delay(room_id, participant_id)
@@ -100,9 +123,13 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def quit_room(request, room_id):
+    def quit_room(request, room_id: int) -> HttpResponseRedirect:
         """
-        Method for quiting room
+        Method for quiting room.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
@@ -115,9 +142,13 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def edit_chat_name(request, room_id):
+    def edit_chat_name(request, room_id: int) -> HttpResponseRedirect:
         """
-        Method for editing chat name
+        Method for editing chat name.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             c_room = Chat.objects.get(id=room_id)
@@ -127,9 +158,13 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def chat_move(request, user_id, friend_id):
+    def chat_move(request, user_id: int, friend_id: int) -> redirect:
         """
-        Method for redirecting to chat, if chat does not exists creates and redirects to it
+        Method for redirecting to chat,
+            if chat does not exists creates and redirects to it.
+        :param request: request
+        :param user_id: user's id
+        :param friend_id: friends' id
         """
         c_user = User.objects.get(id=user_id)
         c_friend = User.objects.get(id=friend_id)
@@ -154,9 +189,14 @@ class Conversations:
             return redirect('/chat/go_to_chat/' + str(new_chat.id) + '/')
 
     @staticmethod
-    def add_to_chat(request, room_id, friend_id):
+    def add_to_chat(request, room_id: int, friend_id: int) -> HttpResponseRedirect:
         """
-        Method for adding user to chat
+        Method for adding user to chat.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :param friend_id: friend's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             add_to_chat_task.delay(room_id, friend_id)
@@ -164,9 +204,14 @@ class Conversations:
         raise Http404()
 
     @staticmethod
-    def remove_from_chat(request, room_id, participant_id):
+    def remove_from_chat(request, room_id: int, participant_id: int) -> HttpResponseRedirect:
         """
-        Method for removing user from chat
+        Method for removing user from chat.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :param participant_id: participant's id
+        :return: HttpResponseRedirect
         """
         if request.method == 'POST':
             rm_from_chat_task.delay(room_id, participant_id)
@@ -178,14 +223,21 @@ class Conversations:
         Chat view class
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            Room ctor
+            :param kwargs: kwargs
+            """
             super().__init__(**kwargs)
             self.template_name_dialog = 'chat/message.html'
             self.template_name_conv = 'chat/conv_message.html'
 
-        def get(self, request, room_id):
+        def get(self, request, room_id: int):
             """
             Processing get request
+            :param request: request
+            :param room_id: room's id
+            :return: HttpResponse | render
             """
             context = self.get_menu_context('messages', 'Чат')
             context['room_name'] = mark_safe(json.dumps(room_id))
@@ -224,9 +276,13 @@ class Conversations:
                 return render(request, self.template_name_conv, context)
 
     @staticmethod
-    def get_messages(request, room_id):
+    def get_messages(request, room_id: int) -> render:
         """
-        Method for getting messages list. Returns rendered responce
+        Method for getting messages list. Returns rendered response.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :return: render
         """
         if request.method == 'POST':
             messages = Chat.objects.get(id=room_id).messages.all()
@@ -245,13 +301,20 @@ class Conversations:
         Managing avatar of chat view
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            AvatarManaging ctor
+            :param kwargs: kwargs
+            """
             self.template_name = 'chat/change_avatar.html'
             super().__init__(**kwargs)
 
-        def post(self, request, **kwargs):
+        def post(self, request, **kwargs: dict) -> redirect:
             """
-            Crop and save avatar of chat
+            Crop and save avatar of chat.
+            :param request: request
+            :param kwargs: room's id
+            :return: redirect
             """
             c_room = Chat.objects.get(id=kwargs['room_id'])
             avatar_form = UpdateChatAvatarForm(request.POST, request.FILES, instance=c_room)
@@ -281,9 +344,12 @@ class Conversations:
 
                 return redirect('/chat/go_to_chat/' + str(c_room.id))
 
-        def get(self, request, room_id):
+        def get(self, request, room_id: int) -> render:
             """
-            Processing get request
+            Processing GET request.
+            :param request: request
+            :param room_id: room's id
+            :return: render
             """
             context = self.get_menu_context('messages', 'Смена аватарки')
             chat_item = get_object_or_404(Chat, id=room_id)
@@ -298,9 +364,13 @@ class Conversations:
             return render(request, self.template_name, context)
 
     @staticmethod
-    def send_files(request, room_id):
+    def send_files(request, room_id: int) -> HttpResponse:
         """
-        Method for sending files to chat
+        Method for sending files to chat.
+        :raises: Http404
+        :param request: request
+        :param room_id: room's id
+        :return: HttpResponse
         """
         chat_item = get_object_or_404(Chat, id=room_id)
         MessageImageFormset = modelformset_factory(

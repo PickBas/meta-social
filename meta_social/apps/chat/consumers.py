@@ -70,7 +70,7 @@ class ChatConsumer(WebsocketConsumer):
         self.accept()
         self.fetch_messages(self.room_name)
 
-    def disconnect(self, close_code) -> None:
+    def disconnect(self, close_code: int) -> None:
         """
         Disconnect
         :param close_code: code
@@ -83,7 +83,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data) -> None:
         """
-        Receive messages and write message to db
+        Receive messages and write message to db.
         :param text_data: json
         :return: None
         """
