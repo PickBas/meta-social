@@ -277,7 +277,7 @@ class PostViews:
         :rtype: :class:`django.http.HttpResponse`
         :raises: :class:`django.http.Http404` if post_id not valid
         """
-        if request.method == 'POST' and all in [0, 1]:
+        if request.method == 'POST' and is_all in [0, 1]:
             post_item = get_object_or_404(Post, id=post_id)
 
             return render(request, 'post/comments.html', {'post': post_item, 'all': bool(is_all)})
