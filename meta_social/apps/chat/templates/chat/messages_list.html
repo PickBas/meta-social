@@ -11,6 +11,12 @@
                 <a href="/accounts/profile/{{ message.author.profile.custom_url }}/">{{ message.author.profile.get_name }}</a>
                 <small class="text-muted ml-1">{{ message.date }}</small>
                 <p>{{ message.message }}</p>
+                {% for music in message.music.all %}
+                    <div>
+                        <button class="btn btn-sm btn-outline-success ml-0" onclick="addMusicToPlaylist('/music/{{ music.id }}/add/')" {% if music not in user.profile.playlist %}disabled{% endif %}>+</button>
+                        <span>{{ music.artist }} - {{ music.title }}</span>
+                    </div>
+                {% endfor %}
                 {% for image_item in message.images.all %}
                 <a data-fancybox="photo" href="{{ image_item.image.url }}" class="w-50">
                             <img src="{{ image_item.image.url }}" class="mb-1 w-50">
