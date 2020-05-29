@@ -20,9 +20,12 @@ class FriendsViews:
     """
 
     @staticmethod
-    def get_render(request, context):
+    def get_render(request, context: dict) -> render:
         """
-        Friends search. Returns rendered responce
+        Friends search. Returns rendered response.
+        :param request: request
+        :param context: dict
+        :return: render
         """
         context['matching'] = True
         if not request.POST.get('query'):
@@ -39,17 +42,24 @@ class FriendsViews:
 
     class FriendsList(MetaSocialView):
         """
-        Friends list view
+        Class FriendsList
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            FriendsList ctor
+            :param kwargs: kwargs
+            """
             self.template_name = 'friends/friends_list.html'
             self.context = self.get_menu_context('friends', 'Список друзей')
             super().__init__(**kwargs)
 
-        def get(self, request, **kwargs):
+        def get(self, request, **kwargs: dict) -> render:
             """
             Processing get request
+            :param request: request
+            :param kwargs: kwargs
+            :return: render
             """
             requested = request.GET.get('username')
             self.context['c_user'] = request.user
@@ -66,9 +76,12 @@ class FriendsViews:
 
             return render(request, self.template_name, self.context)
 
-        def post(self, request, **kwargs):
+        def post(self, request, **kwargs: dict) -> render:
             """
-            Processing post request
+            Processing POST request.
+            :param request: request
+            :param kwargs: kwargs
+            :return: render
             """
             self.context['c_user'] = request.user
             return FriendsViews.get_render(request, self.context)
@@ -78,13 +91,19 @@ class FriendsViews:
         Requests view
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            FriendsRequests ctor
+            :param kwargs: kwargs
+            """
             self.template_name = 'friends/requests.html'
             super().__init__(**kwargs)
 
-        def get(self, request):
+        def get(self, request) -> render:
             """
-            Processing get request
+            Processing GET request
+            :param request: request
+            :return: render
             """
             context = self.get_menu_context('friends', 'Заявки в друзья')
 
@@ -102,7 +121,11 @@ class FriendsViews:
         Blacklist view
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            FriendsBlacklist ctor
+            :param kwargs: kwargs
+            """
             self.template_name = 'friends/blacklist.html'
             super().__init__(**kwargs)
 
@@ -125,15 +148,19 @@ class FriendsViews:
         Class for sending friendship request
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            SendFriendshipRequest ctor
+            :param kwargs: kwargs
+            """
             self.user_item = None
             super().__init__(**kwargs)
 
-        def post(self, request, **kwargs) -> redirect:
+        def post(self, request, **kwargs: dict) -> redirect:
             """
             Sending friendship request view
             :param request: request
-            :param user_id: id
+            :param user_id: user's id
             :return: redirect
             """
 
@@ -154,9 +181,12 @@ class FriendsViews:
 
             raise Http404()
 
-        def get(self, request, **kwargs):
+        def get(self, request, **kwargs: dict) -> Http404:
             """
-            Processing get request
+            Processing GET request. Raising Http404
+            :param request: request
+            :param kwargs: kwargs
+            :return: Http404
             """
             raise Http404()
 
@@ -165,11 +195,15 @@ class FriendsViews:
         Class for accepting friendship request
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            AcceptRequest ctor
+            :param kwargs: kwargs
+            """
             self.user_item = None
             super().__init__(**kwargs)
 
-        def post(self, request, **kwargs) -> redirect:
+        def post(self, request, **kwargs: dict) -> redirect:
             """
             Accept_request view
             :param request: request
@@ -199,16 +233,23 @@ class FriendsViews:
 
             raise Http404()
 
-        def get(self, request, **kwargs):
+        def get(self, request, **kwargs: dict) -> Http404:
             """
-            Processing get request
+            Processing GET request. Raising Http404
+            :param request: request
+            :param kwargs: kwargs
+            :return: Http404
             """
             raise Http404()
 
     @staticmethod
-    def cancel_request(request, user_id):
+    def cancel_request(request, user_id: int) -> render:
         """
-        Method for canceling request
+        Method for canceling request.
+            Raising Http404 if the request type is GET.
+        :param request: request
+        :param user_id: user's id
+        :return: render
         """
         if request.method == 'POST':
             user_item = get_object_or_404(User, id=user_id)
@@ -229,9 +270,10 @@ class FriendsViews:
         raise Http404()
 
     @staticmethod
-    def remove_friend(request, user_id) -> redirect:
+    def remove_friend(request, user_id: int) -> render:
         """
         Remove_friend view
+            Raising Http404 if the request type is GET.
         :param request: request
         :param user_id: id
         :return: redirect
@@ -250,11 +292,13 @@ class FriendsViews:
         raise Http404()
 
     @staticmethod
-    def blacklist_add(request, user_id):
+    def blacklist_add(request, user_id: int) -> render:
         """
-        Blacklist_add view
+        Blacklist_add view.
+            Raising Http404 if the request type is GET.
         :param request: request
-        :param user_id: id
+        :param user_id: user's id
+        :return: render
         """
 
         if request.method == 'POST':
@@ -270,11 +314,13 @@ class FriendsViews:
         raise Http404()
 
     @staticmethod
-    def blacklist_remove(request, user_id):
+    def blacklist_remove(request, user_id: int) -> render:
         """
-        Blacklist_remove view
+        Blacklist_remove view.
+            Raising Http404 if the request type is GET.
         :param request: request
-        :param user_id: id
+        :param user_id: user's id
+        :return: render
         """
         if request.method == 'POST':
             user_to_remove = get_object_or_404(User, id=user_id)
