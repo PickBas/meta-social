@@ -246,7 +246,7 @@ class FriendsViews:
     def cancel_request(request, user_id: int) -> render:
         """
         Method for canceling request.
-            Raising Http404 if the request type is GET.
+        :raises: Http404 if the request type is GET.
         :param request: request
         :param user_id: user's id
         :return: render
@@ -273,7 +273,7 @@ class FriendsViews:
     def remove_friend(request, user_id: int) -> render:
         """
         Remove_friend view
-            Raising Http404 if the request type is GET.
+        :raises: Http404 if the request type is GET.
         :param request: request
         :param user_id: id
         :return: redirect
@@ -295,7 +295,7 @@ class FriendsViews:
     def blacklist_add(request, user_id: int) -> render:
         """
         Blacklist_add view.
-            Raising Http404 if the request type is GET.
+        :raises: Http404 if the request type is GET.
         :param request: request
         :param user_id: user's id
         :return: render
@@ -317,7 +317,7 @@ class FriendsViews:
     def blacklist_remove(request, user_id: int) -> render:
         """
         Blacklist_remove view.
-            Raising Http404 if the request type is GET.
+        :raises: Http404 if the request type is GET.
         :param request: request
         :param user_id: user's id
         :return: render
