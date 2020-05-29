@@ -82,9 +82,12 @@ class Index(MetaSocialView):
 
     def get(self, request) -> render:
         """
-        Index page view
-        :param request: request
-        :return: render
+        Representation if newsfeed page
+
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
         """
         context = self.get_menu_context('newsfeed', 'Главная')
         context['pagename'] = "Главная"
@@ -109,7 +112,12 @@ class Index(MetaSocialView):
     @staticmethod
     def update_nav(request):
         """
-        Method for updating navigation menu. Retutns rendered responce
+        Method for updating navigation menu
+        
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
         """
         if request.method == 'POST':
             context = {
@@ -131,7 +139,12 @@ class GlobalSearch(View):
 
     def post(self, request):
         """
-        Site search. Returns rendered responce
+        Site search
+        
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
         """
         if request.POST.get('query'):
             context = {}
