@@ -15,6 +15,9 @@ from music.models import Music
 class MessageImages(models.Model):
     """
     Message image model
+
+    :param image: image
+
     """
     image = models.ImageField(upload_to='messages/images')
 
@@ -41,11 +44,16 @@ class MessageImages(models.Model):
 class Message(models.Model):
     """
     Chat messages model
+
+    :param author: ForeignKey to :class:`User`
+    :param message: message's text
+    :param date: message's send date
+    :param is_read: True if user's message was read
     """
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_messages", null=True)
     message = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)
-    is_readed = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
 
     images = models.ManyToManyField(MessageImages)
     music = models.ManyToManyField(Music)
@@ -76,7 +84,7 @@ class Chat(models.Model):
         """
         Returns all unread message objects
         """
-        return self.messages.all().filter(is_readed=False)
+        return self.messages.all().filter(is_read=False)
 
     def last_message(self):
         """

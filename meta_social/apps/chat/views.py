@@ -231,10 +231,10 @@ class Conversations:
         if request.method == 'POST':
             messages = Chat.objects.get(id=room_id).messages.all()
 
-            unread_messages = messages.filter(is_readed=False).exclude(author=request.user)
+            unread_messages = messages.filter(is_read=False).exclude(author=request.user)
 
             for message in unread_messages:
-                message.is_readed = True
+                message.is_read = True
                 message.save()
 
             return render(request, 'chat/messages_list.html', {'messages_list': messages})
