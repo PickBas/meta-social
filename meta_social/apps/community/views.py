@@ -38,7 +38,15 @@ class Communities:
 
         def get(self, request, community_url):
             """
-            Processing get request
+            Representation of community page
+
+            :param community_url: community custom_url field
+            :type community_url: str
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if custom url not valid
             """
             context = self.get_menu_context('community', 'Сообщество')
 
@@ -65,7 +73,15 @@ class Communities:
 
         def post(self, request, **kwargs):
             """
-            Changing community data (name, info, country)
+            Processes post request from community edit
+
+            :param community_url: community custom_url field
+            :type community_url: str
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if custom url not valid
             """
             community = get_object_or_404(Community, custom_url=kwargs['community_url'])
             self.context['community'] = community
@@ -77,7 +93,15 @@ class Communities:
 
         def get(self, request, **kwargs):
             """
-            Processing get request
+            Representation of community edit page
+
+            :param community_url: community custom_url field
+            :type community_url: str
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if custom url not valid
             """
             self.context['community'] = get_object_or_404(Community, custom_url=kwargs['community_url'])
             self.context['form'] = EditCommunityForm(instance=self.context['community'])
@@ -96,7 +120,12 @@ class Communities:
         @staticmethod
         def post(request):
             """
-            Creates community
+            Processes post request from community creating page
+
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responces redirect
+            :rtype: :class:`django.http.HttpResponseRedirect`
             """
             form = CommunityCreateForm(request.POST)
             if form.is_valid():
@@ -114,7 +143,12 @@ class Communities:
 
         def get(self, request):
             """
-            Processing get request
+            Representation of community creating page
+
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
             """
             context = self.get_menu_context('community', 'Создание сообщества')
             context['form'] = CommunityCreateForm()
@@ -133,7 +167,15 @@ class Communities:
 
         def post(self, request, **kwargs):
             """
-            Crop and save avatar of community
+            Processes post request from community avatar cropping
+
+            :param community_url: community custom_url field
+            :type community_url: str
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responces redirect
+            :rtype: :class:`django.http.HttpResponseRedirect`
+            :raises: :class:`django.http.Http404` if custom url not valid
             """
             community = get_object_or_404(Community, custom_url=kwargs['community_url'])
             avatar_form = UpdateCommunityAvatarForm(request.POST, request.FILES, instance=community)
@@ -165,7 +207,12 @@ class Communities:
 
         def get(self, request, **kwargs):
             """
-            Processing get request
+            Representation of community avatar changing and cropping
+
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
             """
             avatar_form = UpdateCommunityAvatarForm()
             crop_form = CropAvatarForm()
@@ -179,7 +226,12 @@ class Communities:
     @staticmethod
     def my_communities(request):
         """
-        Method for getting all created communities. Returns rendered responce
+        Rerurn responce to ajax
+
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
         """
         return render(request, 'community/own_community_list.html', {
             'community_pages': 'created'
@@ -198,7 +250,12 @@ class Communities:
 
         def get(self, request):
             """
-            Processing get request
+            Representation of community list
+
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
             """
             self.context = self.get_menu_context('community', 'Список сообществ')
 
@@ -225,7 +282,12 @@ class Communities:
 
         def post(self, request):
             """
-            Searching communities by name and returns rendered responce
+            Process post request from community search
+
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
             """
 
             c_user = request.user
@@ -245,6 +307,14 @@ class Communities:
     def community_join(request, community_url):
         """
         Method for joining to community
+
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
         community = get_object_or_404(Community, custom_url=community_url)
         if request.user not in community.users.all():
@@ -255,7 +325,15 @@ class Communities:
     @staticmethod
     def community_leave(request, community_url):
         """
-        Mthod for leaving from community
+        Method for leaving from community
+
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
         community = get_object_or_404(Community, custom_url=community_url)
         if request.user in community.users.all():
@@ -267,9 +345,14 @@ class Communities:
     def post_community_new(request, community_url):
         """
         Function for creating post
-        :param community_url: url
-        :param request: request
-        :return: HttpResponseRedirect
+
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
 
         community = get_object_or_404(Community, custom_url=community_url)
@@ -305,9 +388,14 @@ class Communities:
     def get_subscribers_list(request, community_url):
         """
         Function for getting users in community
-        :param community_url: url
-        :param request: request
-        :return: HttpResponseRedirect
+        
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
 
         community = get_object_or_404(Community, custom_url=community_url)
@@ -320,11 +408,17 @@ class Communities:
     @staticmethod
     def remove_admin_permissions(request, community_url, user_url):
         """
-        Function for remove admin permission from user
-        :param user_url: url
-        :param community_url: url
-        :param request: request
-        :return: HttpResponseRedirect
+        Function for remove admin permission of user
+        
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param user_url: user custom_url field
+        :type user_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
 
         community = get_object_or_404(Community, custom_url=community_url)
@@ -340,10 +434,16 @@ class Communities:
     def give_admin_permissions(request, community_url, user_url):
         """
         Function for give admin permission from user
-        :param user_url: url
-        :param community_url: url
-        :param request: request
-        :return: HttpResponseRedirect
+        
+        :param community_url: community custom_url field
+        :type community_url: str
+        :param user_url: user custom_url field
+        :type user_url: str
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if custom url not valid
         """
 
         community = get_object_or_404(Community, custom_url=community_url)

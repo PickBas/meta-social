@@ -11,6 +11,16 @@ from post.models import Post
 class Community(models.Model):
     """
     Community model
+
+    :param users: all users of community. ManyToManyField to :class:`django.contrib.auth.models.User` model
+    :param admins: all admins of community. ManyToManyField to :class:`django.contrib.auth.models.User` model
+    :param owner: owner of community. ForeignKey to :class:`django.contrib.auth.models.User` model
+    :param name: community name
+    :param info: information about community
+    :param custom_url: editable community url
+    :param posts: all posts of community. ManyToManyField to :class:`post.models.Post` model
+    :param base_image: not cropped avatar of community
+    :param image: cropped avatar of community
     """
     users = models.ManyToManyField(to=User, related_name='users')
     admins = models.ManyToManyField(to=User, related_name='admins')
@@ -33,4 +43,9 @@ class Community(models.Model):
     image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
 
     def get_posts(self):
+        """
+        Method for getting all posts of community
+
+        :rtype: Django queryset
+        """
         return reversed(self.posts.all())
