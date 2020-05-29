@@ -24,13 +24,20 @@ class MusicViews:
         Music list representaion
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            MusicList ctor
+            :param kwargs: kwargs
+            """
             super().__init__(**kwargs)
             self.template_name = 'music/music_list.html'
 
-        def get(self, request, custom_url):
+        def get(self, request, custom_url: str) -> render:
             """
-            Processing get request
+            Processing GET request. Rendering music_list page.
+            :param custom_url: user's custom url
+            :param request: request
+            :return: render
             """
             context = self.get_menu_context('music', 'Музыка')
             context['music_pages'] = 'my_list'
@@ -40,9 +47,12 @@ class MusicViews:
 
             return render(request, self.template_name, context)
 
-        def post(self, request, custom_url):
+        def post(self, request, custom_url: str) -> render:
             """
-            Replace order
+            Processing POST request. Rendering search list.
+            :param custom_url: user's custom url
+            :param request: request
+            :return: render
             """
 
             c_user = request.user
@@ -64,13 +74,19 @@ class MusicViews:
         Music upload and representation
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: dict) -> None:
+            """
+            MusicUpload ctor
+            :param kwargs: kwargs
+            """
             super().__init__(**kwargs)
             self.template_name = 'music/music_upload.html'
 
-        def post(self, request):
+        def post(self, request) -> redirect:
             """
-            Processing post request. Save uploaded music
+            Processing POST request. Save uploaded music
+            :param request: request
+            :return: redirect
             """
             form = UploadMusicForm(request.POST, request.FILES)
             if form.is_valid():
@@ -82,9 +98,11 @@ class MusicViews:
 
             return redirect('/accounts/profile/{}/music/'.format(request.user.profile.custom_url))
 
-        def get(self, request):
+        def get(self, request) -> render:
             """
-            Processing get request
+            Processing GET request. Rendering music_upload page.
+            :param request: request
+            :return: render
             """
             context = self.get_menu_context('music', 'Загрузка музыки')
             context['music_pages'] = 'upload'
@@ -94,7 +112,13 @@ class MusicViews:
             return render(request, self.template_name, context)
 
     @staticmethod
-    def add_music(request, music_id):
+    def add_music(request, music_id: int) -> HttpResponse:
+        """
+        Method for processing the addition of music.
+        :param request: request
+        :param music_id: int
+        :return: HttpResponse
+        """
         music_item = get_object_or_404(Music, id=music_id)
 
         if music_item in request.user.profile.playlist.all():
@@ -110,7 +134,13 @@ class MusicViews:
         return HttpResponse('Success')
 
     @staticmethod
-    def add_music_from_search(request, music_id):
+    def add_music_from_search(request, music_id: int) -> HttpResponse:
+        """
+        Method for processing the music search.
+        :param request: request
+        :param music_id: int
+        :return: HttpResponseRedirect
+        """
         music_item = get_object_or_404(Music, id=music_id)
 
         if music_item in request.user.profile.playlist.all():
@@ -127,7 +157,13 @@ class MusicViews:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     @staticmethod
-    def remove(request, music_id):
+    def remove(request, music_id: int) -> HttpResponseRedirect:
+        """
+        Method for processing the removal of music.
+        :param request:
+        :param music_id:
+        :return:
+        """
         music_item = get_object_or_404(Music, id=music_id)
         request.user.profile.playlist.remove(music_item)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

@@ -18,9 +18,12 @@ class MessageImages(models.Model):
     """
     image = models.ImageField(upload_to='messages/images')
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: tuple, **kwargs: dict) -> None:
         """
         Resize and compress images before save
+        :param args: args
+        :param kwargs: kwargs
+        :return: None
         """
         pil_image = Image.open(self.image)
         output = BytesIO()

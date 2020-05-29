@@ -11,6 +11,9 @@ class UploadMusicForm(forms.ModelForm):
     Form for upload music
     """
     class Meta:
+        """
+        Meta class. Getting fields.
+        """
         model = Music
         fields = ('audio_file', 'artist', 'title', )
         labels = {
