@@ -18,3 +18,14 @@ var $grid = $('.masonry-grid').masonry({
 $grid.imagesLoaded().progress( function() {
     $grid.masonry();
 });
+
+var $grid2 = $('.masonry-files').masonry({
+    itemSelector: '.masonry-files-item',
+    percentPosition: true,
+    columnWidth: 9,
+    gutter: 1
+});
+
+$grid2.imagesLoaded().progress( function() {
+    $grid2.masonry();
+});
