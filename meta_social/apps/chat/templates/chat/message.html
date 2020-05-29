@@ -19,42 +19,34 @@
             vertical-align: middle;
         }
 
-        .close {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 25px;
-            height: 25px;
-            color:white;
-            opacity: 0.6;
-        }
-
-        .close:hover {
-            color:white;
-            opacity: 1;
-            cursor: pointer;
-        }
-
-        .close:before, .close:after {
-            content: ' ';
-            height: 33px;
-            width: 2px;
-            background-color: #333;
-        }
-
-        .close:before {
-            transform: rotate(45deg);
-        }
-
-        .close:after {
-            transform: rotate(-45deg);
-        }
-
         .img-div {
+            position: relative;
             display: inline-block;
             height: 45px;
             width: calc(10% - 3px);
             margin-right: 5px;
+        }
+
+        .message-image-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            color: white;
+            border-radius: 50%;
+            background-color: #ff4444;
+            width: 23px;
+            height: 23px;
+            z-index: 99;
+            border: 1px solid white;
+        }
+
+        .message-image-badge:hover {
+            cursor: pointer;
+            background-color: #F13636;
+        }
+
+        .message-image-badge:active {
+            background-color: #CC0000;
         }
     </style>
 
@@ -96,9 +88,13 @@
             <div>
                 <div class="md-form input-group">
                     <div class="input-group-prepend">
-                        <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" onclick="triggerInput()" style="font-size: 12pt;">
+                        <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-paperclip" aria-hidden="true"></i>
                         </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" onclick="triggerInput()">Изображения</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#musicSelectModal">Музыка</a>
+                        </div>
                     </div>
                     <textarea class="form-control w-100 md-textarea" rows="1" style="resize: none; padding: 0px 2px;" id="chat-message-input"></textarea>
                     <div class="input-group-append">
@@ -108,9 +104,46 @@
                     </div>
                 </div>
                 
-                <input type="file" id="message_files" style="display: none;" multiple>
+                <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)" style="display: none;">
+
+                <form enctype="multipart/form-data" id="message_images">
+                    {% csrf_token %}
+                    {{ musicform }}
+                    {{ formset.management_form }}
+                    <div style="display: none;">
+                        {% for form in formset %}
+                            {{ form }} <br>
+                        {% endfor %}
+                    </div>
+                </form>
             </div>
             <div id="gallery" class="text-left"></div>
+        </div>
+    </div>
+
+    <div class="modal modal fade" id="musicSelectModal" tabindex="-1" role="dialog" aria-labelledby="musicSelectModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Выберите музыку:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="select-music-list">
+                    {% for pos in user.profile.get_music_list %}
+                        <div>
+                            <button class="btn btn-sm btn-primary" onclick="addMusic(event, {{ pos.position.id }}, '{{ pos.position.artist }} - {{ pos.position.title }}')">+</button>
+                            <span style="max-width: 400px;" class="text-truncate">{{ pos.position.artist }} - {{ pos.position.title }}</span>
+                        </div>
+                    {% empty %}
+                        У вас нет музыки
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -4,9 +4,12 @@ Models module
 
 from io import BytesIO
 from PIL import Image
+
 from django.db import models
 from django.core.files import File
 from django.contrib.auth.models import User
+
+from music.models import Music
 
 
 class MessageImages(models.Model):
@@ -45,6 +48,7 @@ class Message(models.Model):
     is_readed = models.BooleanField(default=False)
 
     images = models.ManyToManyField(MessageImages)
+    music = models.ManyToManyField(Music)
 
     def __str__(self):
         """

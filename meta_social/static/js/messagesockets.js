@@ -43,17 +43,13 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
     if (message.length) {
-        let form_data = new FormData();
-        form_data.append('csrfmiddlewaretoken', c_token);
-        
-        for (let i=0; i<$('#message_files')[0].files.length; i++) {
-            form_data.append('images', $('#message_files')[0].files[i])
-        }
+        let form_data = new FormData($('#message_images')[0])
         
         $.ajax({
             type: 'POST',
             url: '/chat/go_to_chat/' + roomName + '/send_files/',
             data: form_data,
+            cache: false,
             contentType: false,
             processData: false,
             success: function (result) {
@@ -75,9 +71,85 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     }
 };
 
+//-------------------------------
+
+function removeMusic(e) {
+    let div = document.createElement('div')
+
+    let btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('btn-sm')
+    btn.classList.add('btn-primary')
+    btn.innerHTML = '+'
+    btn.onclick = function () {
+        addMusic(event, $(e.target).attr('music-id'), $(e.target).attr('music-name'))
+    }
+
+    let span = document.createElement('span')
+    span.classList.add('text-truncate')
+    $(span).attr('width', '400px')
+    span.innerHTML = $(e.target).attr('music-name')
+
+    div.appendChild(btn)
+    div.appendChild(span)
+
+    $('#select-music-list')[0].appendChild(div)
+    
+    let vals = $('#id_music')[0].value.split(' ')
+    for (let i=0; i < vals.length; i++) {
+        if (vals[i] == $(e.target).attr('music-id')) {
+            vals.splice(i, 1)
+        }
+    }
+
+    let new_val = ''
+    for (let i=0; i < vals.length; i++) {
+        new_val += vals[i]
+    }
+
+    $('#id_music').val(new_val)
+
+    e.target.parentNode.remove()
+}
+
+function getMusicCount() {
+    return $('#id_music')[0].value.split(' ').length
+}
+
+function addMusic(e, id, name) {
+    if (getMusicCount() == 10) {
+        alert('Максимум 10 песен')
+        return
+    }
+
+    $('#id_music')[0].value += id + ' '
+
+    let imgDiv = document.createElement('div')
+    imgDiv.classList.add('img-div')
+    imgDiv.classList.add('border')
+
+    let nameP = document.createElement('p')
+    nameP.classList.add('text-truncate')
+    nameP.innerHTML = name
+
+    let rmBtn = document.createElement('span')
+    rmBtn.classList.add('message-image-badge');
+    rmBtn.classList.add('text-center');
+    rmBtn.onclick = removeMusic;
+    rmBtn.innerHTML = 'X';
+    $(rmBtn).attr('music-name', name)
+    $(rmBtn).attr('music-id', id)
+
+    imgDiv.appendChild(nameP)
+    imgDiv.appendChild(rmBtn)
+
+    document.getElementById('gallery').appendChild(imgDiv)
+
+    e.target.parentNode.remove()
+}
+
 function triggerInput() {
-    $('#message_files')[0].click()
-    $('#gallery').empty()
+    $('#fileElem')[0].click()
 }
 
 let dropArea = document.getElementById('drop-area')
@@ -112,43 +184,76 @@ dropArea.addEventListener('drop', handleDrop, false);
 function handleDrop(e) {
     let dt = e.dataTransfer;
     let files = dt.files;
-    
-    $('#gallery').empty()
-    $('#message_files')[0].files = files
-    
-    handleFiles($('#message_files')[0])
+
+    handleFiles(files)
 }
 
-$('#message_files').on('change', function (e) {
-    let my_input = e.target
-    
-    handleFiles(my_input)
-})
+function handleFiles(files) {
+    files = [...files];
+    files.forEach(uploadFile)
+}
 
-function handleFiles(my_input) {
-    if (my_input.files.length > 10) {
-        alert('Нельзя загрузить более 10 файлов')
-        my_input.value = ''
+function get_free_inputs() {
+    let inputs = [];
+    for (var i = 0; i < 10; i++) {
+        let input = document.getElementById("id_form-" + i + "-image");
+        if (!input.value) {
+            inputs.push(input)
+        }
+    }
+    return inputs
+}
+
+function uploadFile(file) {
+    let inputs = get_free_inputs();
+    
+    if (inputs.length == 0) {
+        alert('Нельзя загрузить более 10 картинок');
         return
     }
 
-    for (let i=0; i<my_input.files.length; i++) {
-        let reader = new FileReader()
-        reader.readAsDataURL(my_input.files[i]);
-        reader.onloadend = function () {
-            let imgDiv = document.createElement('div')
-            imgDiv.style.cssText = 'position: relative;'
-            imgDiv.classList.add('img-div')
-            
-            let img = document.createElement('img');
-            img.src = reader.result;
-            
-            imgDiv.appendChild(img)
+    const dT = new DataTransfer();
+    dT.items.add(file);
+    inputs[0].files = dT.files;
 
-            document.getElementById('gallery').appendChild(imgDiv)
-        }
+    let input_id = inputs[0].id[8];
+
+    previewFile(file, input_id)
+}
+
+function removeFile(e) {
+    let current_id = e.target.id[e.target.id.length - 1];
+
+    document.getElementById("id_form-" + current_id + "-image").value = '';
+    e.target.parentNode.remove()
+}
+
+function previewFile(file, input_id) {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function () {
+        let imgDiv = document.createElement('div')
+        imgDiv.classList.add('img-div')
+
+        let img = document.createElement('img');
+        img.src = reader.result;
+
+        let rmBtn = document.createElement('span')
+
+        rmBtn.id = "image_preview-" + input_id;
+        rmBtn.classList.add('message-image-badge');
+        rmBtn.classList.add('text-center');
+        rmBtn.onclick = removeFile;
+        rmBtn.innerHTML = 'X';
+
+        imgDiv.appendChild(img)
+        imgDiv.appendChild(rmBtn)
+
+        document.getElementById('gallery').appendChild(imgDiv)
     }
 }
+
+//--------------------------------------------
 
 $('#messages_list').on('scroll', function () {
     if ($(this).scrollTop() > $(this).height()) {

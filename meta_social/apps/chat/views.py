@@ -8,13 +8,14 @@ from django.shortcuts import render, redirect, HttpResponseRedirect, HttpRespons
 from django.http import Http404
 from django.utils.safestring import mark_safe
 from django.core.files.base import ContentFile
+from django.forms import modelformset_factory
 
 from core.forms import CropAvatarForm
 from core.views import MetaSocialView
 
 from .tasks import make_admin_task, rm_admin_task, add_to_chat_task, rm_from_chat_task
-from .forms import UpdateChatAvatarForm
-from .models import User, Chat, MessageImages, Image, BytesIO
+from .forms import UpdateChatAvatarForm, MessageImageForm, MessageMusicForm
+from .models import User, Chat, MessageImages, Image, BytesIO, Music
 
 
 class Conversations:
@@ -188,7 +189,13 @@ class Conversations:
             """
             context = self.get_menu_context('messages', 'Чат')
             context['room_name'] = mark_safe(json.dumps(room_id))
-            c_room = Chat.objects.get(id=room_id)
+            c_room = get_object_or_404(Chat, id=room_id)
+
+            MessageImageFormSet = modelformset_factory(
+                MessageImages, form=MessageImageForm, extra=10, max_num=10
+            )
+            context['formset'] = MessageImageFormSet(queryset=MessageImages.objects.none())
+            context['musicform'] = MessageMusicForm()
 
             if request.user not in c_room.participants.all():
                 return HttpResponse('Access denied')
@@ -296,19 +303,30 @@ class Conversations:
         Method for sending files to chat
         """
         chat_item = get_object_or_404(Chat, id=room_id)
+        MessageImageFormset = modelformset_factory(
+            MessageImages, form=MessageImageForm, extra=10, max_num=10
+        )
 
-        if request.method == 'POST':
+        if request.method == "POST":
             message_item = chat_item.messages.create(
                 author=request.user,
                 message=''
             )
+            formset = MessageImageFormset(
+                request.POST, request.FILES, queryset=MessageImages.objects.none()
+            )
 
-            for image in request.FILES.getlist('images'):
-                img_item = MessageImages(image=image)
-                img_item.save()
+            if formset.is_valid():
+                if request.POST.get('music'):
+                    for music_id in [int(i) for i in request.POST.get('music').split()]:
+                        music_item = get_object_or_404(Music, id=music_id)
+                        message_item.music.add(music_item)
 
-                message_item.images.add(img_item)
+                for form in formset.cleaned_data:
+                    if form:
+                        image = form['image']
+                        message_item.images.create(image=image)
 
-            return HttpResponse(message_item.id)
+                return HttpResponse(message_item.id)
 
         raise Http404()
