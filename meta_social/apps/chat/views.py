@@ -328,5 +328,4 @@ class Conversations:
                         message_item.images.create(image=image)
 
                 return HttpResponse(message_item.id)
-
         raise Http404()

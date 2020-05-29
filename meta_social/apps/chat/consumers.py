@@ -91,7 +91,13 @@ class ChatConsumer(WebsocketConsumer):
 
         message = text_data_json['message']
 
-        if not message.isspace():
+        is_good_message = False
+
+        for letter in message:
+            if ord(letter) != 32 and ord(letter) != 10:
+                is_good_message = True
+
+        if is_good_message:
             author_user = get_object_or_404(User, id=int(text_data_json['author']))
             chat = get_object_or_404(Chat, id=int(text_data_json['chat_id']))
 
