@@ -6,8 +6,8 @@ from io import BytesIO
 from PIL import Image
 
 from django.core.files.base import ContentFile
-from django.shortcuts import render, HttpResponse, redirect
-from django.http import Http404
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.utils import timezone
@@ -19,6 +19,8 @@ from post.forms import PostImageForm, PostForm
 
 from .models import Profile
 from .forms import UserUpdateForm, ProfileUpdateForm, UpdateAvatarForm
+from friends.models import FriendshipRequest
+from friends.views import FriendsViews
 
 
 class ProfileViews:
@@ -224,6 +226,25 @@ class ProfileViews:
             request.user.profile.last_act = timezone.now()
             request.user.profile.save()
             return HttpResponse('Success')
+
+        raise Http404()
+
+    @staticmethod
+    def send_friend_request(request, user_id):
+        user_item = get_object_or_404(User, id=user_id)
+
+        if not FriendshipRequest.objects.filter(from_user=user_item,
+                                                to_user=request.user).exists():
+            if not FriendshipRequest.objects.filter(from_user=request.user,
+                                                    to_user=user_item).exists():
+                item = FriendshipRequest(
+                    from_user=request.user,
+                    to_user=user_item,
+                )
+
+                item.save()
+
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         raise Http404()
 
