@@ -305,11 +305,9 @@ class PostViews:
         new_post.save()
         request.user.profile.posts.add(new_post)
 
-        owner_id = post.owner.id if post.owner.id else post.owner_community.id
-
         if post.get_images():
             for img in post.get_images():
-                photo = PostImages(post=new_post, image=img.image, from_user_id=owner_id)
+                photo = PostImages(post=new_post, image=img.image, from_user_id=request.user.id)
             photo.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
