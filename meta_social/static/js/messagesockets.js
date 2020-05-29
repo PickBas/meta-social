@@ -4,8 +4,17 @@ $(function() {
 })
 
 let scrolled_by_user = false
+
+ws_connection = 'wss://'
+
+if (window.location.protocol == 'http:') {
+    ws_connection = 'ws://'
+}
+
+console.log(window.location.protocol)
+
 const chatSocket = new WebSocket(
-    'wss://'
+    ws_connection
     + window.location.host
     + '/ws/chat/'
     + roomName
@@ -42,7 +51,7 @@ document.querySelector('#chat-message-input').onkeyup = function(e) {
 document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
-    if (message.length) {
+    if (/\S/.test(message)) {
         let form_data = new FormData($('#message_images')[0])
         
         $.ajax({

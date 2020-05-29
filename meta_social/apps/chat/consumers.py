@@ -91,13 +91,7 @@ class ChatConsumer(WebsocketConsumer):
 
         message = text_data_json['message']
 
-        is_not_white_space = False
-
-        for letter in message:
-            if letter != ' ' or letter != '\n':
-                is_not_white_space = True
-
-        if is_not_white_space:
+        if not message.isspace():
             author_user = get_object_or_404(User, id=int(text_data_json['author']))
             chat = get_object_or_404(Chat, id=int(text_data_json['chat_id']))
 
