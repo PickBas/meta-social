@@ -11,6 +11,10 @@ from django.contrib.auth.models import User
 class Music(models.Model):
     """
     Music model
+
+    :param audio_file: music file
+    :param artist: music's artist
+    :param title: music's title
     """
     # user = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
