@@ -11,6 +11,9 @@ from .widgets import MyImageFieldWidget
 class PostForm(forms.ModelForm):
     """
     Form for creation post
+
+    :param text: text of post
+    :param music: contains music ids
     """
     text = forms.CharField(max_length=500)
     music = forms.CharField(required=False, widget=forms.TextInput(attrs={'style': 'display: none;'}))
@@ -34,6 +37,8 @@ class PostForm(forms.ModelForm):
 class PostImageForm(forms.ModelForm):
     """
     Form for adding images to post
+
+    :param image: image of post
     """
     image = forms.ImageField()
 
@@ -49,6 +54,8 @@ class PostImageForm(forms.ModelForm):
 class EditPostImageForm(forms.ModelForm):
     """
     Form for editing images of post
+
+    :param image: image of post
     """
     image = forms.ImageField(required=False, widget=MyImageFieldWidget)
 

@@ -16,6 +16,9 @@ from music.models import Music
 class Like(models.Model):
     """
     Like model
+
+    :param date: like date
+    :param user: like owner
     """
     date = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
@@ -24,6 +27,17 @@ class Like(models.Model):
 class Post(models.Model):
     """
     Post model
+
+    :param user: ForeignKey to :class:`django.contrib.auth.models.User` model. Creator of post
+    :param community: ForeignKey to :class:`community.models.Community` model. Creator of post
+    :param text: text of post
+    :param date: post creation date
+    :param likes: ManyToManyField to :class:`post.models.Like`  model
+    :param rt: ManyToManyField to :class:`django.contrib.auth.models.User`  model
+    :param is_reposted: boolean field
+    :param owner: ForeignKey to :class:`django.contrib.auth.models.User` model. Owner of post
+    :param owner_community: ForeignKey to :class:`community.models.Community` model. Owner of post
+    :param music: ManyToManyField to :class:`music.models.Music` model
     """
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True)
     community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True)
@@ -51,18 +65,26 @@ class Post(models.Model):
     def __str__(self):
         """
         Returns a string representation of an object
+
+        :return: text of post
+        :rtype: str
         """
         return self.text
 
     def get_owner(self):
         """
         Returns owner of post
+
+        :return: owner of post
+        :rtype: :class:`community.models.Community` or :class:`user_profile.models.Profile`
         """
         return self.community if self.community else self.user.profile
 
     def get_owner_name(self):
         """
         Returns owner name
+
+        :rtype: str
         """
         if self.community:
             return self.community.name
@@ -71,6 +93,8 @@ class Post(models.Model):
     def get_link(self):
         """
         Returns owner link
+
+        :rtype: str
         """
         if self.community:
             return '/community/' + str(self.community.id) + '/'
@@ -79,30 +103,40 @@ class Post(models.Model):
     def get_images(self):
         """
         Returns images of post
+
+        :rtype: django queryset
         """
         return PostImages.objects.filter(post=self).order_by('order')
 
     def get_images_count(self):
         """
         Returns the number of post images
+
+        :rtype: int
         """
         return PostImages.objects.filter(post=self).count()
 
     def comments(self):
         """
         Returns all comments of post
+
+        :rtype: django queryset
         """
         return Comment.objects.filter(post=self)
 
     def amount_of_comments(self):
         """
         Returns the number of post comments
+
+        :rtype: int
         """
         return len(self.comments())
 
     def get_editors(self):
         """
         Returns all users, who can edit or delete post
+
+        :rtype: :class:`django.contrib.auth.models.User`
         """
         editors = []
         if self.user:
@@ -114,7 +148,8 @@ class Post(models.Model):
     def get_rt_count(self):
         """
         Returns amount of rts
-        :return: int
+
+        :rtype: int
         """
         return len(self.rt.all())
 
@@ -122,6 +157,11 @@ class Post(models.Model):
 class PostImages(models.Model):
     """
     Posts images model
+
+    :param post: ForeignKey to :class:`post.models.Post`
+    :param from_user: ForeignKey to :class:`django.contrib.auth.models.User`
+    :param image: ImageField
+    :param order: order of image in post
     """
     post = models.ForeignKey(Post, models.CASCADE)
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -154,6 +194,11 @@ class PostImages(models.Model):
 class Comment(models.Model):
     """
     Post comments model
+
+    :param date: comment creation date
+    :param text: text of comment
+    :param post: ForeignKey to :class:`post.models.Post`
+    :param user: ForeignKey to :class:`django.contrib.auth.models.User`
     """
     date = models.DateTimeField(auto_now=True, verbose_name='Дата')
     text = models.CharField(max_length=500, verbose_name='Текст')

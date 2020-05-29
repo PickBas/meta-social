@@ -28,10 +28,18 @@ class PostViews:
 
         def get(self, request, **kwargs) -> render:
             """
-            Processing get request
+            Representation of post
+        
+            :param post_id: post id
+            :type post_id: int
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if post_id not valid
             """
             context = self.get_menu_context('post', 'Пост')
-            context['post'] = Post.objects.get(id=kwargs['post_id'])
+            context['post'] = get_object_or_404(Post, id=kwargs['post_id'])
             context['all'] = True
 
             return render(request, self.template_name, context)
@@ -48,7 +56,12 @@ class PostViews:
 
         def get(self, request) -> render:
             """
-            Processing get request
+            Representation of liked posts
+        
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
             """
             return render(request, self.template_name, self.context)
 
@@ -65,7 +78,16 @@ class PostViews:
         def post(self, request, **kwargs):
             """
             Process post request.
-                Changing position, deleting, changing text, changing images of post
+            
+            Changing position, deleting, changing text, changing images of post
+        
+            :param post_id: post id
+            :type post_id: int
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if post_id not valid
             """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             post_image_form_set = modelformset_factory(
@@ -104,7 +126,15 @@ class PostViews:
 
         def get(self, request, **kwargs):
             """
-            Processing get request
+            Representation of post
+        
+            :param post_id: post id
+            :type post_id: int
+            :param request: object with request details
+            :type request: :class:`django.http.HttpRequest`
+            :return: responce object with HTML code
+            :rtype: :class:`django.http.HttpResponse`
+            :raises: :class:`django.http.Http404` if post_id not valid
             """
             post_item = get_object_or_404(Post, id=kwargs['post_id'])
             post_image_form_set = modelformset_factory(
@@ -123,6 +153,14 @@ class PostViews:
     def send_comment(request, post_id):
         """
         Send comment to post from feed
+    
+        :param post_id: post id
+        :type post_id: int
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if post_id not valid
         """
         if request.method == 'POST' and request.POST.get('text'):
             post_item = get_object_or_404(Post, id=post_id)
@@ -142,8 +180,11 @@ class PostViews:
     def post_new(request):
         """
         Function for creating post
-        :param request: request
-        :return: HttpResponseRedirect
+    
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce redirect
+        :rtype: :class:`django.http.HttpResponseRedirect`
         """
         post_image_form_set = modelformset_factory(
             PostImages, form=PostImageForm, extra=10, max_num=10)
@@ -179,18 +220,31 @@ class PostViews:
     def post_remove(request, post_id) -> HttpResponseRedirect:
         """
         Removing a post using Ajax
-        :param request: request
-        :param post_id: id of a post want to be deleted
-        :return: HttpResponseRedirect
+    
+        :param post_id: post id
+        :type post_id: int
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if post_id not valid
         """
         if request.method == "POST":
-            Post.objects.get(id=post_id).delete()
+            get_object_or_404(Post, id=post_id).delete()
         return HttpResponse('Success')
 
     @staticmethod
     def like_post(request, post_id):
         """
         Method for like or unlike post
+    
+        :param post_id: post id
+        :type post_id: int
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if post_id not valid
         """
         if request.method == 'POST':
             post_item = get_object_or_404(Post, id=post_id)
@@ -209,14 +263,24 @@ class PostViews:
         raise Http404()
 
     @staticmethod
-    def get_comments(request, post_id, all):
+    def get_comments(request, post_id, is_all):
         """
         Returns rendered response of post comments
+    
+        :param post_id: post id
+        :type post_id: int
+        :param is_all: return count
+        :type is_all: int
+        :param request: object with request details
+        :type request: :class:`django.http.HttpRequest`
+        :return: responce object with HTML code
+        :rtype: :class:`django.http.HttpResponse`
+        :raises: :class:`django.http.Http404` if post_id not valid
         """
         if request.method == 'POST' and all in [0, 1]:
             post_item = get_object_or_404(Post, id=post_id)
 
-            return render(request, 'post/comments.html', {'post': post_item, 'all': bool(all)})
+            return render(request, 'post/comments.html', {'post': post_item, 'all': bool(is_all)})
 
         raise Http404()
 
