@@ -24,11 +24,21 @@ from music.models import Music
 
 
 class PlayPosition(models.Model):
+    """
+    Model contains music, order and user
+
+    :param position: ForeignKey to :class:`music.models.Music`
+    :param plist: ForeignKey to :class:`user_profile.models.Profile`
+    :param order: order of music
+    """
     position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
     plist = models.ForeignKey('Profile', on_delete=models.CASCADE)
     order = models.IntegerField(blank=True, null=True)
     
     def add_order(self):
+        """
+        Adds order
+        """
         self.order = len(self.plist.playlist.all()) + 1
 
 
@@ -85,6 +95,8 @@ class Profile(models.Model):
     def unread_chats_count(self):
         """
         Returns the number of unread chats
+
+        :rtype: int
         """
         count = 0
         for chat in self.chats.all():
@@ -97,6 +109,8 @@ class Profile(models.Model):
     def get_name(self):
         """
         Returns the name, surname of the user, if they are not specified then returns the nickname
+
+        :rtype: str
         """
         if self.user.first_name:
             if self.user.last_name:
@@ -107,6 +121,8 @@ class Profile(models.Model):
     def get_status(self):
         """
         Returns humanized status of user
+
+        :rtype: str
         """
         duration = timezone.now() - self.last_act
         minutes = (duration.total_seconds() % 3600) // 60
@@ -121,6 +137,7 @@ class Profile(models.Model):
     def get_social_accounts(self) -> list:
         """
         Getting social accounts
+
         :return: list
         """
         return [i.provider for i in self.user.socialaccount_set.all()]
@@ -128,6 +145,7 @@ class Profile(models.Model):
     def get_social_data(self, provider):
         """
         Getting social data
+
         :param provider:
         """
         return self.user.socialaccount_set.filter(provider=provider)[0].extra_data
@@ -135,30 +153,40 @@ class Profile(models.Model):
     def friendship_inbox_requests(self):
         """
         Returns incoming friendship request objects
+
+        :rtype: django queryset
         """
         return FriendshipRequest.objects.filter(to_user=self.user)
 
     def friendship_inbox_users(self):
         """
         Returns incoming friendship user objects
+
+        :rtype: list
         """
         return [i.from_user for i in self.friendship_inbox_requests()]
 
     def friendship_requests_count(self):
         """
         Returns the number of incoming friendship requests
+
+        :rtype: int
         """
         return len(self.friendship_inbox_requests())
 
     def friendship_outbox_requests(self):
         """
         Returns outcoming friendship request objects
+
+        :rtype: django queryset
         """
         return FriendshipRequest.objects.filter(from_user=self.user)
 
     def friendship_outbox_users(self):
         """
         Returns outcoming friendship user objects
+
+        :rtype: list
         """
         return [i.to_user for i in self.friendship_outbox_requests()]
 
@@ -191,9 +219,18 @@ class Profile(models.Model):
         return res
     
     def add_music(self, music):
+        """
+        Adds music to playlist
+
+        :param music: music model
+        :type music: :class:`user_profile.models.PlayPosition`
+        """
         self.playlist.add(music)
 
     def change_playlist(self, new_order):
+        """
+        Not ready function for infinity scroll
+        """
         ymusics = [PlayPosition.objects.get(position=m, plist=self) for m in self.playlist.all()]
         ymusics.sort(key=lambda x: x.order)
         if len(new_order) < len(ymusics):
@@ -208,6 +245,12 @@ class Profile(models.Model):
             new_mlist[i].save()
 
     def get_recommended_communities(self):
+        """
+        Method for getting recommended communities
+
+        :return: recommended communities
+        :rtype: list
+        """
         communities = list(Community.objects.all())
         communities.sort(key=lambda c: c.users.count())
         return communities[:6]

@@ -38,6 +38,7 @@ class ProfileViews:
         def get(self, request, **kwargs) -> render:
             """
             User profile view.
+
             :param request: request
             :return: context
             """
@@ -99,6 +100,7 @@ class ProfileViews:
         def get(self, request, **kwargs) -> render:
             """
             Processing get request
+
             :param request: request
             :param kwargs: attrs
             :return: render
@@ -120,6 +122,7 @@ class ProfileViews:
         def post(self, request, **kwargs) -> redirect:
             """
             Processing post request
+
             :param request: request
             :param kwargs: attrs
             :return:
@@ -168,6 +171,9 @@ class ProfileViews:
         def post(self, request):
             """
             Cropping and saving user avatar
+
+            :param request: request
+            :return: redirect
             """
             avatar_form = UpdateAvatarForm(request.POST, request.FILES, instance=request.user.profile)
             crop_form = CropAvatarForm(request.POST)
@@ -205,7 +211,10 @@ class ProfileViews:
 
         def get(self, request):
             """
-            Processing get request
+            Representation of user changing avatar
+
+            :param request: request
+            :return: HttpResponce with HTML
             """
             avatar_form = UpdateAvatarForm()
             crop_form = CropAvatarForm()
@@ -219,6 +228,9 @@ class ProfileViews:
     def set_online(request):
         """
         Method for setting last action time in user profile
+
+        :param request: request
+        :raises: Http404
         """
         if request.method == 'POST':
             request.user.profile.last_act = timezone.now()
@@ -237,6 +249,10 @@ class Files:
     def all_files(request, user_url):
         """
         My files view
+
+        :param request: request
+        :param user_url: user url
+        :return: HttpResponce with HTML
         """
         context = MetaSocialView.get_menu_context('files', 'Мои файлы')
         c_user = User.objects.get(profile=Profile.objects.get(custom_url=user_url))
