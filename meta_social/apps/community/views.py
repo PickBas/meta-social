@@ -197,11 +197,17 @@ class Communities:
 
                 io = BytesIO()
 
-                resized_image.save(io, 'JPEG', quality=60)
+                try:
+                    resized_image.save(io, 'JPEG', quality=100)
+                    community.image.save('image_{}.jpg'.format(community.id), ContentFile(io.getvalue()),
+                                         save=False)
 
-                community.image.save('image_{}.jpg'.format(community.id), ContentFile(io.getvalue()),
-                                     save=False)
-                community.save()
+                    community.save()
+                except OSError:
+                    resized_image.save(io, 'PNG', quality=100)
+                    community.image.save('image_{}.jpg'.format(community.id), ContentFile(io.getvalue()),
+                                         save=False)
+                    community.save()
 
                 return redirect('/community/' + str(community.custom_url))
 
