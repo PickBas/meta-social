@@ -336,11 +336,17 @@ class Conversations:
 
                 io = BytesIO()
 
-                resized_image.save(io, 'JPEG', quality=60)
+                try:
+                    resized_image.save(io, 'JPEG', quality=100)
+                    c_room.image.save('image_{}.jpg'.format(c_room.id), ContentFile(io.getvalue()),
+                                      save=False)
 
-                c_room.image.save('image_{}.jpg'.format(c_room.id), ContentFile(io.getvalue()),
-                                  save=False)
-                c_room.save()
+                    c_room.save()
+                except OSError:
+                    resized_image.save(io, 'PNG', quality=100)
+                    c_room.image.save('image_{}.jpg'.format(c_room.id), ContentFile(io.getvalue()),
+                                      save=False)
+                    c_room.save()
 
                 return redirect('/chat/go_to_chat/' + str(c_room.id))
 
