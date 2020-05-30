@@ -5,7 +5,7 @@ sed -i "/community = models.ForeignKey(to='community.Community', on_delete=model
 sed -i "/owner_community = models.ForeignKey(to='community.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')/owner_community = models.ForeignKey(to='community.models.Community', on_delete=models.CASCADE, null=True, related_name='owner_community')" meta_social/apps/post/models.py
 
 # run pylint
-pylint $(python ./pylint_runner.py) --load-plugins pylint_django | tee pylint.txt
+pylint $(python ./pylint_runner.py) --load-plugins pylint_django --disable=F0401 | tee pylint.txt
 
 # get badge
 mkdir public
