@@ -97,7 +97,7 @@ class Post(models.Model):
         :rtype: str
         """
         if self.community:
-            return '/community/' + str(self.community.id) + '/'
+            return '/community/' + str(self.community.custom_url) + '/'
         return '/accounts/profile/' + str(self.user.profile.custom_url) + '/'
 
     def get_images(self):
