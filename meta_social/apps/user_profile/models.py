@@ -34,7 +34,7 @@ class PlayPosition(models.Model):
     position = models.ForeignKey(to=Music, on_delete=models.CASCADE)
     plist = models.ForeignKey('Profile', on_delete=models.CASCADE)
     order = models.IntegerField(blank=True, null=True)
-    
+
     def add_order(self):
         """
         Adds order
@@ -90,7 +90,6 @@ class Profile(models.Model):
     chats = models.ManyToManyField(Chat)
     playlist = models.ManyToManyField(Music, related_name='playlist',
                                       through='PlayPosition')
-
 
     def unread_chats_count(self):
         """
@@ -214,10 +213,10 @@ class Profile(models.Model):
         """
         Returns all music in user playlist
         """
-        res = [PlayPosition.objects.get(position=m, plist=self ) for m in self.playlist.all()]
+        res = [PlayPosition.objects.get(position=m, plist=self) for m in self.playlist.all()]
         res.sort(key=lambda x: x.order, reverse=True)
         return res
-    
+
     def add_music(self, music):
         """
         Adds music to playlist
@@ -234,12 +233,12 @@ class Profile(models.Model):
         ymusics = [PlayPosition.objects.get(position=m, plist=self) for m in self.playlist.all()]
         ymusics.sort(key=lambda x: x.order)
         if len(new_order) < len(ymusics):
-            pass                # TODO для постепенной загрузки infinite scroll
+            pass  # TODO для постепенной загрузки infinite scroll
         new_mlist = []
         for i in new_order:
-            new_mlist.append(ymusics[i-1])
+            new_mlist.append(ymusics[i - 1])
         new_mlist.reverse()
-            
+
         for i in range(len(new_order)):
             new_mlist[i].order = i + 1
             new_mlist[i].save()
@@ -253,6 +252,7 @@ class Profile(models.Model):
         """
         communities = list(Community.objects.all())
         communities.sort(key=lambda c: c.users.count())
+        communities = list(dict.fromkeys(communities))
         return communities[:6]
 
 
