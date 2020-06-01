@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<section class="my-5 p-1">
+
+  <!-- Grid row -->
+  <div class="row">
+
+    <!-- Grid column -->
+    <div class="col-md-6 col-lg-4">
+
+      <!-- Section: Personal card -->
+      <section class="my-5">
+
+	<!-- Grid row -->
+	<div class="row">
+
+	  <!-- Grid column -->
+	  <div class="col-md-6 col-lg-4">
+
+	    <div class="card-container mt-4">
+	      <!-- Card -->
+	      <div class="card card-personal">
+		<div class="front">
+		  <div class="content">
+		    
+		    <!-- Card image-->
+		    <img class="card-img-top" src="https://mdbootstrap.com/img/Photos/Avatars/img%20(29).jpg" alt="Card image cap">
+		      <!-- Card image-->
+		      <!-- Title-->
+		      <a>
+			<h4 class="card-title title-one">Сайед Кирилл</h4>
+		      </a>
+		      <h4 class="text-center">Роли в команде</h4>
+		      <p class="text-center" style="font-size: 14px">main backend developer</p>
+		      <div class="stats-container">
+			<div class="stats">
+			  <h4>~260</h4>
+			  <p style="font-size: 14px">
+			    Коммитов
+			  </p>
+			</div>
+			<div class="stats">
+			  <h4>~27</h4>
+			  <p style="font-size: 14px">
+			    Созданных issue
+			  </p>
+			</div>
+		      </div>
+		      
+		      <div class="footer">
+			<i class="fa fa-mail-forward" aria-hidden="true"></i> Наведите для большей информации
+		      </div>
+
+		    </div></div>
+		    
+		    
+
+				    
+
+		    <!-- Card content -->
+		    
+		    <div class="back">
+		      <div id="content">
+			<ul class="org-ul">
+			  <li>Поиск музыки</li>
+			  <li>Добавление музыки в плейлист через глобальный поиск</li>
+			  <li>Баннер cookie</li>
+			  <li>Модели для профиля и сообщества</li>
+			  <li>Страница редактирования профиля</li>
+			  <li>Чаты и диалоги</li>
+			  <li>Редактирование чатов</li>
+			  <li>URLs</li>
+			  <li>Изменяемые ссылки для пользователей и сообществ</li>
+			  <li>Добавление в друзья</li>
+			  <li>Система добавления в черный список</li>
+			  <li>Страница для постов</li>
+			  <li>Удаление поста</li>
+			  <li>Страницы со списком сообществ</li>
+			  <li>CI (Pylint)</li>
+			  <li>Система репостов</li>
+			  <li>HTTPS</li>
+			  <li>GitLab badges</li>
+			</ul>
+		      </div>
+		    <div class="footer">
+		      <div class="email mt-2 text-center"><a href="mailto: test@gmail.com">почта</a>
+		      </div>
+		      <div class="social-links text-center">
+			<a href="" class="facebook icon"><i class="fab fa-vk fa-fw" aria-hidden="true"></i></a>
+			<a href="" class="google icon"><i class="fab fa-telegram-plane fa-fw" aria-hidden="true"></i></a>
+		      </div>
+		    </div>
+
+		  </div>
+		  <!-- Card -->
+		</div>
+	      </div>
+	    </div>
+	    <!-- Grid column -->
+
+	  </div>
+	  <!-- Grid row -->
+
+	</section>
+	<!-- Section: Personal card -->
+
+
+      </div>
+      <!-- Grid column -->
+
+    </div>
+    <!-- Grid row -->
+
+  </section>
+
+
+{% endblock %}
+
+
+{% block extra_head %}
+    <style>
+     .card-container{
+	 width: 100%;
+	 height: 600px;
+	 border-radius: 4px;
+     }
+     
+     .card{
+	 position: absolute;
+	 width: 350px;
+	 height: 100%;
+	 transform-style: preserve-3d;
+	 transition: all 0.5s ease;
+     }
+
+     .card:hover{
+	 transform: rotateY(180deg);
+     }
+
+     .front{
+	 position: absolute;
+	 width: 100%;
+	 height: 100%;
+	 backface-visibilty: hidden;
+	 background-color: #FFF;
+     }
+
+     .back{
+	 position: absolute;
+	 width: 100%;
+	 height: 100%;
+	 backface-visibilty: hidden;
+	 transform: rotateY(180deg);
+	 background-color: #FFF;
+     }
+
+     .footer {
+	 border-top: 1px solid #EEEEEE;
+	 color: #999999;
+	 margin: 50px 0 0;
+	 padding: -10px 0 0;
+	 text-align: center;
+     }
+	 
+    </style>
+    
+{% endblock extra_head %}
+
+{% block PageName %}О нас{% endblock PageName %}
