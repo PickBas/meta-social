@@ -17,6 +17,7 @@ from core.forms import CropAvatarForm
 from post.forms import PostImageForm, PostForm
 from post.models import PostImages
 from user_profile.models import Profile
+from music.models import Music
 
 from .models import Community
 from .forms import EditCommunityForm, CommunityCreateForm, UpdateCommunityAvatarForm
