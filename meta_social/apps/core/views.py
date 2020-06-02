@@ -4,7 +4,7 @@ Meta social core views module
 
 from simple_search import search_filter
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import modelformset_factory
@@ -15,6 +15,8 @@ from post.forms import PostForm, PostImageForm
 from post.models import PostImages
 from community.models import Community
 from music.models import Music
+from .forms import DeveloperForm
+from .models import Developer
 
 
 class MetaSocialView(View):
@@ -166,3 +168,45 @@ class GlobalSearch(View):
         Processing get request
         """
         raise Http404()
+
+
+class AboutFormView(View):
+    """
+    Developer service form
+    """
+    def __init__(self, **kwargs):
+        self.template_name = 'about_us.html'
+        super().__init__(**kwargs)
+        self.context = {}
+
+    def post(self, request, **kwargs):
+        dev = DeveloperForm(request.POST)
+
+        if request.method == 'POST':
+            if dev.is_valid():
+                dev.save()
+        return redirect('/about/')
+
+    def get(self, request):
+        """
+        Processing get request
+        """
+        self.context['devform'] = DeveloperForm()
+        return render(request, self.template_name, self.context)
+
+
+class AboutView(View):
+    """
+    Developer service form
+    """
+    def __init__(self, **kwargs):
+        self.template_name = 'about_us.html'
+        super().__init__(**kwargs)
+        self.context = {}
+
+    def get(self, request):
+        """
+        Processing get request
+        """
+        self.context['devs'] = Developer.objects.all()
+        return render(request, self.template_name, self.context)
