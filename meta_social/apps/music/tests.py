@@ -1,6 +1,19 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
+from os import walk
+from os.path import abspath, join, dirname
+from shutil import rmtree
+from tempfile import mkdtemp
+from django.core.files.storage import FileSystemStorage
+from django_s3_storage.storage import StaticS3Storage
+from django.test.utils import override_settings
+from django.core.files.uploadedfile import SimpleUploadedFile
+# import mock
+from music.models import Music
+from music.forms import UploadMusicForm
+
+
 
 class MetaSetUp(TestCase):
     fixtures = ["test_db.json"]
@@ -33,7 +46,42 @@ class MusicUpload(MetaSetUp):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'music/music_upload.html')
 
-    # TODO: Добавление музыки
+    # @mock.patch('django_s3_storage.storage.StaticS3Storage', FileSystemStorage)
+    # @mock.patch.object(StaticS3Storage, '_save', FileSystemStorage()._save)
+    def test_upload(self):
+        music_path = join(abspath(dirname(__file__)), 'fixtures/test.mp3')
+        media_folder = mkdtemp()
+        print(music_path)
+        music_dict = {
+            'artist': 'lovecraft',
+            'title': 'witchhouse',
+        }
+        upload_file = open(music_path, 'rb')
+        audio_dict = {
+            'audio_file': SimpleUploadedFile(upload_file.name,
+                                             upload_file.read())
+        }
+
+        form = UploadMusicForm(music_dict, audio_dict)
+        self.assertTrue(form.is_valid())
+
+        with override_settings(
+                MEDIA_ROOT=media_folder,
+                STATIC_ROOT=media_folder,
+        ):
+            resp = self.client.post('/music/upload/', {
+                **music_dict,
+                **audio_dict
+            })
+
+            for (dirpath, dirnames, filenames) in walk(media_folder):
+                print("{} {} {}".format(dirpath, dirnames, filenames))
+            self.assertTrue(Music.objects.all())
+
+            self.assertEqual(resp.status_code, 302)
+            rmtree(media_folder)  # post test
+
+            # TODO: mock нечего работает
 
 
 class AddExistedMusic(TestCase):
