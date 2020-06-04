@@ -86,9 +86,13 @@
                 {% for friend in community.users.all|slice:":6"%}
                     <div class="col-4 px-0 mx-0 text-center">
                         <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
-                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">
-                                {{ friend.profile.get_name }}
-                            </a>
+                        <a href="/accounts/profile/{{ friend.profile.custom_url }}/">
+			    {% if friend.first_name %}
+                                {{ friend.first_name }}
+			    {% else %}
+				{{ friend.profile.custom_url }}
+			    {% endif %}
+                        </a>
                     </div>
                 {% endfor %}
                 </div>
