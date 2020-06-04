@@ -16,3 +16,33 @@
 {% block right %}
     {% include 'music/right_menu.html' %}
 {% endblock %}
+
+
+{% block extra__js %}
+    <script src="https://cdn.rawgit.com/aadsm/jsmediatags/master/dist/jsmediatags.min.js"></script>
+    <script>
+
+     // From File
+     audio =  document.getElementById("id_audio_file")
+     audio.addEventListener("change", function(event) {
+	 var file = event.target.files[0];
+	 jsmediatags.read(file, {
+	     onSuccess: function(tag) {
+		 var tags = tag.tags;
+		 console.log(tags.artist);
+		 if (tags.artist){
+		     document.getElementById("id_artist").value = String(tags.artist);
+		 }
+		 console.log(tags.title);
+		 if (tags.title){
+		     document.getElementById("id_title").value = String(tags.title)
+		 }
+		 // use ajax to upload tag info, or create some new form elements
+	     },
+	     onError: function(error) {
+		 console.log(error);
+	     }
+	 });              
+	 }, false);
+    </script>
+{% endblock extra__js %}
