@@ -1,6 +1,10 @@
-from django.db import models
+"""
+Meta Social core models
+"""
 
-# Create your models here.
+from django.db import models
+from django.contrib.auth.models import User
+
 
 class Developer(models.Model):
     """
@@ -12,10 +16,11 @@ class Developer(models.Model):
     :param issues: Number of issues
     :param phrase: Catch phrase
     """
-    name =  models.CharField(null=True, max_length=100)
-    role =  models.CharField(null=True, max_length=100)
-    commits = models.IntegerField()
-    issiues = models.IntegerField()
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+    gradient = models.CharField(max_length=50, default="aqua-gradient")
+    name = models.CharField(null=True, max_length=100)
+    role = models.CharField(null=True, max_length=100)
     phrase = models.CharField(blank=True, null=True, max_length=140)
+    commits = models.IntegerField()
     task_list = models.TextField()
-    contact =  models.CharField(blank=True, null=True, max_length=100)

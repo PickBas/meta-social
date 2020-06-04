@@ -2,9 +2,10 @@
 Meta social core views module
 """
 
+import random
 from simple_search import search_filter
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import modelformset_factory
@@ -15,7 +16,7 @@ from post.forms import PostForm, PostImageForm
 from post.models import PostImages
 from community.models import Community
 from music.models import Music
-from .forms import DeveloperForm
+
 from .models import Developer
 
 
@@ -170,43 +171,60 @@ class GlobalSearch(View):
         raise Http404()
 
 
-class AboutFormView(View):
+class AboutView(MetaSocialView):
     """
     Developer service form
     """
     def __init__(self, **kwargs):
         self.template_name = 'about_us.html'
         super().__init__(**kwargs)
-        self.context = {}
+        self.context = self.get_menu_context('post', 'О нас')
+    
+    def post(self, request):
+        """
+        Processing post request
+        """
+        CHOICES = [
+            'aqua-gradient',
+            'purple-gradient',
+            'peach-gradient',
+            'blue-gradient'
+        ]
 
-    def post(self, request, **kwargs):
-        dev = DeveloperForm(request.POST)
+        for i in request.POST:
+            if i != 'commits':
+                if not request.POST[i].strip():
+                    return redirect('/about/')
+            else:
+                if int(request.POST[i]) < 1 or int(request.POST[i]) > 500:
+                    return redirect('/about/')
 
-        if request.method == 'POST':
-            if dev.is_valid():
-                dev.save()
+        dev_item = Developer(
+            user=request.user,
+            name=request.POST.get('name'),
+            role=request.POST.get('role'),
+            phrase=request.POST.get('phrase'),
+            commits=request.POST.get('commits'),
+            task_list=request.POST.get('tasklist'),
+            gradient=random.choice(CHOICES)
+        )
+        dev_item.save()
+
         return redirect('/about/')
 
     def get(self, request):
         """
         Processing get request
         """
-        self.context['devform'] = DeveloperForm()
-        return render(request, self.template_name, self.context)
-
-
-class AboutView(View):
-    """
-    Developer service form
-    """
-    def __init__(self, **kwargs):
-        self.template_name = 'about_us.html'
-        super().__init__(**kwargs)
-        self.context = {}
-
-    def get(self, request):
-        """
-        Processing get request
-        """
         self.context['devs'] = Developer.objects.all()
+
         return render(request, self.template_name, self.context)
+    
+    @staticmethod
+    def remove_developer(request, dev_id):
+        dev = get_object_or_404(Developer, id=dev_id)
+
+        if request.user == dev.user:
+            dev.delete()
+
+        return redirect('/about/')

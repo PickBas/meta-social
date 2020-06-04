@@ -1,167 +1,123 @@
 {% extends 'base.html' %}
 
+
 {% block main %}
-    <div class="container"> <!-- Это вставь вместо всего в блок main -->
-	<div class="row">
-	    {% if devs %}
-		{% for dev in devs %}
+    <div class="container px-0">
+        <h2 class="w-100 text-center mt-4">Все разработчики</h2>
+        <div class="row mt-3">
+            {% if user.is_superuser %}
+                <div class="col-lg-4 col-md-6 col-sm-12 col-12 mb-3" style="position: relative; height: 435px;">
+                    <div class="card text-center">
+                        <div class="aqua-gradient form-hide" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 99;" onclick="this.remove()">
+                            <p style="margin-top: 40%; color: white; font-size: 50pt;">
+                                +
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <h5>Добавить себя</h5>
+                            <form method="POST" class="md-form mb-0">
+                                {% csrf_token %}
 
-		    <div class="col-3 mb-3">
-			<div class="card-container">
-			    <div class="card">
-				<div class="front">
-				    <img src="https://api.adorable.io/avatars/150/1">
-				    <h4 class="card-title">{{ dev.name }}</h4>
-				    <h4 class="text-center">Роли в команде</h4>
-				    <p class="text-center" style="font-size: 14px">
-					{{ dev.role }}
-				    </p>
-				    <div class="stats-container">
-					<div class="stats">
-					    <h4>~{{ dev.commits }}</h4>
-					    <p style="font-size: 14px">
-						Коммитов
-					    </p>
-					</div>
-					<div class="stats">
-					    <h4>~{{ dev.issiues }}</h4>
-					    <p style="font-size: 14px">
-						Созданных issue
-					    </p>
-					</div>
-				    </div>
-				    <p class="text-center" style="font-size: 14px">"{{ dev.phrase }}"</p>
-				    <div class="card-footer">
-					<i class="fa fa-mail-forward" aria-hidden="true"></i> Наведите для большей информации
-				    </div>
+                                <input type="text" placeholder="Имя" name="name" class="form-control">
 
-				</div>
-				<div class="back">
-				    <div>
-					{% autoescape off %}
-					    {{ dev.task_list }}
-					{% endautoescape %}					
-				    </div>
-				    <div class="footer">
-					<div class="email mt-2 text-center"><a href="{{ dev.contact }}">контакт</a>
-					</div>
-					<div class="social-links text-center">
-					    <a href="" class="facebook icon"><i class="fab fa-vk fa-fw" aria-hidden="true"></i></a>
-					    <a href="" class="google icon"><i class="fab fa-telegram-plane fa-fw" aria-hidden="true"></i></a>
-					</div>
-				    </div>
-				</div>
-			    </div>
-			</div>
-			
-		    </div>
+                                <input type="text" placeholder="Роль" name="role" class="form-control">
+                                <small class="text-muted">Пример: 'Teamleader, main backend developer'</small>
 
-		{% endfor %}
-	    {% endif %}
+                                <input type="text" placeholder="Девиз" name="phrase" class="form-control">
+                                <small class="text-muted">Пример: 'Работает и хрен с ним'</small>
 
-	</div>
+                                <input type="number" placeholder="Кол-во коммитов" name="commits" class="form-control" min="0" max="500">
+
+                                <input type="text" placeholder="Вкраце о том что вы сделали" name="tasklist" class="form-control">
+
+                                <button type="submit" class="btn btn-block btn-success mx-0 mt-3">Добавить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% for dev in devs %}
+                <div class="col-lg-4 col-md-6 col-sm-12 col-12 mb-3">
+                    <div class="card text-center content" style="height: 435px;">
+                        {% if user == dev.user %}
+                            <a style="position: absolute; top: -8px; right: -8px; width: 25px; border: 1px solid white;"
+                                class="text-white rounded-pill bg-danger"
+                                href="/about/{{ dev.id }}/remove/">X</a>
+                        {% endif %}
+                        <div class="card-header py-5 {{ dev.gradient }}"></div>
+                        <img src="{{ dev.user.profile.image.url }}"
+                             class="rounded-circle mx-auto"
+                             width="150"
+                             height="150"
+                             style="margin-top: -75px; border: 5px solid white;">
+                        <div class="card-body px-0" style="position: relative;">
+                            <h5 class="card-title">{{ dev.name }}</h5>
+                            <small class="text-muted">{{ dev.role }}</small>
+
+                            <div class="front">
+                                <p class="card-text mt-4">"{{ dev.phrase }}"</p>
+
+                                <p class="card-text">~{{ dev.commits }} коммитов</p>
+
+                            </div>
+
+                            <div style="position: absolute; bottom: 0; width: 100%; background-color: #eceff1; font-size: 11pt; color: #7B7E80;" class="py-2 more-info">
+                                Наведите чтобы узнать больше
+                            </div>
+
+                            <div class="back">
+                                <p class="mt-4 card-text mb-2">Участие в проекте:</p>
+                                <p class="card-text">{{ dev.task_list }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </h2>
     </div>
-
-
-    {% if devform %}
-	<form method="POST" action="/aboutform/">
-	    {% csrf_token %}
-	    {{ devform.as_p }}
-	    <button type="submit" class="btn btn-block btn-primary mt-3">
-		Сохранить</button>
-	</form>
-
-    {% endif %}
-
-{% endblock %}
+{% endblock main %}
 
 
 {% block extra_head %}
     <style>
-     .card-container {
-	 -webkit-perspective: 500px;
-         perspective: 500px;
-     }
+        .form-hide {
+            transition-duration: .5s;
+        }
 
-     .card-container:hover .card{
-	 -webkit-transform: rotateY( 180deg );
-         transform: rotateY( 180deg );
-     }
+        .form-hide:hover {
+            opacity: .7;
+        }
 
-     .card {
-	 -webkit-transition: -webkit-transform 0.7s;
-         transition: transform 0.7s;
-	 -webkit-transform-style: preserve-3d;
-         transform-style: preserve-3d;
-     }
+        .content:hover .front {
+            opacity: 0;
+        }
 
-     .front, .back {
-	 -webkit-backface-visibility: hidden;
-         backface-visibility: hidden;
-     }
+        .content:hover .more-info {
+            opacity: 0;
+        }
 
-     .front{
-	 transform: rotateX(0deg);
-     }
+        .content:hover .back {
+            opacity: 1;
+        }
 
-     .back {
-	 -webkit-transform: rotateY( 180deg );
-         transform: rotateY( 180deg );
-     }
+        .back {
+            transition-duration: .5s;
+            opacity: 0;
 
-     /*Custom Styles*/
-     .cards-container{
-	 display: -webkit-flex;
-	 display: -webkit-box;
-	 display: -ms-flexbox;
-	 display: flex;
-	 -webkit-flex-direction: row;
-	 -webkit-box-orient: horizontal;
-	 -webkit-box-direction: normal;
-	 -ms-flex-direction: row;
-         flex-direction: row;
-	 -webkit-box-pack: center;
-	 -webkit-justify-content: center;
-	 -ms-flex-pack: center;
-         justify-content: center;
-     }
+            position: absolute;
+            width: 100%;
+        }
 
-     .card {
-	 width: 350px;
-	 height: 600px;
-	 margin: 10px;
-     }
+        .front {
+            transition-duration: .5s;
 
-     .front, .back {
-	 box-shadow: 0 1px 6px 0;
-	 position: absolute;
-	 width: 100%;
-	 top: 0;
-	 bottom: 0;
-     }
+            position: absolute;
+            width: 100%;
+        }
 
-     img {
-	 display: block;
-     }
-
-     .card .motto {
-	 border-bottom: 1px solid #EEEEEE;
-	 color: #999999;
-	 font-size: 14px;
-	 font-weight: 400;
-	 padding-bottom: 10px;
-	 text-align: center;
-     }
-
-     .card .footer {
-	 border-top: 1px solid #EEEEEE;
-	 color: #999999;
-	 margin: 50px 0 0;
-	 padding: 10px 0 0;
-	 text-align: center;
-     }
+        .more-info {
+            transition-duration: .5s;
+        }
     </style>
-    
 {% endblock extra_head %}
 
-{% block PageName %}О нас{% endblock PageName %}
