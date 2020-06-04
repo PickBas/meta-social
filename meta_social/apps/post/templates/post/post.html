@@ -41,10 +41,13 @@
             <div class="post-music mb-2">
                 {% for music in post.music.all %}
                     <div>
-                        {% if music not in user.profile.playlist %}
+                        {% if music_list %}
+                            <button class="btn btn-sm btn-outline-success ml-0" onclick="addMusicToPlaylist('/music/{{ music.id }}/add/')" disabled>+</button>
+                            <span>{{ music.artist }} - {{ music.title }}</span>
+                        {% else %}
                             <button class="btn btn-sm btn-outline-success ml-0" onclick="addMusicToPlaylist('/music/{{ music.id }}/add/')">+</button>
+                            <span>{{ music.artist }} - {{ music.title }}</span>
                         {% endif %}
-                        <span>{{ music.artist }} - {{ music.title }}</span>
                     </div>
                 {% endfor %}
             </div>
