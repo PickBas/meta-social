@@ -4,17 +4,24 @@ cache:
   paths:
   - /root/.cache/pip/
 
+stages:
+  - test
+  - style
+  - deploy
+
 before_script:
   - pip install -r requirements.txt
   - pip install -r ci/pylint_requirements.txt
 
 test:
+  stage: test
   script:
     - ci/tests_runner.sh
   only:
     - devel
 
 pylint:
+  stage: style
   script:
     - ci/pylint_runner.sh
   only:
@@ -25,8 +32,19 @@ pylint:
       - public/pylint.html
 
 test_coverage:
+  stage: style
   script:
     - cd meta_social
     - coverage run manage.py test
     - coverage report -m apps/*/*.py
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+
+pages:
+  stage: deploy
+  script:
+    - echo 'Publish pages data'
+  artifacts:
+    paths:
+      - public
+  only:
+    - devel
