@@ -8,9 +8,9 @@ sed -i "/owner_community = models.ForeignKey(to='community.Community', on_delete
 pylint $(python ./pylint_runner.py) --load-plugins pylint_django --disable=F0401 | tee pylint.txt
 
 # get badge
-mkdir pylint
+mkdir public
 score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.txt)
-anybadge --label=Pylint --file=pylint/pylint.svg --value=$score 2=red 4=orange 8=yellow 10=green
+anybadge --label=Pylint --file=public/badges/pylint.svg --value=$score 2=red 4=orange 8=yellow 10=green
 echo "Pylint score was $score"
 
 exit 0
