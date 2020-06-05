@@ -45,13 +45,17 @@
                                 href="/about/{{ dev.id }}/remove/">X</a>
                         {% endif %}
                         <div class="card-header py-5 {{ dev.gradient }}"></div>
-                        <img src="{{ dev.user.profile.image.url }}"
-                             class="rounded-circle mx-auto"
-                             width="150"
-                             height="150"
-                             style="margin-top: -75px; border: 5px solid white;">
+                        <a href="/accounts/profile/{{ dev.user.profile.custom_url }}/">
+                            <img src="{{ dev.user.profile.image.url }}"
+                                class="rounded-circle mx-auto"
+                                width="150"
+                                height="150"
+                                style="margin-top: -75px; border: 5px solid white;">
+                        </a>
                         <div class="card-body px-0" style="position: relative;">
-                            <h5 class="card-title">{{ dev.name }}</h5>
+                            <a href="/accounts/profile/{{ dev.user.profile.custom_url }}/" class="text-dark">
+                                <h5 class="card-title">{{ dev.name }}</h5>
+                            </a>
                             <small class="text-muted">{{ dev.role }}</small>
 
                             <div class="front">
