@@ -21,7 +21,7 @@ pylint:
     - master
   artifacts:
     paths:
-      - public/pylint.svg
+      - ./pylint/
 
 test_coverage:
   script:
