@@ -1,0 +1,25 @@
+{% extends 'base_menu.html' %}
+{% block center %}
+
+<div class="card">
+    <div class="card-body">
+        <h5>Ваши друзья</h5>
+        <hr>
+        <div id="chat-list">
+            {% if user.profile.friends.all %}
+            <ul class="list-group list-group-flush">
+                {% for friend in user.profile.friends.all %}
+                    <li class="list-group-item">
+                        <img src="{{ friend.profile.image.url }}" class="rounded-circle border float-left" width=40 height=40>
+                        <a class="float-left ml-2" style="text-decoration: none;" href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            Список чатов пуст
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

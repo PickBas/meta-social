@@ -1,0 +1,41 @@
+{% if users or communities or music %}
+    <ul class="list-group list-group-flush ml-1" style="max-height: 570px; overflow-y: scroll;">
+        {% if users %}
+            <li class="list-group-item">Друзья:</li>
+            {% for match in users %}
+                <li class="list-group-item">
+                    <img src="{{ match.profile.image.url }}" class="rounded-circle" width="20" height="20">
+                    <a href="/accounts/profile/{{ match.profile.custom_url }}/">{{ match.username }}</a>
+                </li>
+            {% endfor %}
+        {% endif %}
+        
+        {% if communities %}
+            <li class="list-group-item">Сообщества:</li>
+            {% for match in communities %}
+                <li class="list-group-item">
+                    <img src="{{ match.image.url }}" class="rounded-circle" width="20" height="20">
+                    <a href="/community/{{ match.custom_url }}/">{{ match.name }}</a>
+                </li>
+            {% endfor %}
+        {% endif %}
+
+        {% if music %}
+            <li class="list-group-item">Музыка:</li>
+            {% for match in music %}
+                <li class="list-group-item">
+                    <img src="https://image.flaticon.com/icons/svg/651/651717.svg" class="rounded-circle" width="20" height="20">
+                    <span>{{ match.artist }} - {{ match.title }}</span>
+                    {% if match not in user.profile.playlist.all %}
+                        <a type="button" class="btn float-right btn-outline-success px-2 py-1" data-toggle="tooltip" data-placement="top"
+                           title="Добавить в плейлист" href="/music/{{ match.id }}/add_from_search/">
+                            <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+{% else %}
+    <p class="mb-0 ml-1">Ничего не найдено</p>
+{% endif %}

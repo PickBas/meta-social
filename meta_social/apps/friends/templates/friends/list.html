@@ -1,0 +1,111 @@
+{% if matching %}
+    {% if f_matches %}
+        {% for match in f_matches %}
+            <li class="list-group-item">
+                <img src="{{ match.profile.image.url }}" class="rounded-circle border" width="40" height="40">
+                <a href="/accounts/profile/{{ match.profile.custom_url }}/">{{ match.profile.get_name }}</a>
+
+                {% if c_user == user %}
+                    {% if match in user.profile.friends.all and user not in match.profile.blacklist.all %}
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                            title="Добавить в черный список" onclick="addBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+                        </button>
+
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2 mr-2" data-toggle="tooltip" data-placement="top"
+                            title="Удалить из друзей" onclick="removeFriend(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.blacklist.all and user not in match.profile.blacklist.all %}
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                            title="Удалить из черного списка" onclick="removeBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/597/597356.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.friendship_inbox_users and user not in match.profile.blacklist.all %}
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                            title="Принять заявку в друзья" onclick="acceptRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/447/447147.svg" width="20" height="20">
+                        </button>
+
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2 mr-2" data-toggle="tooltip" data-placement="top"
+                            title="Отменить заявку в друзья" onclick="cancelRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
+                        </button>
+                    {% elif match in user.profile.friendship_outbox_users and user not in match.profile.blacklist.all %}
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                            title="Отменить заявку в друзья" onclick="cancelRequest(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/748/748122.svg" width="20" height="20">
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                            title="Добавить в черный список" onclick="addBlacklist(event, {{ match.id }})">
+                            <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+                        </button>
+                        {% if user not in match.profile.blacklist.all %}
+                            <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2 mr-2" data-toggle="tooltip" data-placement="top"
+                                title="Добавить в друзья" onclick="addFriend(event, {{ match.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/748/748113.svg" width="20" height="20">
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        <p class="text-center">Ничего не найдено.</p>
+    {% endif %}
+{% else %}
+    {% if user == c_user %}
+        {% if friendlist %}
+            <div class="infinite-container">
+                {% for friend in friendlist %}
+                    <div class="infinite-container">
+                        <li class="list-group-item">
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width="40" height="40">
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
+
+                            <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2" data-toggle="tooltip" data-placement="top"
+                                title="Добавить в черный список" onclick="addBlacklist(event, {{ friend.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/565/565312.svg" width="20" height="20">
+                            </button>
+
+                            <button type="button" class="btn btn-outline-dark float-right btn-lg px-3 my-0 py-2 mr-2" data-toggle="tooltip"
+                                data-placement="top" title="Удалить из друзей" onclick="removeFriend(event, {{ friend.id }})">
+                                <img src="https://image.flaticon.com/icons/svg/1214/1214428.svg" width="20" height="20">
+                            </button>
+
+                            <form action="/chats/{{ user.id }}/{{ friend.id }}/" method="POST" class="float-right">
+                                {% csrf_token %}
+                                <button class="float-right btn-lg px-3 my-0 py-2 btn btn-outline-secondary" type="submit">Text</button>
+                            </form>
+                        </li>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if friendlist.has_next %}
+                <a class="infinite-more-link" href="?page={{ friendlist.next_page_number }}">More</a>
+            {% endif %}
+        {% else %}
+            <p class="mb-0 text-center">Список друзей пуст.</p>
+        {% endif %}
+    {% else %}
+        {% if friendlist %}
+            <div class="infinite-container">
+                {% for friend in friendlist %}
+                    <div class="infinite-container">
+                        <li class="list-group-item">
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width="40" height="40">
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">{{ friend.profile.get_name }}</a>
+                            {% if friend.id == user.id %}
+                                <p class="float-right mr-2">Это Вы</p>
+                            {% endif %}
+                            {% if friend in user.profile.friends  %}
+                                <p>TEXT</p>
+                            {% endif %}
+                        </li>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}

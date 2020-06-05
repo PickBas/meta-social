@@ -1,0 +1,30 @@
+{% if messages_list %}
+    {% for message in messages_list %}
+        <div class="row" 
+            style="{% if forloop.first %}margin-top: auto;{% endif %}
+            {% if not message.is_read %}background-color: #F0F7FF;{% endif %}"
+        >
+            <div class="col-lg-1 col-sm-1">
+                <img src="{{ message.author.profile.image.url }}" class="rounded-circle border ml-lg-2 ml-md-1" width=40 height=40>
+            </div>
+            <div class="col-lg-11 col-sm-11 text-left">
+                <a href="/accounts/profile/{{ message.author.profile.custom_url }}/">{{ message.author.profile.get_name }}</a>
+                <small class="text-muted ml-1">{{ message.date }}</small>
+                <p>{{ message.message }}</p>
+                {% for music in message.music.all %}
+                    <div>
+                        <button class="btn btn-sm btn-outline-success ml-0" onclick="addMusicToPlaylist('/music/{{ music.id }}/add/')" {% if music not in user.profile.playlist %}disabled{% endif %}>+</button>
+                        <span>{{ music.artist }} - {{ music.title }}</span>
+                    </div>
+                {% endfor %}
+                {% for image_item in message.images.all %}
+                <a data-fancybox="photo" href="{{ image_item.image.url }}" class="w-50">
+                            <img src="{{ image_item.image.url }}" class="mb-1 w-50">
+                        </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-center" style="margin-top: auto;">Список сообщений пуст</p>
+{% endif %}

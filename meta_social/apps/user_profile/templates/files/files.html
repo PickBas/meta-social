@@ -1,0 +1,17 @@
+{% extends 'base_menu.html' %}
+{% block center %}
+    <div class="card">
+        <div class="card-body text-center pr-1">
+            <h5>Здесь находятся все ваши файлы, которые вы загружали раннее</h5>
+            <div class="masonry-files">
+                {% for i in images %}
+                    <a data-fancybox="photo" href="{{ i.image.url }}" class="masonry-files-item mb-1" style="width: calc(33% - 4px);">
+                        <img src="{{ i.image.url }}" width="100%">
+                    </a>
+                {% empty %}
+                    <p class="mb-0 mt-3">Правда вы ещё ничего не загрузили</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

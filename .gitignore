@@ -2,6 +2,8 @@
 # Created by https://www.gitignore.io/api/venv,linux,django,python,pycharm
 # Edit at https://www.gitignore.io/?templates=venv,linux,django,python,pycharm
 
+meta_social/collectedstatic/
+
 ### Django ###
 *.log
 *.pot
@@ -146,7 +148,7 @@ dmypy.json
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-meta_social/meta_social_app/migrations/0*.py
+
 
 # Generated files
 .idea/**/contentModel.xml
@@ -287,7 +289,7 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/venv,linux,django,python,pycharm
 
-# meta_social/meta_social_app/migrations/0*
+
 vk_config.v2.json
 
 ### VisualStudioCode ###

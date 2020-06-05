@@ -1,0 +1,26 @@
+{% extends "account/landing.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block PageName %}Регистрация{% endblock %}
+
+{% block landing %}
+    <h1>{% trans "Sign Up" %}</h1><hr>
+
+    <p>
+        Осталось совсем немного! Вы используете {{ account.get_provider.name }} для
+        входа. Введите данные ниже, и завершите регистрацию.
+    </p>
+
+    <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+        {% csrf_token %}
+        {{ form | crispy }}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-block">{% trans "Sign Up" %} &raquo;</button>
+    </form>
+
+{% endblock %}

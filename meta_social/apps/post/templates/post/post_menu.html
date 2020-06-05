@@ -1,0 +1,301 @@
+<style>
+    #drop-area.highlight {
+        border: 2px dashed black;
+    }
+
+    .my-form {
+        margin-bottom: 10px;
+    }
+
+    #gallery {
+        margin-top: 10px;
+        margin-left: 2px;
+    }
+
+    #gallery img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        vertical-align: middle;
+    }
+
+    #fileElem {
+        display: none;
+    }
+
+    .img-div {
+        position: relative;
+        display: inline-block;
+        height: 45px;
+        width: calc(10% - 3px);
+        margin-right: 5px;
+    }
+
+    .post-image-badge {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        color: white;
+        border-radius: 50%;
+        background-color: #ff4444;
+        width: 23px;
+        height: 23px;
+        z-index: 99;
+        border: 1px solid white;
+    }
+
+    .post-image-badge:hover {
+        cursor: pointer;
+        background-color: #F13636;
+    }
+
+    .post-image-badge:active {
+        background-color: #CC0000;
+    }
+</style>
+
+<div id="drop-area" class="card">
+    <div class="card-body text-left">
+        <form method="POST" action="{{ action_type }}" enctype="multipart/form-data" class="post-form">
+            {% csrf_token %}
+
+            <div class="md-form input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="button" style="font-size: 12pt;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-paperclip" aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" onclick="triggerInput()">Изображения</a>
+                        <a class="dropdown-item" data-toggle="modal" data-target="#musicSelectModal">Музыка</a>
+                    </div>
+                </div>
+                {{ postform }}
+                <div class="input-group-append">
+                    <button class="btn btn-outline-primary btn-sm py-0 my-0" type="submit" style="font-size: 12pt;">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+            <div id="gallery"></div>
+
+            {{ formset.management_form }}
+            <div style="display: none;">
+                {% for form in formset %}
+                    {{ form }} <br>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal fade" id="musicSelectModal" tabindex="-1" role="dialog" aria-labelledby="musicSelectModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите музыку:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="select-music-list">
+                {% for pos in user.profile.get_music_list %}
+                    <div>
+                        <button class="btn btn-sm btn-primary" onclick="addMusic(event, {{ pos.position.id }}, '{{ pos.position.artist }} - {{ pos.position.title }}')">+</button>
+                        <span style="max-width: 400px;" class="text-truncate">{{ pos.position.artist }} - {{ pos.position.title }}</span>
+                    </div>
+                {% empty %}
+                    У вас нет музыки
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-block" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function removeMusic(e) {
+        let div = document.createElement('div')
+
+        let btn = document.createElement('button')
+        btn.classList.add('btn')
+        btn.classList.add('btn-sm')
+        btn.classList.add('btn-primary')
+        btn.innerHTML = '+'
+        btn.onclick = function () {
+            addMusic(event, $(e.target).attr('music-id'), $(e.target).attr('music-name'))
+        }
+
+        let span = document.createElement('span')
+        span.classList.add('text-truncate')
+        $(span).attr('width', '400px')
+        span.innerHTML = $(e.target).attr('music-name')
+
+        div.appendChild(btn)
+        div.appendChild(span)
+
+        $('#select-music-list')[0].appendChild(div)
+        
+        let vals = $('#id_music')[0].value.split(' ')
+        for (let i=0; i < vals.length; i++) {
+            if (vals[i] == $(e.target).attr('music-id')) {
+                vals.splice(i, 1)
+            }
+        }
+
+        let new_val = ''
+        for (let i=0; i < vals.length; i++) {
+            new_val += vals[i]
+        }
+
+        $('#id_music').val(new_val)
+
+        e.target.parentNode.remove()
+    }
+
+    function getMusicCount() {
+        return $('#id_music')[0].value.split(' ').length
+    }
+
+    function addMusic(e, id, name) {
+        if (getMusicCount() == 10) {
+            alert('Максимум 10 песен')
+            return
+        }
+
+        $('#id_music')[0].value += id + ' '
+
+        let imgDiv = document.createElement('div')
+        imgDiv.classList.add('img-div')
+        imgDiv.classList.add('border')
+
+        let nameP = document.createElement('p')
+        nameP.classList.add('text-truncate')
+        nameP.innerHTML = name
+
+        let rmBtn = document.createElement('span')
+        rmBtn.classList.add('post-image-badge');
+        rmBtn.classList.add('text-center');
+        rmBtn.onclick = removeMusic;
+        rmBtn.innerHTML = 'X';
+        $(rmBtn).attr('music-name', name)
+        $(rmBtn).attr('music-id', id)
+
+        imgDiv.appendChild(nameP)
+        imgDiv.appendChild(rmBtn)
+
+        document.getElementById('gallery').appendChild(imgDiv)
+
+        e.target.parentNode.remove()
+    }
+
+    autosize(document.getElementById("id_text"));
+
+    function triggerInput() {
+        $('#fileElem')[0].click()
+    }
+
+    let dropArea = document.getElementById('drop-area')
+
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation()
+    }
+
+    ;['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false)
+    })
+
+    ;['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false)
+    });
+
+    function highlight(e) {
+        dropArea.classList.add('highlight')
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('highlight')
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+
+        handleFiles(files)
+    }
+
+    function handleFiles(files) {
+        files = [...files];
+        files.forEach(uploadFile)
+    }
+
+    function get_free_inputs() {
+        let inputs = [];
+        for (var i = 0; i < 10; i++) {
+            let input = document.getElementById("id_form-" + i + "-image");
+            if (!input.value) {
+                inputs.push(input)
+            }
+        }
+        return inputs
+    }
+
+    function uploadFile(file) {
+        let inputs = get_free_inputs();
+        
+        if (inputs.length == 0) {
+            alert('Нельзя загрузить более 10 картинок');
+            return
+        }
+
+        const dT = new DataTransfer();
+        dT.items.add(file);
+        inputs[0].files = dT.files;
+
+        let input_id = inputs[0].id[8];
+
+        previewFile(file, input_id)
+    }
+
+    function removeFile(e) {
+        let current_id = e.target.id[e.target.id.length - 1];
+
+        document.getElementById("id_form-" + current_id + "-image").value = '';
+        e.target.parentNode.remove()
+    }
+
+    function previewFile(file, input_id) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+            let imgDiv = document.createElement('div')
+            imgDiv.classList.add('img-div')
+
+            let img = document.createElement('img');
+            img.src = reader.result;
+
+            let rmBtn = document.createElement('span')
+
+            rmBtn.id = "image_preview-" + input_id;
+            rmBtn.classList.add('post-image-badge');
+            rmBtn.classList.add('text-center');
+            rmBtn.onclick = removeFile;
+            rmBtn.innerHTML = 'X';
+
+            imgDiv.appendChild(img)
+            imgDiv.appendChild(rmBtn)
+
+            document.getElementById('gallery').appendChild(imgDiv)
+        }
+    }
+</script>

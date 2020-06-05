@@ -1,15 +1,18 @@
 version: '3'
-
 services:
   social:
     build:
       context: .
     ports:
-      - 80:80
+      - '80:80'
+      - '443:443'
     command: ./docker-entrypoint.sh
     depends_on:
       - db
+      - redis
     container_name: social
+    volumes:
+      - './:/code'
 
   db:
     image: postgres
@@ -19,3 +22,42 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: DB
     container_name: db
+    environment:
+      - START_WITH_DOCKER=True
+
+  redis:
+    container_name: redis
+    image: 'redis:alpine'
+    ports:
+      - '6379:6379'
+    restart: always
+    environment:
+      - START_WITH_DOCKER=True
+
+  smtp:
+    image: namshi/smtp
+    restart: always
+    ports:
+      - '25:25'
+    volumes:
+      - './:/code'
+    environment:
+      - KEY_PATH=/code/config/privkey.pem
+      - CERTIFICATE_PATH=/code/config/cert.pem
+      - START_WITH_DOCKER=True
+    container_name: smtp
+
+  celery:
+    build: .
+    working_dir: /code/meta_social
+    command: "celery -A meta_social worker -l info"
+    volumes:
+      - './:/code'
+    links:
+      - redis
+    depends_on:
+      - db
+      - redis
+    environment:
+      - START_WITH_DOCKER=True
+    container_name: celery

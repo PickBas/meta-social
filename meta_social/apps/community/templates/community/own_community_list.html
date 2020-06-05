@@ -1,0 +1,27 @@
+{% extends 'base_menu.html' %}
+
+{% load static %}
+
+{% block center %}
+    <div class="card">
+        <div class="card-body">
+            <h5>Ваши сообщества</h5>
+            <ul class="list-group list-group-flush" id="community-list">
+                {% if user.profile.communities.all %}
+                    {% for community in user.profile.communities.all %}
+                        {% if user == community.owner %}
+                            <li class="list-group-item">
+                                <img src="{{ community.image.url }}" class="rounded-circle border float-left" width=40 height=40>
+                                <a href="/community/{{ community.custom_url }}/" class="float-left ml-2">{{ community.name }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block right %}
+    {% include 'community/right_menu.html' %}
+{% endblock %}

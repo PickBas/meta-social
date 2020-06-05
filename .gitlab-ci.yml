@@ -1,0 +1,21 @@
+image: python:latest
+
+cache:
+  paths:
+  - /root/.cache/pip/
+
+before_script:
+  - pip install -r requirements.txt
+  - pip install -r ci/pylint_requirements.txt
+
+test:
+  script:
+    - ci/tests_runner.sh
+  only:
+    - devel
+
+pylint:
+  script:
+    - ci/pylint_runner.sh
+  only:
+    - devel

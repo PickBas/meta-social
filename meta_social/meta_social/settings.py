@@ -11,9 +11,20 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
+
+# Simple changing DB and redis
+START_WITH_DOCKER = os.getenv('START_WITH_DOCKER', False) == 'True'
+
+if START_WITH_DOCKER:
+    SECURE_SSL_REDIRECT = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Setup apps folder
+APPS_DIR = os.path.join(BASE_DIR, 'apps/')
+sys.path.insert(0, APPS_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -22,9 +33,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#bhq1g66br=mwyxcvxxc+1yu=1fq@wcv--ys&&7=233@0^zv5!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not START_WITH_DOCKER
 
-ALLOWED_HOSTS = ['*']
+# if START_WITH_DOCKER:
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
+
+ALLOWED_HOSTS = [
+    'metasocial.savink.in',
+    '127.0.0.1',
+    'localhost',
+    '0.0.0.0',
+]
 
 # Application definition
 
@@ -36,19 +58,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'meta_social_app',
+
+    'chat',
+    'community',
+    'core',
+    'friends',
+    'music',
+    'post',
+    'user_profile',
+
     'crispy_forms',
     'django_countries',
-    'easy_thumbnails',
-    'image_cropping',
+    'channels',
 
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
-    # 'allauth.socialaccount.providers.twitter',
-    # 'allauth.socialaccount.providers.instagram',
+    'allauth.socialaccount.providers.yandex',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +95,13 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'meta_social_app/templates',
+            os.path.join(APPS_DIR, 'chat/templates'),
+            os.path.join(APPS_DIR, 'community/templates'),
+            os.path.join(APPS_DIR, 'core/templates'),
+            os.path.join(APPS_DIR, 'friends/templates'),
+            os.path.join(APPS_DIR, 'music/templates'),
+            os.path.join(APPS_DIR, 'post/templates'),
+            os.path.join(APPS_DIR, 'user_profile/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -89,24 +123,43 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 4
 
 WSGI_APPLICATION = 'meta_social.wsgi.application'
+ASGI_APPLICATION = 'meta_social.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis' if START_WITH_DOCKER else '127.0.0.1', 6379)],
+            'channel_capacity': {
+                'http.request': 200,
+                'websocket.send*': 1000,
+            },
+            'expiry': 15
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'DB',
-    #     'USER': 'postgres',
-    #     'PASSWORD': 'postgres',
-    #     'HOST': 'db',
-    #     'PORT': '5432',
-    # },
-    # 'old_sqlite3': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if START_WITH_DOCKER:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'DB',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'db',
+            'PORT': '5432',
+        },
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        },
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -141,36 +194,72 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
+if START_WITH_DOCKER:
+    AWS_REGION_STATIC = "nl-ams"
+    AWS_ACCESS_KEY_ID_STATIC = "SCW4Y1H2449R5QJ05B52"
+    AWS_SECRET_ACCESS_KEY_STATIC = "88aed883-f609-4331-b728-69b866fca6a2"
+    AWS_S3_ENDPOINT_URL_STATIC = "https://s3.nl-ams.scw.cloud"
+    AWS_S3_BUCKET_NAME_STATIC = "social-static"
+    STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Login/Logout urls
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_URL = '/accounts/logout/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
+# S3 files storage
+AWS_REGION = "nl-ams"
+AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
+AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
+AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
+AWS_S3_BUCKET_NAME = "social-bucket"
 
+DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
+
+# Crispy forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'piryazev555@gmail.com'
-# EMAIL_HOST_PASSWORD = 'zelt gjfv bhtt zhlt'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
-
+# Allauth settings
 ACCOUNT_EMAIL_REQUIRED = True
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
-THUMBNAIL_PROCESSORS = (
-    'image_cropping.thumbnail_processors.crop_corners',
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
+# Обязательное подтверждение мыла
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
-IMAGE_CROPPING_THUMB_SIZE = (800, 800)
+# Fixtures
+FIXTURE_DIRS = [
+    'core/fixtures',
+    'user_profile/fixtures',
+]
+
+# Email settings
+if START_WITH_DOCKER:
+    EMAIL_HOST = 'smtp'
+    EMAIL_PORT = '25'
+    EMAIL_USE_TLS = True
+    EMAIL_SSL_KEYFILE = os.path.join(BASE_DIR, '../config/privkey.pem')
+    EMAIL_SSL_CERTFILE = os.path.join(BASE_DIR, '../config/cert.pem')
+    DEFAULT_FROM_EMAIL = 'noreply@metasocial.savink.in'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Celery settings
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_TASK_ALWAYS_EAGER = True
+if START_WITH_DOCKER:
+    CELERY_BROKER_URL = 'redis://redis:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+else:
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'

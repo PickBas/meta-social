@@ -20,15 +20,24 @@
         cd meta_social
         python manage.py makemigrations
         python manage.py migrate
-        python manage.py loaddata db.json
+        python manage.py loaddata allauth.json
 
+3. Запуск проекта
 
-## Что делать если django не видит миграции?
+    #### Используя docker:
 
-Удаляем **db.sqlite3** и папку **migrations**, затем вводим
+        docker-compose up --build
+    
+    #### Без docker:
 
-    python manage.py makemigrations meta_social_app
-    python manage.py migrate
+        python manage.py runserver
+        celery -A meta_social worker -l info
+
+## Как создать админа?
+
+Из-за кастомного профиля админ создается криво, так что делаем так и не паримся
+
+    python manage.py createsuperuser_ms
 
 
 # Данные о соц. сетях
@@ -56,3 +65,37 @@
     # 2
     login: vzsdnhqifk_1582663185@tfbnw.net
     password: verystrongpa55word
+
+## Yandex
+
+Приложение
+
+    id: 1ff42eb87f8e4467807e3d8a9932424e
+    key: 8d552db3599c4126ad977c3ed51498b5
+
+# Для работы чата
+
+## Запуск приложения через Docker
+    docker-compose up --build
+
+## Запуск на локальной машине
+    CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)], Заменить на "hosts": [('127.0.0.1', 6379)],
+            },
+        },
+    }
+
+## Установка redis
+    Arch: sudo pacman -S redis
+    Fedora: sudo dnf install redis
+    Debian: sudo apt install redis
+
+## Запуск redis
+    Linux: redis-server
+    Docker: docker run -p 6379:6379 -d redis:5
+
+## Проверка redis
+    redis-cli ping

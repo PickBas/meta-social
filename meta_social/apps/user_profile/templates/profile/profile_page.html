@@ -1,0 +1,218 @@
+{% extends 'profile/base.html' %}
+{% load static %}
+
+
+{% block extra_head %}
+
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+
+{% endblock extra_head %}
+
+
+
+{% block content %}
+
+<div class="row text-left">
+    <div class="col-lg-3 col-md-12 mb-3">
+        <div class="card">
+            <style>
+                .rollover {
+                    transition: 0.3s;
+                }
+
+                .rollover:hover {
+                    transition: 0.7s;
+                    opacity: 0.7;
+                }
+            </style>
+            {% if user == c_user %}
+                <a href="/change_avatar/">
+                    <img src="{{ c_user.profile.image.url }}" class="card-img-top rollover"></img>
+                </a>
+            {% else %}
+                <img src="{{ c_user.profile.image.url }}" class="card-img-top"></img>
+            {% endif %}
+            <div class="card-body">
+                {% if c_user == user %}
+                    <hr class="mt-0">
+                    <a href="/accounts/profile/{{ c_user.profile.custom_url }}/edit/" class="btn btn-block btn-primary px-1 mx-0">Редактировать</a>
+                {% else %}
+                    <hr class="mt-0">
+                    {% if not is_in_blacklist and not is_friend %}
+                        <form method="POST" action="/accounts/profile/{{ c_user.id }}/send_req/">
+                            {% csrf_token %}
+                            <input class="btn btn-block btn-primary" type="submit" value="Добавить в друзья">
+                        </form>
+                    {% else %}
+                        {% if is_in_blacklist %}
+                            <p class="btn btn-block btn-primary">Вы в черном списке</p>
+                        {% else %}
+			                <form action="/chats/{{ user.id }}/{{ c_user.id }}/" method="POST">
+                                {% csrf_token %}
+                                <button class="btn btn-block btn-primary px-1 mx-0" type="submit">Сообщение</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% if c_user.profile.friends.count %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    {% if user != c_user %}
+                        <h6 class="card-title"><a href="/friends/?username={{ c_user.profile.custom_url }}">Друзья</a> </h6>
+                    {% else %}
+                        <h6 class="card-title"><a href="/friends/">Друзья</a> </h6>
+                    {% endif %}
+                    <div class="row px-2">
+                    {% for friend in c_user.profile.friends.all|slice:":6"%}
+                        <div class="col-4 px-0 mx-0 text-center">
+                            <img src="{{ friend.profile.image.url }}" class="rounded-circle border" width=40 height=40>
+                            <a href="/accounts/profile/{{ friend.profile.custom_url }}/">
+				{% if friend.first_name %}
+                                    {{ friend.first_name }}
+				{% else %}
+				    {{ friend.profile.custom_url }}
+				{% endif %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if c_user.profile.communities.count %}
+            <div class="card mt-3 mb-3">
+                <div class="card-body">
+                    {% if user != c_user %}
+                        <h6 class="card-title"><a href="/community/user/list/?username={{ c_user.profile.custom_url }}">Сообщества</a> </h6>
+                    {% else %}
+                        <h6 class="card-title"><a href="/community/user/list/">Сообщества</a> </h6>
+                    {% endif %}
+                    <div class="row px-2">
+                        {% for community in c_user.profile.communities.all|slice:":6"%}
+                            <div class="col-4 px-0 mx-0 text-center">
+                                <img src="{{ community.image.url }}" class="rounded-circle border" width=40 height=40>
+                                    <a href="/community/{{ community.custom_url }}/">
+                                        {{ community.name }}
+                                    </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if c_user.profile.get_music_list %}
+            <div class="card mt-3 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <a class="pb-2" href="/accounts/profile/{{ c_user.profile.custom_url }}/music/">Музыка</a>
+                        {% for music in c_user.profile.get_music_list %}
+                            <div class="{% if forloop.first %}mt-3{% endif %}">
+                                <button class="float-left btn btn-sm btn-outline-success ml-0 my-0 px-2 py-2" onclick="addMusicToPlaylist('/music.position.artist/{{ music.position.artist.id }}/add/')" {% if music in user.profile.get_music_list %}disabled{% endif %}>+</button>
+                                <p class="mt-2 float-left text-truncate" style="width:130px">{{ music.position.title }} - {{ music.position.artist }}</p>
+                            </div>
+                        {% endfor %}
+                    </h6>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-9 col-md-12 mb-3 px-0 mx-lg-0 mx-md-3 mx-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title float-left">{{ c_user.profile.get_name }}</h5>
+                <small
+                    class="float-right text-muted">{% if user == c_user %}Онлайн{% else %}{{ c_user.profile.get_status }}{% endif %}</small>
+                <br>
+                <hr>
+                <p class="card-text">
+                    {% if c_user.profile.job and not c_user.profile.study or c_user.profile.job and c_user.profile.study %}
+                        Работа: {{ c_user.profile.job }}
+                    {% else %}
+                        {% if c_user.profile.study and not c_user.profile.job %}
+                            Учеба: {{ c_user.profile.study }}
+                        {% else %}
+                            {% if not c_user.profile.study and not c_user.profile.job %}
+                                Место работы/учебы: -
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.job and c_user.profile.study %}
+                        Учеба: {{ c_user.profile.study }}
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.biography %}
+                        Биография: {{ c_user.profile.biography }}
+                    {% else %}
+                        Биография: -
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.country %}
+                        Страна: {{ c_user.profile.country.name }}
+                    {% else %}
+                        Страна: -
+                    {% endif %}
+                </p>
+                <p class="card-text">
+                    {% if c_user.profile.birth %}
+                        Дата рождения: {{ c_user.profile.birth }}
+                    {% endif %}
+                </p>
+                {% if c_user.profile.show_email %}
+                <p class="card-text">
+                    {% if c_user.email %}
+                        Почта: {{ c_user.email }}
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if c_user == user %}
+            <div class="mt-3">
+                {% include 'post/post_menu.html' %}
+            </div>
+        {% endif %}
+        {% if is_in_blacklist %}
+            <h5 class="mt-3 text-center">Не доступно для просмотра</h5>
+        {% else %}
+            {% if c_user_posts %}
+                <div class="infinite-container mt-3">
+                    {% for post in c_user_posts %}
+                        <div class="infinite-item">
+                            {% include 'post/post.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if c_user_posts.has_next %}
+                    <a class="infinite-more-link" href="?page={{ c_user_posts.next_page_number }}">More</a>
+                {% endif %}
+            {% else %}
+                <p class="text-center w-100 text-muted mt-3">У данного пользователя нет записей</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra__js %}
+
+<script src="{% static 'js/noframework.waypoints.min.js' %}"></script>
+<script src="{% static 'js/infinite.min.js' %}"></script>
+<script src="{% static 'js/manage_post.js' %}"></script>
+<script>
+    var infinite = new Waypoint.Infinite({
+        element: $('.infinite-container')[0]
+    });
+</script>
+
+{% endblock extra__js %}
