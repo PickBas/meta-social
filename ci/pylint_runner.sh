@@ -10,7 +10,7 @@ pylint $(python ./pylint_runner.py) --load-plugins pylint_django --disable=F0401
 # get badge
 mkdir public
 score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.txt)
-anybadge --label=Pylint --file=public/badges/pylint.svg --value=$score 2=red 4=orange 8=yellow 10=green
+anybadge --value=$score --file=public/pylint.svg pylint
 echo "Pylint score was $score"
 
 exit 0
