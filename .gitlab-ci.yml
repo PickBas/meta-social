@@ -18,14 +18,14 @@ test:
   script:
     - ci/tests_runner.sh
   only:
-    - devel
+    - master
 
 pylint:
   stage: style
   script:
     - ci/pylint_runner.sh
   only:
-    - devel
+    - master
   artifacts:
     paths:
       - public/pylint.svg
@@ -47,4 +47,4 @@ pages:
     paths:
       - public
   only:
-    - devel
+    - master
