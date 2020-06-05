@@ -19,3 +19,13 @@ pylint:
     - ci/pylint_runner.sh
   only:
     - master
+  artifacts:
+    paths:
+      - public/pylint.svg
+
+test_coverage:
+  script:
+    - cd meta_social
+    - coverage run manage.py test
+    - coverage report -m apps/*/*.py
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
