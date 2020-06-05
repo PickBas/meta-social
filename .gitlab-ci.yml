@@ -12,10 +12,10 @@ test:
   script:
     - ci/tests_runner.sh
   only:
-    - devel
+    - master
 
 pylint:
   script:
     - ci/pylint_runner.sh
   only:
-    - devel
+    - master
