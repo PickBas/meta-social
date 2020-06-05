@@ -12,16 +12,17 @@ test:
   script:
     - ci/tests_runner.sh
   only:
-    - master
+    - devel
 
 pylint:
   script:
     - ci/pylint_runner.sh
   only:
-    - master
+    - devel
   artifacts:
     paths:
       - public/pylint.svg
+      - public/pylint.html
 
 test_coverage:
   script:

@@ -13,4 +13,9 @@ score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.txt
 anybadge --value=$score --file=public/pylint.svg pylint
 echo "Pylint score was $score"
 
+# get html
+pylint $(python ./pylint_runner.py) --load-plugins=pylint_json2html,pylint_django --output-format=jsonextended --disable=F0401 > pylint.json
+
+pylint-json2html -f jsonextended -o public/pylint.html pylint.json
+
 exit 0
