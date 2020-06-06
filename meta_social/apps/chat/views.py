@@ -49,7 +49,15 @@ class Conversations:
             self.context['c_user'] = c_user
 
             chats = c_user.profile.chats.all().order_by('-messages__date')
-            self.context['chats'] = list(dict.fromkeys(chats))
+            chats = list(dict.fromkeys(chats))
+            self.context['chats'] = []
+            for chat in chats:
+                dict_chat = {
+                    'chat': chat,
+                    'unread_count': chat.get_unread_messages().exclude(author=c_user).count()
+                }
+
+                self.context['chats'].append(dict_chat)
             return render(request, self.template_name, self.context)
 
     @staticmethod

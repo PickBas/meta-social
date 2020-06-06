@@ -1,0 +1,564 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>community.views &#8212; meta-social v1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for community.views</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Meta social community views</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">simple_search</span> <span class="kn">import</span> <span class="n">search_filter</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">modelformset_factory</span>
+<span class="kn">from</span> <span class="nn">django.core.files.base</span> <span class="kn">import</span> <span class="n">ContentFile</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+<span class="kn">from</span> <span class="nn">core.views</span> <span class="kn">import</span> <span class="n">MetaSocialView</span>
+<span class="kn">from</span> <span class="nn">core.forms</span> <span class="kn">import</span> <span class="n">CropAvatarForm</span>
+<span class="kn">from</span> <span class="nn">post.forms</span> <span class="kn">import</span> <span class="n">PostImageForm</span><span class="p">,</span> <span class="n">PostForm</span>
+<span class="kn">from</span> <span class="nn">post.models</span> <span class="kn">import</span> <span class="n">PostImages</span>
+<span class="kn">from</span> <span class="nn">user_profile.models</span> <span class="kn">import</span> <span class="n">Profile</span>
+<span class="kn">from</span> <span class="nn">music.models</span> <span class="kn">import</span> <span class="n">Music</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Community</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">EditCommunityForm</span><span class="p">,</span> <span class="n">CommunityCreateForm</span><span class="p">,</span> <span class="n">UpdateCommunityAvatarForm</span>
+
+
+<div class="viewcode-block" id="Communities"><a class="viewcode-back" href="../../code.html#community.views.Communities">[docs]</a><span class="k">class</span> <span class="nc">Communities</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Communities class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Communities.CommunityView"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityView">[docs]</a>    <span class="k">class</span> <span class="nc">CommunityView</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Community view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;community/community_page.html&#39;</span>
+
+<div class="viewcode-block" id="Communities.CommunityView.get"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityView.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Representation of community page</span>
+
+<span class="sd">            :param community_url: community custom_url field</span>
+<span class="sd">            :type community_url: str</span>
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">,</span> <span class="s1">&#39;Сообщество&#39;</span><span class="p">)</span>
+
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+
+            <span class="n">post_image_form_set</span> <span class="o">=</span> <span class="n">modelformset_factory</span><span class="p">(</span><span class="n">PostImages</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">PostImageForm</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;postform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PostForm</span><span class="p">()</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;formset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post_image_form_set</span><span class="p">(</span><span class="n">queryset</span><span class="o">=</span><span class="n">PostImages</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">())</span>
+
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;action_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/post/create/</span><span class="si">{}</span><span class="s1">/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">community_url</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Communities.EditCommunity"><a class="viewcode-back" href="../../code.html#community.views.Communities.EditCommunity">[docs]</a>    <span class="k">class</span> <span class="nc">EditCommunity</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Edit community information view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;community/edit_community.html&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">,</span> <span class="s1">&#39;Редактирование сообщества&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Communities.EditCommunity.post"><a class="viewcode-back" href="../../code.html#community.views.Communities.EditCommunity.post">[docs]</a>        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processes post request from community edit</span>
+
+<span class="sd">            :param community_url: community custom_url field</span>
+<span class="sd">            :type community_url: str</span>
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;community_url&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">community</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">EditCommunityForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/community/</span><span class="si">{}</span><span class="s1">/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">custom_url</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.EditCommunity.get"><a class="viewcode-back" href="../../code.html#community.views.Communities.EditCommunity.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Representation of community edit page</span>
+
+<span class="sd">            :param community_url: community custom_url field</span>
+<span class="sd">            :type community_url: str</span>
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;community_url&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EditCommunityForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Communities.CommunityCreate"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityCreate">[docs]</a>    <span class="k">class</span> <span class="nc">CommunityCreate</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Community create view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;community/community_create.html&#39;</span>
+
+<div class="viewcode-block" id="Communities.CommunityCreate.post"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityCreate.post">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processes post request from community creating page</span>
+
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responces redirect</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponseRedirect`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">CommunityCreateForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">community</span> <span class="o">=</span> <span class="n">Community</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
+                    <span class="n">info</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">),</span>
+                    <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                    <span class="n">custom_url</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="n">community</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">community</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">communities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">community</span><span class="p">)</span>
+                <span class="n">community</span><span class="o">.</span><span class="n">admins</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/community/</span><span class="si">{}</span><span class="s1">/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">custom_url</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.CommunityCreate.get"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityCreate.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Representation of community creating page</span>
+
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">,</span> <span class="s1">&#39;Создание сообщества&#39;</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CommunityCreateForm</span><span class="p">()</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;community_pages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;create&#39;</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Communities.AvatarManaging"><a class="viewcode-back" href="../../code.html#community.views.Communities.AvatarManaging">[docs]</a>    <span class="k">class</span> <span class="nc">AvatarManaging</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Managing avatar of community view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">,</span> <span class="s1">&#39;Смена аватарки сообщества&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;community/change_avatar.html&#39;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Communities.AvatarManaging.post"><a class="viewcode-back" href="../../code.html#community.views.Communities.AvatarManaging.post">[docs]</a>        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processes post request from community avatar cropping</span>
+
+<span class="sd">            :param community_url: community custom_url field</span>
+<span class="sd">            :type community_url: str</span>
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responces redirect</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponseRedirect`</span>
+<span class="sd">            :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;community_url&#39;</span><span class="p">])</span>
+            <span class="n">avatar_form</span> <span class="o">=</span> <span class="n">UpdateCommunityAvatarForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">community</span><span class="p">)</span>
+            <span class="n">crop_form</span> <span class="o">=</span> <span class="n">CropAvatarForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">crop_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">avatar_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">avatar_form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">))</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">))</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">))</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;base_image&#39;</span><span class="p">):</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;base_image&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">base_image</span><span class="p">)</span>
+                <span class="n">cropped_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">crop</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span> <span class="o">+</span> <span class="n">x</span><span class="p">,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">y</span><span class="p">))</span>
+                <span class="n">resized_image</span> <span class="o">=</span> <span class="n">cropped_image</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+                <span class="n">io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">resized_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="s1">&#39;JPEG&#39;</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="n">community</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;image_</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">ContentFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()),</span>
+                                         <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                    <span class="n">community</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                    <span class="n">resized_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="s1">&#39;PNG&#39;</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="n">community</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;image_</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">ContentFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()),</span>
+                                         <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">community</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/community/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">custom_url</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.AvatarManaging.get"><a class="viewcode-back" href="../../code.html#community.views.Communities.AvatarManaging.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Representation of community avatar changing and cropping</span>
+
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">avatar_form</span> <span class="o">=</span> <span class="n">UpdateCommunityAvatarForm</span><span class="p">()</span>
+            <span class="n">crop_form</span> <span class="o">=</span> <span class="n">CropAvatarForm</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;avatar_form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avatar_form</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;crop_form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crop_form</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;community_url&#39;</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Communities.my_communities"><a class="viewcode-back" href="../../code.html#community.views.Communities.my_communities">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">my_communities</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rerurn responce to ajax</span>
+
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/own_community_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;community_pages&#39;</span><span class="p">:</span> <span class="s1">&#39;created&#39;</span>
+        <span class="p">})</span></div>
+
+<div class="viewcode-block" id="Communities.CommunityList"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityList">[docs]</a>    <span class="k">class</span> <span class="nc">CommunityList</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Community list view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name_get</span> <span class="o">=</span> <span class="s1">&#39;community/community_list.html&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name_post</span> <span class="o">=</span> <span class="s1">&#39;community/search.html&#39;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Communities.CommunityList.get"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityList.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Representation of community list</span>
+
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">,</span> <span class="s1">&#39;Список сообществ&#39;</span><span class="p">)</span>
+
+            <span class="n">requested</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span>
+
+            <span class="n">c_user</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">requested</span><span class="p">:</span>
+                <span class="n">c_user</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span>
+                                           <span class="n">profile</span><span class="o">=</span><span class="n">Profile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">custom_url</span><span class="o">=</span><span class="n">requested</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_user</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;community_pages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;subs&#39;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pagination_elemetns</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">communities</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+                <span class="s1">&#39;c_user_communities&#39;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/community_list.html&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Communities.CommunityList.post"><a class="viewcode-back" href="../../code.html#community.views.Communities.CommunityList.post">[docs]</a>        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Process post request from community search</span>
+
+<span class="sd">            :param request: object with request details</span>
+<span class="sd">            :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">            :return: responce object with HTML code</span>
+<span class="sd">            :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="n">c_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_user_communities&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">communities</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/search.html&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">)</span>
+            <span class="n">search_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_matches&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Community</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">search_filter</span><span class="p">(</span><span class="n">search_fields</span><span class="p">,</span> <span class="n">query</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/search.html&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Communities.community_join"><a class="viewcode-back" href="../../code.html#community.views.Communities.community_join">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">community_join</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for joining to community</span>
+
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">community</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">community</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">communities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">community</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.community_leave"><a class="viewcode-back" href="../../code.html#community.views.Communities.community_leave">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">community_leave</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for leaving from community</span>
+
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">in</span> <span class="n">community</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">community</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">communities</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">community</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.post_community_new"><a class="viewcode-back" href="../../code.html#community.views.Communities.post_community_new">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">post_community_new</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for creating post</span>
+
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+
+        <span class="n">post_image_form_set</span> <span class="o">=</span> <span class="n">modelformset_factory</span><span class="p">(</span><span class="n">PostImages</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">PostImageForm</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="n">postForm</span> <span class="o">=</span> <span class="n">PostForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+            <span class="n">formset</span> <span class="o">=</span> <span class="n">post_image_form_set</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">PostImages</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="n">postForm</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">formset</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">post_form</span> <span class="o">=</span> <span class="n">postForm</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">post_form</span><span class="o">.</span><span class="n">community</span> <span class="o">=</span> <span class="n">community</span>
+                <span class="n">post_form</span><span class="o">.</span><span class="n">owner_community</span> <span class="o">=</span> <span class="n">community</span>
+                <span class="n">post_form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;music&#39;</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">music_id</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;music&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()]:</span>
+                        <span class="n">music_item</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Music</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">music_id</span><span class="p">)</span>
+                        <span class="n">post_form</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">music_item</span><span class="p">)</span>
+
+                <span class="n">community</span><span class="o">.</span><span class="n">posts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">post_form</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">formset</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">form</span><span class="p">:</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span>
+                        <span class="n">photo</span> <span class="o">=</span> <span class="n">PostImages</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">post_form</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">from_user_id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                        <span class="n">photo</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Communities.get_subscribers_list"><a class="viewcode-back" href="../../code.html#community.views.Communities.get_subscribers_list">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_subscribers_list</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for getting users in community</span>
+<span class="sd">        </span>
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/community_subscribers_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s1">&#39;community&#39;</span><span class="p">:</span> <span class="n">community</span>
+            <span class="p">})</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Communities.remove_admin_permissions"><a class="viewcode-back" href="../../code.html#community.views.Communities.remove_admin_permissions">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_admin_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">,</span> <span class="n">user_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for remove admin permission of user</span>
+<span class="sd">        </span>
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param user_url: user custom_url field</span>
+<span class="sd">        :type user_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Profile</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">user_url</span><span class="p">)</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="ow">and</span> <span class="n">user</span> <span class="o">!=</span> <span class="n">community</span><span class="o">.</span><span class="n">owner</span><span class="p">:</span>
+            <span class="n">community</span><span class="o">.</span><span class="n">admins</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/community_subscribers_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s1">&#39;community&#39;</span><span class="p">:</span> <span class="n">community</span>
+            <span class="p">})</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Communities.give_admin_permissions"><a class="viewcode-back" href="../../code.html#community.views.Communities.give_admin_permissions">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">give_admin_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">community_url</span><span class="p">,</span> <span class="n">user_url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for give admin permission from user</span>
+<span class="sd">        </span>
+<span class="sd">        :param community_url: community custom_url field</span>
+<span class="sd">        :type community_url: str</span>
+<span class="sd">        :param user_url: user custom_url field</span>
+<span class="sd">        :type user_url: str</span>
+<span class="sd">        :param request: object with request details</span>
+<span class="sd">        :type request: :class:`django.http.HttpRequest`</span>
+<span class="sd">        :return: responce object with HTML code</span>
+<span class="sd">        :rtype: :class:`django.http.HttpResponse`</span>
+<span class="sd">        :raises: :class:`django.http.Http404` if custom url not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">community</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Community</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">community_url</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Profile</span><span class="p">,</span> <span class="n">custom_url</span><span class="o">=</span><span class="n">user_url</span><span class="p">)</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="ow">and</span> <span class="n">user</span> <span class="o">!=</span> <span class="n">community</span><span class="o">.</span><span class="n">owner</span><span class="p">:</span>
+            <span class="n">community</span><span class="o">.</span><span class="n">admins</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;community/community_subscribers_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s1">&#39;community&#39;</span><span class="p">:</span> <span class="n">community</span>
+            <span class="p">})</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">meta-social</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Dev docs</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, pro(gram).
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
