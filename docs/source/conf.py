@@ -10,9 +10,16 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../meta_social'))
+
+#Django
+
+import django
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'meta_social.settings'
+django.setup()
 
 
 # -- Project information -----------------------------------------------------
@@ -31,6 +38,9 @@ release = 'v1.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+	'sphinx.ext.autodoc',
+	'sphinx.ext.viewcode',
+
 ]
 
 # Add any paths that contain templates here, relative to this directory.
