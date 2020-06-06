@@ -18,7 +18,4 @@ pylint $(python ./pylint_runner.py) --load-plugins=pylint_json2html,pylint_djang
 
 pylint-json2html -f jsonextended -o public/pylint.html pylint.json
 
-# cleanup
-rm pylint.txt pylint.json
-
 exit 0
