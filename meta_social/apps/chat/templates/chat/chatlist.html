@@ -21,7 +21,7 @@
     {% for chat in chats %}
         <div class="btn btn-lg btn-flat pl-3 pr-1 py-2 mx-0 my-0"
             onclick="window.location.href = '/chat/go_to_chat/{{ chat.chat.id }}/';"
-            style="box-shadow: none; text-transform: none; width: {% if not chat.is_dialog and user != chat.owner %}90%{% else %}100%{% endif %}; {% if not forloop.last %}border-bottom: 1px solid #cfd8dc{% endif %};">
+            style="box-shadow: none; text-transform: none; width: {% if not chat.chat.is_dialog and user != chat.chat.owner %}90%{% else %}100%{% endif %}; {% if not forloop.last %}border-bottom: 1px solid #cfd8dc{% endif %};">
             <img src="  {% if chat.chat.is_dialog %}
                             {% for participant in chat.chat.participants.all %}
                                 {% if participant != c_user %}
