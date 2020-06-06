@@ -1,0 +1,516 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.views &#8212; meta-social v1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for chat.views</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Chat views module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.utils.safestring</span> <span class="kn">import</span> <span class="n">mark_safe</span>
+<span class="kn">from</span> <span class="nn">django.core.files.base</span> <span class="kn">import</span> <span class="n">ContentFile</span>
+<span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">modelformset_factory</span>
+
+<span class="kn">from</span> <span class="nn">core.forms</span> <span class="kn">import</span> <span class="n">CropAvatarForm</span>
+<span class="kn">from</span> <span class="nn">core.views</span> <span class="kn">import</span> <span class="n">MetaSocialView</span>
+
+<span class="kn">from</span> <span class="nn">.tasks</span> <span class="kn">import</span> <span class="n">make_admin_task</span><span class="p">,</span> <span class="n">rm_admin_task</span><span class="p">,</span> <span class="n">add_to_chat_task</span><span class="p">,</span> <span class="n">rm_from_chat_task</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">UpdateChatAvatarForm</span><span class="p">,</span> <span class="n">MessageImageForm</span><span class="p">,</span> <span class="n">MessageMusicForm</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Chat</span><span class="p">,</span> <span class="n">MessageImages</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">Music</span>
+
+
+<div class="viewcode-block" id="Conversations"><a class="viewcode-back" href="../../code.html#chat.views.Conversations">[docs]</a><span class="k">class</span> <span class="nc">Conversations</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class containing chat functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Conversations.ChatList"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.ChatList">[docs]</a>    <span class="k">class</span> <span class="nc">ChatList</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chat list view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            ChatList ctor</span>
+<span class="sd">            :param kwargs: kwargs</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;chat/chat.html&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;messages&#39;</span><span class="p">,</span> <span class="s1">&#39;Чаты&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Conversations.ChatList.get"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.ChatList.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">render</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processing get request</span>
+<span class="sd">            :param request: request</span>
+<span class="sd">            :return: render</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;pagename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Чаты&#39;</span>
+
+            <span class="n">c_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_user</span>
+
+            <span class="n">chats</span> <span class="o">=</span> <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-messages__date&#39;</span><span class="p">)</span>
+            <span class="n">chats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">chats</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;chats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">chat</span> <span class="ow">in</span> <span class="n">chats</span><span class="p">:</span>
+                <span class="n">dict_chat</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;chat&#39;</span><span class="p">:</span> <span class="n">chat</span><span class="p">,</span>
+                    <span class="s1">&#39;unread_count&#39;</span><span class="p">:</span> <span class="n">chat</span><span class="o">.</span><span class="n">get_unread_messages</span><span class="p">()</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">c_user</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+                <span class="p">}</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;chats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dict_chat</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Conversations.create_chat"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.create_chat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_chat</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">render</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for creating chat. Returns rendered response of chatlist.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :return: render</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">):</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_chat</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+                <span class="n">new_chat</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="n">new_chat</span><span class="o">.</span><span class="n">chat_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+                <span class="n">new_chat</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+                <span class="n">new_chat</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">c_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_chat</span><span class="p">)</span>
+                <span class="n">c_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_user</span>
+                <span class="n">chats</span> <span class="o">=</span> <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-messages__date&#39;</span><span class="p">)</span>
+                <span class="n">context</span><span class="p">[</span><span class="s1">&#39;chats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">chats</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;chat/chatlist.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.remove_chat"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.remove_chat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_chat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">redirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for deleting chat. Redirects to chatlist</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: id of room&#39;s</span>
+<span class="sd">        :return: redirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c_room</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">c_room</span><span class="o">.</span><span class="n">owner</span><span class="p">:</span>
+            <span class="n">c_room</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/chats/&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.make_admin"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.make_admin">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_admin</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for giving admin permissions in chat.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :param participant_id: participant&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">make_admin_task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.rm_admin"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.rm_admin">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rm_admin</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for removing admin permissions in chat.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :param participant_id: participant&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">rm_admin_task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.quit_room"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.quit_room">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">quit_room</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for quiting room.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">c_room</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+            <span class="n">c_room</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">in</span> <span class="n">c_room</span><span class="o">.</span><span class="n">administrators</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">c_room</span><span class="o">.</span><span class="n">administrators</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">c_room</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c_room</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.edit_chat_name"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.edit_chat_name">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">edit_chat_name</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for editing chat name.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">c_room</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+            <span class="n">c_room</span><span class="o">.</span><span class="n">chat_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+            <span class="n">c_room</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.chat_move"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.chat_move">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">chat_move</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">friend_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">redirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for redirecting to chat,</span>
+<span class="sd">            if chat does not exists creates and redirects to it.</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param user_id: user&#39;s id</span>
+<span class="sd">        :param friend_id: friends&#39; id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="n">c_friend</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">friend_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c_user_chat</span> <span class="ow">in</span> <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">c_user_chat</span> <span class="ow">in</span> <span class="n">c_friend</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">c_user_chat</span><span class="o">.</span><span class="n">is_dialog</span><span class="p">:</span>
+                    <span class="n">ex_chat</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">c_user_chat</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/chat/go_to_chat/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex_chat</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+            <span class="n">new_chat</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+            <span class="n">new_chat</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c_user</span><span class="p">)</span>
+            <span class="n">new_chat</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c_friend</span><span class="p">)</span>
+            <span class="n">new_chat</span><span class="o">.</span><span class="n">chat_name</span> <span class="o">=</span> <span class="n">c_user</span><span class="o">.</span><span class="n">username</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">c_friend</span><span class="o">.</span><span class="n">username</span>
+
+            <span class="n">new_chat</span><span class="o">.</span><span class="n">is_dialog</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">new_chat</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">c_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_chat</span><span class="p">)</span>
+            <span class="n">c_friend</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_chat</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/chat/go_to_chat/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_chat</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Conversations.add_to_chat"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.add_to_chat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_to_chat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">friend_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for adding user to chat.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :param friend_id: friend&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">add_to_chat_task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">friend_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.remove_from_chat"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.remove_from_chat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_from_chat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponseRedirect</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for removing user from chat.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :param participant_id: participant&#39;s id</span>
+<span class="sd">        :return: HttpResponseRedirect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">rm_from_chat_task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">participant_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.Room"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.Room">[docs]</a>    <span class="k">class</span> <span class="nc">Room</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chat view class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Room ctor</span>
+<span class="sd">            :param kwargs: kwargs</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name_dialog</span> <span class="o">=</span> <span class="s1">&#39;chat/message.html&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name_conv</span> <span class="o">=</span> <span class="s1">&#39;chat/conv_message.html&#39;</span>
+
+<div class="viewcode-block" id="Conversations.Room.get"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.Room.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processing get request</span>
+<span class="sd">            :param request: request</span>
+<span class="sd">            :param room_id: room&#39;s id</span>
+<span class="sd">            :return: HttpResponse | render</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;messages&#39;</span><span class="p">,</span> <span class="s1">&#39;Чат&#39;</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;room_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">room_id</span><span class="p">))</span>
+            <span class="n">c_room</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Chat</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+
+            <span class="n">MessageImageFormSet</span> <span class="o">=</span> <span class="n">modelformset_factory</span><span class="p">(</span>
+                <span class="n">MessageImages</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">MessageImageForm</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span>
+            <span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;formset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MessageImageFormSet</span><span class="p">(</span><span class="n">queryset</span><span class="o">=</span><span class="n">MessageImages</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">())</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;musicform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MessageMusicForm</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c_room</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;Access denied&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">participant</span> <span class="ow">in</span> <span class="n">c_room</span><span class="o">.</span><span class="n">participants</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">participant</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+                    <span class="n">context</span><span class="p">[</span><span class="s1">&#39;first_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">participant</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pagination_elemetns</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="n">c_room</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+                <span class="n">context</span><span class="p">,</span>
+                <span class="s1">&#39;messages_list&#39;</span><span class="p">,</span>
+                <span class="mi">20</span>
+            <span class="p">)</span>
+
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;c_room&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_room</span>
+            <span class="n">other_chats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">chats</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-messages__date&#39;</span><span class="p">)))</span>
+            <span class="n">other_chats</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c_room</span><span class="p">)</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;other_chats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">other_chats</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;len_other_chats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_chats</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">c_room</span><span class="o">.</span><span class="n">is_dialog</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name_dialog</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name_conv</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Conversations.get_messages"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.get_messages">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_messages</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">render</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for getting messages list. Returns rendered response.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :return: render</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+            <span class="n">unread_messages</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_read</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">unread_messages</span><span class="p">:</span>
+                <span class="n">message</span><span class="o">.</span><span class="n">is_read</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">message</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;chat/messages_list.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;messages_list&#39;</span><span class="p">:</span> <span class="n">messages</span><span class="p">})</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Conversations.AvatarManaging"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.AvatarManaging">[docs]</a>    <span class="k">class</span> <span class="nc">AvatarManaging</span><span class="p">(</span><span class="n">MetaSocialView</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Managing avatar of chat view</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            AvatarManaging ctor</span>
+<span class="sd">            :param kwargs: kwargs</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;chat/change_avatar.html&#39;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Conversations.AvatarManaging.post"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.AvatarManaging.post">[docs]</a>        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">redirect</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Crop and save avatar of chat.</span>
+<span class="sd">            :param request: request</span>
+<span class="sd">            :param kwargs: room&#39;s id</span>
+<span class="sd">            :return: redirect</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">c_room</span> <span class="o">=</span> <span class="n">Chat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;room_id&#39;</span><span class="p">])</span>
+            <span class="n">avatar_form</span> <span class="o">=</span> <span class="n">UpdateChatAvatarForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">c_room</span><span class="p">)</span>
+            <span class="n">crop_form</span> <span class="o">=</span> <span class="n">CropAvatarForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">crop_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">avatar_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">avatar_form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">))</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">))</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">))</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;base_image&#39;</span><span class="p">):</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;base_image&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">base_image</span><span class="p">)</span>
+                <span class="n">cropped_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">crop</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span> <span class="o">+</span> <span class="n">x</span><span class="p">,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">y</span><span class="p">))</span>
+                <span class="n">resized_image</span> <span class="o">=</span> <span class="n">cropped_image</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+                <span class="n">io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">resized_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="s1">&#39;JPEG&#39;</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="n">c_room</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;image_</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c_room</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">ContentFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()),</span>
+                                      <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                    <span class="n">c_room</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                    <span class="n">resized_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="s1">&#39;PNG&#39;</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="n">c_room</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;image_</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c_room</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">ContentFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()),</span>
+                                      <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">c_room</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/chat/go_to_chat/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c_room</span><span class="o">.</span><span class="n">id</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Conversations.AvatarManaging.get"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.AvatarManaging.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">render</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Processing GET request.</span>
+<span class="sd">            :param request: request</span>
+<span class="sd">            :param room_id: room&#39;s id</span>
+<span class="sd">            :return: render</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_menu_context</span><span class="p">(</span><span class="s1">&#39;messages&#39;</span><span class="p">,</span> <span class="s1">&#39;Смена аватарки&#39;</span><span class="p">)</span>
+            <span class="n">chat_item</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Chat</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+
+            <span class="n">avatar_form</span> <span class="o">=</span> <span class="n">UpdateChatAvatarForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">chat_item</span><span class="p">)</span>
+            <span class="n">crop_form</span> <span class="o">=</span> <span class="n">CropAvatarForm</span><span class="p">()</span>
+
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;avatar_form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avatar_form</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;crop_form&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crop_form</span>
+            <span class="n">context</span><span class="p">[</span><span class="s1">&#39;chat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chat_item</span>
+
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Conversations.send_files"><a class="viewcode-back" href="../../code.html#chat.views.Conversations.send_files">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">send_files</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for sending files to chat.</span>
+<span class="sd">        :raises: Http404</span>
+<span class="sd">        :param request: request</span>
+<span class="sd">        :param room_id: room&#39;s id</span>
+<span class="sd">        :return: HttpResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chat_item</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Chat</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">room_id</span><span class="p">)</span>
+        <span class="n">MessageImageFormset</span> <span class="o">=</span> <span class="n">modelformset_factory</span><span class="p">(</span>
+            <span class="n">MessageImages</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">MessageImageForm</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="n">message_item</span> <span class="o">=</span> <span class="n">chat_item</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+            <span class="p">)</span>
+            <span class="n">formset</span> <span class="o">=</span> <span class="n">MessageImageFormset</span><span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">MessageImages</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">formset</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;music&#39;</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">music_id</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;music&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()]:</span>
+                        <span class="n">music_item</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Music</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">music_id</span><span class="p">)</span>
+                        <span class="n">message_item</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">music_item</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">formset</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">form</span><span class="p">:</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span>
+                        <span class="n">message_item</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">message_item</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">meta-social</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Dev docs</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, pro(gram).
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
