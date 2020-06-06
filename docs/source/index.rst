@@ -10,6 +10,7 @@ Welcome to meta-social's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   code.rst
 
 
 Indices and tables
