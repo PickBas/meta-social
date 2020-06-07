@@ -9,10 +9,11 @@ stages:
   - style
   - deploy
 
+before_script:
+  - pip install -r requirements.txt
+
 test:
   stage: test
-  before_script:
-    - pip install -r ci/tests_requirements.txt
   script:
     - python meta_social/manage.py test
   only:
