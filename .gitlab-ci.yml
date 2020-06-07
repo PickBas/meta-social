@@ -9,11 +9,10 @@ stages:
   - style
   - deploy
 
-before_script:
-  - pip install -r requirements.txt
-
 test:
   stage: test
+  before_script:
+    - pip install -r requirements.txt
   script:
     - cd meta_social
     - python manage.py test
@@ -23,6 +22,7 @@ test:
 pylint:
   stage: style
   before_script:
+    - pip install -r requirements.txt
     - pip install -r ci/pylint_requirements.txt
   script:
     - ci/pylint_runner.sh
@@ -36,6 +36,7 @@ pylint:
 test_coverage:
   stage: style
   before_script:
+    - pip install -r requirements.txt
     - pip install -r ci/coverage_requirements.txt
   script:
     - cd meta_social
