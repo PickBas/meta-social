@@ -22,9 +22,10 @@
                 <a href="/chat/go_to_chat/{{ chat.id }}/" class="names-chats">
                     {% if chat.is_dialog %}
                         {% for participant in chat.participants %}
-                        {% participant != user %}
-                            {{ participant.profile.get_name }}
-                        {% endif %}
+                            {% if participant != user %}
+                                {{ participant.profile.get_name }}
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
                         {{ chat.chat_name }}
                     {% endif %}
