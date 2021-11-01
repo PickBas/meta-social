@@ -3,6 +3,8 @@
 # Edit at https://www.gitignore.io/?templates=venv,linux,django,python,pycharm
 
 meta_social/collectedstatic/
+#venv
+venv*
 
 ### Django ###
 *.log
