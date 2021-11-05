@@ -2,7 +2,7 @@
 
 export START_WITH_DOCKER="True"
 
-cd meta_social || exit
+cd ../meta_social || exit
 echo "======Собираем статику======"
 echo "Загрузка в s3 облако, это займет много времени"
 python manage.py collectstatic --noinput
