@@ -51,7 +51,6 @@ class MusicUpload(MetaSetUp):
     def test_upload(self):
         music_path = join(abspath(dirname(__file__)), 'fixtures/test.mp3')
         media_folder = mkdtemp()
-        print(music_path)
         music_dict = {
             'artist': 'lovecraft',
             'title': 'witchhouse',

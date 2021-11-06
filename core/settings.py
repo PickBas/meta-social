@@ -14,6 +14,8 @@ import os
 import sys
 
 # Simple changing DB and redis
+import django.db.models
+
 START_WITH_DOCKER = os.getenv('START_WITH_DOCKER', False) == 'True'
 
 if START_WITH_DOCKER:
@@ -115,6 +117,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 SITE_ID = 4
 

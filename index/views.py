@@ -102,7 +102,6 @@ class Index(MetaSocialView):
         context['postform'] = PostForm()
         context['formset'] = PostImageFormSet(queryset=PostImages.objects.none())
         context['action_type'] = '/post/create/'
-
         self.pagination_elemetns(
             request,
             request.user.profile.get_newsfeed(),

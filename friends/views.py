@@ -69,7 +69,7 @@ class FriendsViews:
 
             self.pagination_elemetns(
                 request,
-                self.context['c_user'].profile.friends.all(),
+                self.context['c_user'].profile.friends.get_queryset().order_by('id'),
                 self.context,
                 'friendlist'
             )
