@@ -1,0 +1,25 @@
+{% extends 'base_menu.html' %}
+
+{% load static %}
+
+{% block center %}
+    <div class="card">
+        <div class="card-body">
+            {% if user == c_user %}
+                <input type="text" class="form-control w-100" placeholder="Найти сообщества" id="community-search-input">
+                <hr>
+            {% endif %}
+            <ul class="list-group list-group-flush infinite-container" id="community-list">
+                {% include 'community/search.html' %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block right %}
+    {% include 'community/right_menu.html' %}
+{% endblock %}
+
+{% block extra__js %}
+    <script src="{% static 'js/community_search.js' %}"></script>
+{% endblock %}

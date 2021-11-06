@@ -1,0 +1,22 @@
+{% for subscriber in community.users.all %}
+    <div>
+        <img src="{{ subscriber.profile.image.url }}" class="rounded-circle border float-left mt-1" width=40 height=40>
+        <a href="/accounts/profile/{{ subscriber.profile.custom_url }}/" class="float-left ml-2 mt-1">{{ subscriber.profile.get_name }}</a>
+        {% if user in community.admins.all %}
+            {% if subscriber in community.admins.all %}
+                <button type="button" class="btn btn-outline-primary float-right my-0 mx-0 px-2"
+                        onclick="remove_permissions('/community/{{ community.custom_url }}/remove_admin_permission/{{ subscriber.profile.custom_url }}/')">
+                    <i class="fa fa-user-times" aria-hidden="true"></i>
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-outline-primary float-right my-0 mx-0 px-2"
+                        onclick="give_permissions('/community/{{ community.custom_url }}/give_admin_permission/{{ subscriber.profile.custom_url }}/')">
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                </button>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% if not forloop.last %}
+        <br style="clear: both;"><hr class="my-1">
+    {% endif %}
+{% endfor %}
