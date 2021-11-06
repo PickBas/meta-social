@@ -22,10 +22,6 @@ if START_WITH_DOCKER:
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Setup apps folder
-APPS_DIR = os.path.join(BASE_DIR, 'apps/')
-sys.path.insert(0, APPS_DIR)
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -95,13 +91,13 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(APPS_DIR, 'chat/templates'),
-            os.path.join(APPS_DIR, 'community/templates'),
-            os.path.join(APPS_DIR, 'core/templates'),
-            os.path.join(APPS_DIR, 'friends/templates'),
-            os.path.join(APPS_DIR, 'music/templates'),
-            os.path.join(APPS_DIR, 'post/templates'),
-            os.path.join(APPS_DIR, 'user_profile/templates'),
+            os.path.join(BASE_DIR, 'chat/templates'),
+            os.path.join(BASE_DIR, 'community/templates'),
+            os.path.join(BASE_DIR, 'core/templates'),
+            os.path.join(BASE_DIR, 'friends/templates'),
+            os.path.join(BASE_DIR, 'music/templates'),
+            os.path.join(BASE_DIR, 'post/templates'),
+            os.path.join(BASE_DIR, 'user_profile/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
