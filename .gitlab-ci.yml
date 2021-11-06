@@ -14,7 +14,7 @@ test:
   before_script:
     - pip install -r requirements.txt
   script:
-    - cd meta_social
+    - cd core
     - python manage.py test
   only:
     - master
@@ -39,7 +39,7 @@ test_coverage:
     - pip install -r requirements.txt
     - pip install -r ci/coverage_requirements.txt
   script:
-    - cd meta_social
+    - cd core
     - coverage run manage.py test
     - coverage report -m apps/*/*.py
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'

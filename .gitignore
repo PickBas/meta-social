@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/venv,linux,django,python,pycharm
 # Edit at https://www.gitignore.io/?templates=venv,linux,django,python,pycharm
 
-meta_social/collectedstatic/
+core/collectedstatic/
 #venv
 venv*
 

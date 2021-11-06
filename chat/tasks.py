@@ -2,7 +2,7 @@
 Celery tasks
 """
 
-from meta_social.celery import app
+from core.celery import app
 
 from .models import Chat, User
 
