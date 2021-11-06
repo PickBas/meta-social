@@ -12,8 +12,8 @@ from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.utils import timezone
 
-from core.views import MetaSocialView
-from core.forms import CropAvatarForm
+from index.views import MetaSocialView
+from index.forms import CropAvatarForm
 from post.models import PostImages
 from post.forms import PostImageForm, PostForm
 

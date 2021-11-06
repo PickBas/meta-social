@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.http import Http404
 
-from core.views import MetaSocialView
+from index.views import MetaSocialView
 from user_profile.models import Profile
 
 from .models import FriendshipRequest

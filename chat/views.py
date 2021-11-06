@@ -10,8 +10,8 @@ from django.utils.safestring import mark_safe
 from django.core.files.base import ContentFile
 from django.forms import modelformset_factory
 
-from core.forms import CropAvatarForm
-from core.views import MetaSocialView
+from index.forms import CropAvatarForm
+from index.views import MetaSocialView
 
 from .tasks import make_admin_task, rm_admin_task, add_to_chat_task, rm_from_chat_task
 from .forms import UpdateChatAvatarForm, MessageImageForm, MessageMusicForm

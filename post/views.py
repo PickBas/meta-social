@@ -5,7 +5,7 @@ from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.http import Http404, HttpResponseRedirect
 from django.forms import modelformset_factory
 
-from core.views import MetaSocialView
+from index.views import MetaSocialView
 from music.models import Music
 
 from .models import Post, PostImages, Comment

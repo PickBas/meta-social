@@ -57,7 +57,7 @@ INSTALLED_APPS = [
 
     'chat',
     'community',
-    'core',
+    'index',
     'friends',
     'music',
     'post',
@@ -93,7 +93,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'chat/templates'),
             os.path.join(BASE_DIR, 'community/templates'),
-            os.path.join(BASE_DIR, 'core/templates'),
+            os.path.join(BASE_DIR, 'index/templates'),
             os.path.join(BASE_DIR, 'friends/templates'),
             os.path.join(BASE_DIR, 'music/templates'),
             os.path.join(BASE_DIR, 'post/templates'),
@@ -235,7 +235,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 
 # Fixtures
 FIXTURE_DIRS = [
-    'core/fixtures',
+    'index/fixtures',
     'user_profile/fixtures',
 ]
 

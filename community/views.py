@@ -12,8 +12,8 @@ from django.forms import modelformset_factory
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 
-from core.views import MetaSocialView
-from core.forms import CropAvatarForm
+from index.views import MetaSocialView
+from index.forms import CropAvatarForm
 from post.forms import PostImageForm, PostForm
 from post.models import PostImages
 from user_profile.models import Profile
