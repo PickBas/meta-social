@@ -72,7 +72,6 @@ class ProfileEditTest(MetaSetUp):
         self.assertEqual(resp.status_code, 404)
 
         resp = self.client.post(url)
-        print(self.user.profile.last_act)
         # такое ощущение что это не
         # данные, а ссылка
         # TODO: Здесь нужен нормальный тест
