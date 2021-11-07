@@ -258,7 +258,7 @@ class Conversations:
 
             self.pagination_elemetns(
                 request,
-                c_room.messages.all(),
+                c_room.messages.get_queryset().order_by('id'),
                 context,
                 'messages_list',
                 20
