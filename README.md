@@ -7,15 +7,15 @@
 
 1. Clone the repo, create venv, install all the libraries
 
-        git clone https://gitlab.informatics.ru/2019-2020/online/s101/meta-social.git
+        git clone https://github.com/PickBas/meta-social.git
         cd meta-social
-        python3 -m venv venv
-        source venv/bin/activate
+        python -m venv venv
+        . ./venv/bin/activate
+	pip install -U pip
         pip install -r requirements.txt
 
 2. Get your migrations ready, import allath.json
 
-        cd meta_social
         python manage.py makemigrations
         python manage.py migrate
         python manage.py loaddata allauth.json
