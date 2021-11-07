@@ -6,7 +6,7 @@ services:
     ports:
       - '80:80'
       - '443:443'
-    command: ./docker-entrypoint.sh
+    command: ./bin/docker-entrypoint.sh
     depends_on:
       - db
       - redis
@@ -49,8 +49,8 @@ services:
 
   celery:
     build: .
-    working_dir: /code/meta_social
-    command: "celery -A meta_social worker -l info"
+    working_dir: /code/core
+    command: "celery -A core worker -l info"
     volumes:
       - './:/code'
     links:

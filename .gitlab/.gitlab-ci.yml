@@ -1,0 +1,55 @@
+image: python:latest
+
+cache:
+  paths:
+  - /root/.cache/pip/
+
+stages:
+  - test
+  - style
+  - deploy
+
+test:
+  stage: test
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - cd core
+    - python manage.py test
+  only:
+    - master
+
+pylint:
+  stage: style
+  before_script:
+    - pip install -r requirements.txt
+    - pip install -r ci/pylint_requirements.txt
+  script:
+    - ci/pylint_runner.sh
+  only:
+    - master
+  artifacts:
+    paths:
+      - public/pylint.svg
+      - public/pylint.html
+
+test_coverage:
+  stage: style
+  before_script:
+    - pip install -r requirements.txt
+    - pip install -r ci/coverage_requirements.txt
+  script:
+    - cd core
+    - coverage run manage.py test
+    - coverage report -m apps/*/*.py
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+
+pages:
+  stage: deploy
+  script:
+    - echo 'Publish pages data'
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

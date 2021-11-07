@@ -1,4 +1,5 @@
 # Meta Social
+[![Tests CI](https://github.com/PickBas/meta-social/actions/workflows/tests.yml/badge.svg)](https://github.com/PickBas/meta-social/actions/workflows/tests.yml)
 
 > Team lead : Kropotuhin Alex 
 
