@@ -1,6 +1,11 @@
+import os
+
+from PIL import Image
+
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
+from core.settings import BASE_DIR
 from user_profile.forms import UserUpdateForm, ProfileUpdateForm
 
 
@@ -21,6 +26,10 @@ class ProfileViewTest(MetaSetUp):
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
+
+    def test_nonexistent_page(self):
+        response = self.client.get('/accounts/profile/non_existent/')
+        self.assertEqual(response.status_code, 404)
 
 
 class ProfileEditTest(MetaSetUp):
@@ -81,11 +90,31 @@ class ProfileEditTest(MetaSetUp):
 class AvatarManagingTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/change_avatar/')
+        self.response = self.client.get(reverse('profile-change-avatar'))
 
     def test_get_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'profile/change_avatar.html')
+    
+    def test_avatar_update(self):
+        x_position = 0
+        y_position = 0
+        width = 1915
+        height = 1915
+        photo = Image.open(os.path.join(BASE_DIR, 'static/img/unknown_profile.jpg'))
+        to_send_image = {
+            'base_image': photo,
+        }
+        to_send_cropper = {
+            'x': x_position,
+            'y': y_position,
+            'width': width,
+            'height': height,
+        }
+        response = self.client.post(reverse('profile-change-avatar'), {
+            **to_send_image,
+            **to_send_cropper,
 
-    def test_forms(self):
-        self.assertTrue(True)
+        })
+        self.assertEqual(response.status_code, 302)
+

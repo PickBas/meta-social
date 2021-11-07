@@ -64,8 +64,8 @@ class Profile(models.Model):
                                       'invalid': 'Invalid url'
                                   }, )
 
-    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
-    image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/unknown_profile.jpg')
+    image = models.ImageField(upload_to='avatars/users', default='avatars/users/unknown_profile.jpg') 
 
     job = models.CharField(null=True, max_length=100)
     study = models.CharField(null=True, max_length=100)

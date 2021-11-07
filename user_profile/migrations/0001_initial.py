@@ -23,8 +23,8 @@ class Migration(migrations.Migration):
             name='Profile',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('base_image', models.ImageField(default='avatars/users/0.png', upload_to='avatars/users')),
-                ('image', models.ImageField(default='avatars/users/0.png', upload_to='avatars/users')),
+                ('base_image', models.ImageField(default='avatars/users/unknown_profile.jpg', upload_to='avatars/users')),
+                ('image', models.ImageField(default='avatars/users/unknown_profile.jpg', upload_to='avatars/users')),
                 ('job', models.CharField(max_length=100, null=True)),
                 ('study', models.CharField(max_length=100, null=True)),
                 ('biography', models.CharField(max_length=500, null=True)),

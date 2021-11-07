@@ -44,7 +44,7 @@ class ProfileViews:
             :param request: request
             :return: context
             """
-            if not User.objects.filter(profile=Profile.objects.get(custom_url=kwargs['user_url'])).exists():
+            if not Profile.objects.filter(custom_url=kwargs['user_url']).exists():
                 raise Http404()
 
             context = self.get_menu_context('profile', 'Профиль')
