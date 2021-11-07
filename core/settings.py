@@ -77,6 +77,16 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.yandex',
 ]
 
+SOCIALACCOUNT_PROVIDERS = {
+    "vk": {
+        "APP": {
+            "client_id": "7995287",
+            "secret": os.getenv('VK_SECRET_KEY_ALLAUTH'),
+            "key": ""
+        }
+    },
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

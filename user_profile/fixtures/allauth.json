@@ -25,22 +25,6 @@
 },
 {
   "model": "socialaccount.socialapp",
-  "pk": 1,
-  "fields": {
-    "provider": "vk",
-    "name": "VK",
-    "client_id": "7317110",
-    "secret": "ST3oRjWFifOgxxFUl5sH",
-    "key": "",
-    "sites": [
-      3,
-      2,
-      4
-    ]
-  }
-},
-{
-  "model": "socialaccount.socialapp",
   "pk": 2,
   "fields": {
     "provider": "facebook",
