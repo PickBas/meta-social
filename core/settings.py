@@ -202,12 +202,24 @@ STATICFILES_DIRS = (
 )
 
 if START_WITH_DOCKER:
+    # Static
     AWS_REGION_STATIC = "nl-ams"
     AWS_ACCESS_KEY_ID_STATIC = "SCW4Y1H2449R5QJ05B52"
     AWS_SECRET_ACCESS_KEY_STATIC = "88aed883-f609-4331-b728-69b866fca6a2"
     AWS_S3_ENDPOINT_URL_STATIC = "https://s3.nl-ams.scw.cloud"
     AWS_S3_BUCKET_NAME_STATIC = "social-static"
     STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
+
+    # Media
+    AWS_REGION = "nl-ams"
+    AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
+    AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
+    AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
+    AWS_S3_BUCKET_NAME = "social-bucket"
+    
+    DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
+
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -220,14 +232,6 @@ LOGOUT_URL = '/accounts/logout/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # S3 files storage
-AWS_REGION = "nl-ams"
-AWS_ACCESS_KEY_ID = "SCW4Y1H2449R5QJ05B52"
-AWS_SECRET_ACCESS_KEY = "88aed883-f609-4331-b728-69b866fca6a2"
-AWS_S3_ENDPOINT_URL = "https://s3.nl-ams.scw.cloud"
-AWS_S3_BUCKET_NAME = "social-bucket"
-
-DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
-
 # Crispy forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
