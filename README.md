@@ -11,16 +11,16 @@
         cd meta-social
         python -m venv venv
         . ./venv/bin/activate
-	pip install -U pip
+        pip install -U pip
         pip install -r requirements.txt
 
-2. Get your migrations ready, import allath.json
+3. Get your migrations ready, import allath.json
 
         python manage.py makemigrations
         python manage.py migrate
         python manage.py loaddata allauth.json
 
-3. Running the project
+4. Running the project
 
     #### Using Docker:
 
