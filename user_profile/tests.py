@@ -1,10 +1,10 @@
 import os
 
 from PIL import Image
-
-from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.test import TestCase, Client
 from django.urls import reverse
+
 from core.settings import BASE_DIR
 from user_profile.forms import UserUpdateForm, ProfileUpdateForm
 
@@ -95,7 +95,7 @@ class AvatarManagingTest(MetaSetUp):
     def test_get_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'profile/change_avatar.html')
-    
+
     def test_avatar_update(self):
         x_position = 0
         y_position = 0
@@ -118,6 +118,7 @@ class AvatarManagingTest(MetaSetUp):
         })
         self.assertEqual(response.status_code, 302)
 
+
 class FriendRequestTest(MetaSetUp):
 
     def setUp(self):
@@ -125,6 +126,6 @@ class FriendRequestTest(MetaSetUp):
 
     def test_send_friend_request(self):
         response = self.client.post(
-                reverse('friend-request-send', kwargs={'user_id': 2})
-                )
+            reverse('friend-request-send', kwargs={'user_id': 2})
+        )
         self.assertEqual(response.status_code, 302)
