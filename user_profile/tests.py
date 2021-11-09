@@ -129,3 +129,15 @@ class FriendRequestTest(MetaSetUp):
             reverse('friend-request-send', kwargs={'user_id': 2})
         )
         self.assertEqual(response.status_code, 302)
+
+
+class FilePageTest(MetaSetUp):
+
+    def setUp(self):
+        super().setUp()
+
+    def test_get_request(self):
+        response = self.client.get(
+            reverse('profile-files-page', kwargs={'user_url': 'test_user'})
+        )
+        self.assertEqual(response.status_code, 200)
