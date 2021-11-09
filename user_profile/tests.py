@@ -21,21 +21,24 @@ class MetaSetUp(TestCase):
 class ProfileViewTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/accounts/profile/{}/'.format(
-            self.user.username))
+        self.response = self.client.get(
+            reverse('profile-page', kwargs={'user_url': self.user.username})
+        )
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
 
     def test_nonexistent_page(self):
-        response = self.client.get('/accounts/profile/non_existent/')
+        response = self.client.get(
+            reverse('profile-page', kwargs={'user_url': 'non_existent'})
+        )
         self.assertEqual(response.status_code, 404)
 
 
 class ProfileEditTest(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.url = '/accounts/profile/{}/edit/'.format(self.user.username)
+        self.url = reverse('profile-page-edit', kwargs={'user_url': self.user.username})
         self.response = self.client.get(self.url)
 
     def test_get_page(self):
@@ -48,9 +51,9 @@ class ProfileEditTest(MetaSetUp):
         upus = UserUpdateForm(f_user_update_data, instance=self.user)
         self.assertTrue(upus.is_valid())
         f_profile_data = {
-            'job': 'Есть',
-            'study': 'Всю жизнь',
-            'biography': 'Трудно найти, легко потерять, тяжело прокормить',
+            'job': 'Have',
+            'study': 'MIT',
+            'biography': 'Something',
             'gender': 'M',
             'custom_url': self.user.profile.custom_url,
         }
@@ -114,7 +117,6 @@ class AvatarManagingTest(MetaSetUp):
 
 
 class FriendRequestTest(MetaSetUp):
-
     def setUp(self):
         super().setUp()
 
@@ -126,7 +128,6 @@ class FriendRequestTest(MetaSetUp):
 
 
 class FilePageTest(MetaSetUp):
-
     def setUp(self):
         super().setUp()
 
