@@ -54,16 +54,16 @@ class ProfileEditTest(MetaSetUp):
             'gender': 'M',
             'custom_url': self.user.profile.custom_url,
         }
-        prfl = ProfileUpdateForm(f_profile_data, instance=self.user.profile)
-        self.assertTrue(prfl.is_valid())
+        profile = ProfileUpdateForm(f_profile_data, instance=self.user.profile)
+        self.assertTrue(profile.is_valid())
 
     def test_edit_profile(self):
         f_user_update_data = {'first_name': 'test', 'last_name': 'usertest'}
         f_profile_data = {
-            'job': 'Есть',
-            'study': 'Всю жизнь',
-            'biography': 'Трудно найти, легко потерять, тяжело прокормить',
-            'gender': 'M',  # LGBTQ+ ???
+            'job': 'Have',
+            'study': 'MIT',
+            'biography': 'Something',
+            'gender': 'M',
             'custom_url': self.user.profile.custom_url,
         }
         resp = self.client.post(self.url, {
@@ -77,13 +77,7 @@ class ProfileEditTest(MetaSetUp):
 
     def test_online(self):
         url = '/ajax/set_online/'
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 404)
-
         resp = self.client.post(url)
-        # такое ощущение что это не
-        # данные, а ссылка
-        # TODO: Здесь нужен нормальный тест
         self.assertContains(resp, 'Success', status_code=200)
 
 
