@@ -118,3 +118,13 @@ class AvatarManagingTest(MetaSetUp):
         })
         self.assertEqual(response.status_code, 302)
 
+class FriendRequestTest(MetaSetUp):
+
+    def setUp(self):
+        super().setUp()
+
+    def test_send_friend_request(self):
+        response = self.client.post(
+                reverse('friend-request-send', kwargs={'user_id': 2})
+                )
+        self.assertEqual(response.status_code, 302)
