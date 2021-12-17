@@ -2,11 +2,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
 
-# class AdminTest(TestCase):
-#     pass
-# class LogoutViewTest(MetaSetUp):
-#     pass
-
 
 class MetaSetUp(TestCase):
     fixtures = ["test_friends_music_db.json"]
@@ -33,26 +28,32 @@ class IndexViewTest(MetaSetUp):
         last_url, status = response.redirect_chain[-1]
         self.assertIn(reverse("account_login"), last_url)
 
+    def test_update_nav(self):
+        response = self.client.post(reverse('nav-update'))
+        self.assertEqual(200, response.status_code)
+
 
 class GlobalSearchTest(MetaSetUp):
     def setUp(self):
         super().setUp()
 
     def test_search(self):
-        resp = self.client.post('/ajax/search/', {
+        resp = self.client.post(reverse('global-search'), {
             'query': 'test',
         })
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(resp.context['users']), 2)
         self.assertEqual(len(resp.context['communities']), 0)
         self.assertTemplateUsed(resp, 'search_list.html')
-        resp = self.client.post('/ajax/search/', {
+        resp = self.client.post(reverse('global-search'), {
             'query': 'Dreams',
         })
         self.assertEqual(len(resp.context['music']), 3)
 
     def test_page(self):
-        self.response = self.client.get('/accounts/profile/test_user/')
+        self.response = self.client.get(
+            reverse('profile-page', kwargs={'custom_url': 'test_user'})
+        )
         self.assertEqual(self.response.status_code, 200)
 
     def test_get_reqeust(self):
@@ -60,25 +61,10 @@ class GlobalSearchTest(MetaSetUp):
         self.assertEqual(404, self.response.status_code)
 
 
-# class FriendsSearchView(MetaSetUp):
-#     def setUp(self):
-#         super().setUp()
-#         self.response = self.client.get('/friends/search/')
-#
-#     def test_friend_post(self):
-#         print(self.response.context)
-#         response = self.client.post('/friends/search/', {'username': 'test_user'})
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(self.response.status_code, 200)
-#         self.assertTrue(
-#             User.objects.get(
-#                 username="test_user2") in response.context['matches'])
-
-
 class FriendsListView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/friends/')
+        self.response = self.client.get(reverse('friends-list'))
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -87,40 +73,18 @@ class FriendsListView(MetaSetUp):
 class ChatView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/chats/')
+        self.response = self.client.get(reverse('chat-list'))
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
-
-
-# class CommunityView(MetaSetUp):
-#     def setUp(self):
-#         super().setUp()
-#         self.response = self.client.get('/community/asd/')
-
-#     def test_page(self):
-#         self.assertEqual(self.response.status_code, 200)
-
-# class CommunityListView(MetaSetUp):
-#     def setUp(self):
-#         super().setUp()
-#         self.response = self.client.get('/community/user/list/')
-
-#     def test_page(self):
-#         self.assertEqual(self.response.status_code, 200)
 
 
 class PostView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/post/1/')
+        self.response = self.client.get(
+            reverse('post-page', kwargs={'post_id': 1})
+        )
 
     def test_page(self):
         self.assertEqual(self.response.status_code, 200)
-
-
-# Админка не обладает данными об аккаунтах в
-# сетях хотя там есть модели даже что-то предлагается ввести,
-# отсутствуют подсказки.
-# test_user : test_pass
-# test_user2 : test_password2
