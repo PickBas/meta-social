@@ -5,6 +5,7 @@ from os import walk
 from os.path import abspath, join, dirname
 from shutil import rmtree
 from tempfile import mkdtemp
+from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from django_s3_storage.storage import StaticS3Storage
 from django.test.utils import override_settings
@@ -27,12 +28,12 @@ class MetaSetUp(TestCase):
 class MusicView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/accounts/profile/{}/music/'.format(
-            self.user.username))
+        self.response = self.client.get(reverse('profile-music-page', kwargs={'custom_url': self.user.username}))
 
     def test_open_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'music/music_list.html')
+
 
     # TODO: Изменение порядка
 
@@ -114,3 +115,4 @@ class AddExistedMusic(TestCase):
 
         self.assertContains(resp, 'Success', status_code=200)
         self.assertIn(m, self.u2.profile.playlist.all())
+        
