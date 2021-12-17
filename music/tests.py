@@ -1,17 +1,9 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
-from os import walk
 from os.path import abspath, join, dirname
-from shutil import rmtree
-from tempfile import mkdtemp
 from django.urls import reverse
-from django.core.files.storage import FileSystemStorage
-from django_s3_storage.storage import StaticS3Storage
-from django.test.utils import override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-# import mock
-from music.models import Music
 from music.forms import UploadMusicForm
 
 
@@ -36,8 +28,6 @@ class MusicView(MetaSetUp):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'music/music_list.html')
 
-    # TODO: Изменение порядка
-
 
 class MusicUpload(MetaSetUp):
     def setUp(self):
@@ -48,42 +38,25 @@ class MusicUpload(MetaSetUp):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'music/music_upload.html')
 
-    # @mock.patch('django_s3_storage.storage.StaticS3Storage', FileSystemStorage)
-    # @mock.patch.object(StaticS3Storage, '_save', FileSystemStorage()._save)
     def test_upload(self):
-        pass
-        # music_path = join(abspath(dirname(__file__)), 'fixtures/test.mp3')
-        # media_folder = mkdtemp()
-        # music_dict = {
-        #     'artist': 'lovecraft',
-        #     'title': 'witchhouse',
-        # }
-        # upload_file = open(music_path, 'rb')
-        # audio_dict = {
-        #     'audio_file': SimpleUploadedFile(upload_file.name,
-        #                                      upload_file.read())
-        # }
-
-        # form = UploadMusicForm(music_dict, audio_dict)
-        # self.assertTrue(form.is_valid())
-
-        # with override_settings(
-        #         MEDIA_ROOT=media_folder,
-        #         STATIC_ROOT=media_folder,
-        # ):
-        #     resp = self.client.post('/music/upload/', {
-        #         **music_dict,
-        #         **audio_dict
-        #     })
-
-        #     for (dirpath, dirnames, filenames) in walk(media_folder):
-        #         print("{} {} {}".format(dirpath, dirnames, filenames))
-        #     self.assertTrue(Music.objects.all())
-
-        #     self.assertEqual(resp.status_code, 302)
-        #     rmtree(media_folder)  # post test
-
-        # TODO: mock нечего работает
+        music_path = join(abspath(dirname(__file__)), 'fixtures/test.mp3')
+        music_dict = {
+            'artist': 'lovecraft',
+            'title': 'witchhouse',
+        }
+        upload_file = open(music_path, 'rb')
+        audio_dict = {
+            'audio_file': SimpleUploadedFile(upload_file.name,
+                                             upload_file.read())
+        }
+        form = UploadMusicForm(music_dict, audio_dict)
+        self.assertTrue(form.is_valid())
+        response = self.client.post(reverse('music-upload'), {
+            **music_dict,
+            **audio_dict
+        })
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(self.user.profile.get_music_list())
 
 
 class AddExistedMusic(TestCase):
@@ -100,20 +73,59 @@ class AddExistedMusic(TestCase):
     def test_existed_inplist_music(self):
         m = self.user.profile.playlist.all()[0]
         self.assertTrue(m)
-        resp = self.client.post(
-            reverse('profile-music-add', kwargs={'music-id': 404})
+        response = self.client.post(
+            reverse('profile-music-add', kwargs={'music_id': 404})
         )
-        self.assertEqual(resp.status_code, 404)
-        resp = self.client.post(
-            reverse('profile-music-add', kwargs={'music-id': m.id})
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post(
+            reverse('profile-music-add', kwargs={'music_id': m.id})
         )
-        self.assertContains(resp, 'Success', status_code=200)
+        self.assertContains(response, 'Success', status_code=200)
 
-    def test_add_friend_music(self):
+    def test_add_friends_music(self):
         m = self.user.profile.playlist.all()[0]
         self.assertNotIn(m, self.u2.profile.playlist.all())
-        resp = self.c2.post(
-            reverse('profile-music-add', kwargs={'music-id': m.id})
+        response = self.c2.post(
+            reverse('profile-music-add', kwargs={'music_id': m.id})
         )
-        self.assertContains(resp, 'Success', status_code=200)
+        self.assertContains(response, 'Success', status_code=200)
         self.assertIn(m, self.u2.profile.playlist.all())
+
+
+class MusicSearchTest(MusicUpload):
+
+    def setUp(self):
+        super(MusicSearchTest, self).setUp()
+
+    def test_search(self):
+        self.test_upload()
+        response = self.client.post(
+            reverse('profile-music-page', kwargs={'custom_url': self.user.profile.custom_url}),
+            {'query': 'lovecraft'}
+        )
+        self.assertEqual(200, response.status_code)
+
+    def test_add_music_from_search(self):
+        self.test_upload()
+        response = self.client.post(
+            reverse('profile-music-add-from-search', kwargs={'music_id': 1})
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(self.user.profile.playlist.all())
+
+
+class MusicRemoval(MusicUpload):
+
+    def setUp(self):
+        super().setUp()
+
+    def test_music_removal_from_users_playlist(self):
+        self.test_upload()
+        self.client.post(
+            reverse('profile-music-add-from-search', kwargs={'music_id': 1})
+        )
+        self.assertTrue(self.user.profile.playlist.all())
+        response = self.client.post(
+            reverse('music-remove', kwargs={'music_id': 1})
+        )
+        self.assertEqual(302, response.status_code)
