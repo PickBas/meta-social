@@ -15,7 +15,6 @@ from music.models import Music
 from music.forms import UploadMusicForm
 
 
-
 class MetaSetUp(TestCase):
     fixtures = ["test_db.json"]
 
@@ -28,12 +27,14 @@ class MetaSetUp(TestCase):
 class MusicView(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get(reverse('profile-music-page', kwargs={'custom_url': self.user.username}))
+        self.response = self.client.get(
+            reverse('profile-music-page',
+                    kwargs={'custom_url': self.user.username})
+        )
 
     def test_open_page(self):
         self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'music/music_list.html')
-
 
     # TODO: Изменение порядка
 
@@ -41,7 +42,7 @@ class MusicView(MetaSetUp):
 class MusicUpload(MetaSetUp):
     def setUp(self):
         super().setUp()
-        self.response = self.client.get('/music/upload/')
+        self.response = self.client.get(reverse('music-upload'))
 
     def test_open_page(self):
         self.assertEqual(self.response.status_code, 200)
@@ -82,7 +83,7 @@ class MusicUpload(MetaSetUp):
         #     self.assertEqual(resp.status_code, 302)
         #     rmtree(media_folder)  # post test
 
-            # TODO: mock нечего работает
+        # TODO: mock нечего работает
 
 
 class AddExistedMusic(TestCase):
@@ -92,7 +93,6 @@ class AddExistedMusic(TestCase):
         self.client = Client()
         self.user = User.objects.get(username="test_user")
         self.client.force_login(user=self.user)
-
         self.c2 = Client()
         self.u2 = User.objects.get(username="test_user2")
         self.c2.force_login(user=self.u2)
@@ -100,19 +100,20 @@ class AddExistedMusic(TestCase):
     def test_existed_inplist_music(self):
         m = self.user.profile.playlist.all()[0]
         self.assertTrue(m)
-        resp = self.client.post('/music/{}/add/'.format(404))
+        resp = self.client.post(
+            reverse('profile-music-add', kwargs={'music-id': 404})
+        )
         self.assertEqual(resp.status_code, 404)
-
-        resp = self.client.post('/music/{}/add/'.format(m.id))
-
+        resp = self.client.post(
+            reverse('profile-music-add', kwargs={'music-id': m.id})
+        )
         self.assertContains(resp, 'Success', status_code=200)
 
     def test_add_friend_music(self):
         m = self.user.profile.playlist.all()[0]
-
         self.assertNotIn(m, self.u2.profile.playlist.all())
-        resp = self.c2.post('/music/{}/add/'.format(m.id))
-
+        resp = self.c2.post(
+            reverse('profile-music-add', kwargs={'music-id': m.id})
+        )
         self.assertContains(resp, 'Success', status_code=200)
         self.assertIn(m, self.u2.profile.playlist.all())
-        

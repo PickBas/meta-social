@@ -55,7 +55,9 @@ class GlobalSearchTest(MetaSetUp):
         self.response = self.client.get('/accounts/profile/test_user/')
         self.assertEqual(self.response.status_code, 200)
 
-    # здесь тест содержимого
+    def test_get_reqeust(self):
+        self.response = self.client.get(reverse('global-search'))
+        self.assertEqual(404, self.response.status_code)
 
 
 # class FriendsSearchView(MetaSetUp):
