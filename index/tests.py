@@ -52,7 +52,7 @@ class GlobalSearchTest(MetaSetUp):
 
     def test_page(self):
         self.response = self.client.get(
-            reverse('profile-page', kwargs={'custom_url': 'test_user'})
+            reverse('profile-page', kwargs={'user_url': 'test_user'})
         )
         self.assertEqual(self.response.status_code, 200)
 
