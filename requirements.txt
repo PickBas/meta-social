@@ -20,7 +20,7 @@ constantly==15.1.0
 cryptography==35.0.0
 daphne==3.0.2
 defusedxml==0.7.1
-Django==3.2.8
+Django==3.2.11
 django-allauth==0.45.0
 django-channels==0.7.0
 django-countries==7.2.1
