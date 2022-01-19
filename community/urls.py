@@ -11,7 +11,7 @@ urlpatterns = [
     path(
         'community/<str:community_url>/',
         login_required(Communities.CommunityView.as_view()),
-        name='commutiny-page'),
+        name='community-page'),
     path(
         'community/user/list/',
         login_required(Communities.CommunityList.as_view()),

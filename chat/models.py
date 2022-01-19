@@ -80,8 +80,8 @@ class Chat(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_owner', null=True)
     administrators = models.ManyToManyField(User, related_name='chat_administrators')
 
-    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
-    image = models.ImageField(upload_to='avatars/users', default='avatars/users/0.png')
+    base_image = models.ImageField(upload_to='avatars/users', default='avatars/users/unknown_profile.jpg')
+    image = models.ImageField(upload_to='avatars/users', default='avatars/users/unknown_profile.jpg')
 
     def get_unread_messages(self):
         """

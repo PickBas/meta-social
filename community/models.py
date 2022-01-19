@@ -39,8 +39,8 @@ class Community(models.Model):
                                   }, )
 
     posts = models.ManyToManyField(Post, 'posts_com')
-    base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
-    image = models.ImageField(upload_to='avatars/communities', default='avatars/users/0.png')
+    base_image = models.ImageField(upload_to='avatars/communities', default='avatars/users/unknown_profile.jpg')
+    image = models.ImageField(upload_to='avatars/communities', default='avatars/users/unknown_profile.jpg')
 
     def get_posts(self):
         """

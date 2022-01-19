@@ -1255,8 +1255,8 @@
   "fields": {
     "user": 1,
     "custom_url": "test_user",
-    "base_image": "avatars/users/0.png",
-    "image": "avatars/users/0.png",
+    "base_image": "avatars/users/unknown_profile.jpg",
+    "image": "avatars/users/unknown_profile.jpg",
     "job": null,
     "study": null,
     "biography": null,
@@ -1284,8 +1284,8 @@
   "fields": {
     "user": 2,
     "custom_url": "test_user2",
-    "base_image": "avatars/users/0.png",
-    "image": "avatars/users/0.png",
+    "base_image": "avatars/users/unknown_profile.jpg",
+    "image": "avatars/users/unknown_profile.jpg",
     "job": null,
     "study": null,
     "biography": null,
@@ -1310,8 +1310,8 @@
   "fields": {
     "user": 3,
     "custom_url": "test_user3",
-    "base_image": "avatars/users/0.png",
-    "image": "avatars/users/0.png",
+    "base_image": "avatars/users/unknown_profile.jpg",
+    "image": "avatars/users/unknown_profile.jpg",
     "job": null,
     "study": null,
     "biography": null,
