@@ -256,7 +256,7 @@ class Conversations:
                 if participant != request.user:
                     context['first_user'] = participant
 
-            self.pagination_elemetns(
+            self.pagination_elements(
                 request,
                 c_room.messages.get_queryset().order_by('id'),
                 context,

@@ -7,9 +7,10 @@ from PIL import Image
 
 from django.core.files.base import ContentFile
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpRequest
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
+from django.urls import reverse
 from django.utils import timezone
 
 from index.views import MetaSocialView
@@ -20,73 +21,57 @@ from post.forms import PostImageForm, PostForm
 from .models import Profile
 from .forms import UserUpdateForm, ProfileUpdateForm, UpdateAvatarForm
 from friends.models import FriendshipRequest
-from friends.views import FriendsViews
 
 
 class ProfileViews:
-    """
-    ProfileViews
-    """
 
     class ProfilePage(MetaSocialView):
-        """
-        Profile page view
-        """
 
         def __init__(self, **kwargs):
             self.template_name = 'profile/profile_page.html'
+            self.context = {}
             super().__init__(**kwargs)
 
-        def get(self, request, **kwargs) -> render:
-            """
-            User profile view.
-
-            :param request: request
-            :return: context
-            """
+        def get(self, request, **kwargs: dict) -> render:
             if not Profile.objects.filter(custom_url=kwargs['user_url']).exists():
                 raise Http404()
-
-            context = self.get_menu_context('profile', 'Профиль')
-            context['profile'] = Profile.objects.get(custom_url=kwargs['user_url'])
+            self.context = self.get_menu_context('profile', 'Профиль')
+            self.context['profile'] = Profile.objects.get(custom_url=kwargs['user_url'])
             user_item = User.objects.get(profile=Profile.objects.get(custom_url=kwargs['user_url']))
-            context['c_user'] = user_item
-
+            self.context['c_user'] = user_item
             post_image_form_set = modelformset_factory(
                 PostImages, form=PostImageForm, extra=10, max_num=10
             )
-
             pass_add_to_friends = False
-
-            is_in_blacklist = False
-
+            is_blacklisted = False
             if user_item != request.user:
-                if request.user not in user_item.profile.friends.all():
-                    pass_add_to_friends = True
-                if request.user in user_item.profile.blacklist.all():
-                    is_in_blacklist = True
-
-            context['is_in_blacklist'] = is_in_blacklist
-            context['is_friend'] = True if request.user in user_item.profile.friends.all() \
+                pass_add_to_friends = self.is_in_friend_list(pass_add_to_friends, request, user_item)
+                is_blacklisted = self.is_in_blacklist(is_blacklisted, request, user_item)
+            self.context['is_in_blacklist'] = is_blacklisted
+            self.context['is_friend'] = True if request.user in user_item.profile.friends.all() \
                                            and request.user != user_item else False
-            context['pass_add_to_friends'] = pass_add_to_friends
-
-            context['postform'] = PostForm()
-            context['formset'] = post_image_form_set(queryset=PostImages.objects.none())
-
-            user_item.username
-
-            if not is_in_blacklist:
-                self.pagination_elemetns(
+            self.context['pass_add_to_friends'] = pass_add_to_friends
+            self.context['postform'] = PostForm()
+            self.context['formset'] = post_image_form_set(queryset=PostImages.objects.none())
+            if not is_blacklisted:
+                self.pagination_elements(
                     request,
                     list(reversed(user_item.profile.posts.all())),
-                    context,
+                    self.context,
                     'c_user_posts'
                 )
+            self.context['action_type'] = reverse('profile-post-create')
+            return render(request, self.template_name, self.context)
 
-            context['action_type'] = '/post/create/'
+        def is_in_blacklist(self, is_blacklisted, request, user_item):
+            if request.user in user_item.profile.blacklist.all():
+                is_blacklisted = True
+            return is_blacklisted
 
-            return render(request, self.template_name, context)
+        def is_in_friend_list(self, pass_add_to_friends, request, user_item):
+            if request.user not in user_item.profile.friends.all():
+                pass_add_to_friends = True
+            return pass_add_to_friends
 
     class EditProfile(MetaSocialView):
         """

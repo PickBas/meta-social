@@ -67,7 +67,7 @@ class FriendsViews:
                 self.context['c_user'] = User.objects.get(profile=Profile.objects.get(custom_url=requested))
             self.context['friends_pages'] = 'my_list'
 
-            self.pagination_elemetns(
+            self.pagination_elements(
                 request,
                 self.context['c_user'].profile.friends.get_queryset().order_by('id'),
                 self.context,

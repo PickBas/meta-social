@@ -278,7 +278,7 @@ class Communities:
             self.context['c_user'] = c_user
             self.context['community_pages'] = 'subs'
 
-            self.pagination_elemetns(
+            self.pagination_elements(
                 request,
                 list(c_user.profile.communities.all()),
                 self.context,
