@@ -302,3 +302,6 @@ vk_config.v2.json
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+
+# Music files
+media/music/*.mp3
