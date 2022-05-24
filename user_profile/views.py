@@ -7,7 +7,7 @@ from PIL import Image
 
 from django.core.files.base import ContentFile
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-from django.http import Http404, HttpResponseRedirect, HttpRequest
+from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.urls import reverse
